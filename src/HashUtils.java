@@ -1,9 +1,8 @@
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
+import java.security.*;
 
-public class Utils {
+public class HashUtils {
     public static String Hash(String string) {
         return toHexString(hexHash(string));
     }
