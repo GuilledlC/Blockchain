@@ -1,36 +1,55 @@
-import java.io.IOException;
+import Utils.HashUtils;
+import Utils.KeyUtils;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.*;
-import java.security.spec.*;
-import java.security.interfaces.RSAPrivateCrtKey;
-import java.security.spec.RSAPublicKeySpec;
 
 public class Client {
+
+    private final String uid;
     private PrivateKey priv;
     private PublicKey pub;
+    private String address;
+    private final String privatePath;
+    private final String publicPath;
 
-    public Client() throws Exception {
+    public Client(String userID) throws Exception {
+        uid = userID;
+        privatePath = "./" + uid + ".key";
+        publicPath = "./" + uid + ".pub";
         Init();
     }
 
     private void Init() throws Exception {
         CheckKeys();
+        address = HashUtils.Hash(pub.toString());
     }
 
     private void CheckKeys() throws Exception {
-        if(Files.exists(Paths.get("./key.key"))) {
-            priv = KeyUtils.PrivateKeyReader("./key.key");
-            if(Files.exists(Paths.get("./key.pub")))
-                pub = KeyUtils.PublicKeyReader("./key.pub");
-            else
+        if(Files.exists(Paths.get(privatePath))) {
+            priv = KeyUtils.PrivateKeyReader(privatePath);
+            if(Files.exists(Paths.get(publicPath)))
+                pub = KeyUtils.PublicKeyReader(publicPath);
+            else {
                 pub = KeyUtils.PublicKeyFromPrivate(priv);
+                KeyUtils.SaveKey(pub, publicPath);
+            }
         } else {
             KeyPair keyPair = KeyUtils.KeyPairGenerator();
             priv = keyPair.getPrivate();
-            KeyUtils.SaveKey(priv, "key.key");
+            KeyUtils.SaveKey(priv, privatePath);
             pub = keyPair.getPublic();
-            KeyUtils.SaveKey(pub, "key.pub");
+            KeyUtils.SaveKey(pub, publicPath);
         }
+    }
+
+    public Transaction Send(int money, String receiver) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+        String transaction = address + " " + money + " " + receiver;
+        byte[] signature = HashUtils.Sign(transaction, priv);
+        return new Transaction(transaction, signature, pub);
+    }
+
+    public String getAddress() {
+        return address;
     }
 }

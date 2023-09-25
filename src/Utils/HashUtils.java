@@ -1,3 +1,5 @@
+package Utils;
+
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
@@ -16,7 +18,7 @@ public class HashUtils {
         return hex;
     }
 
-    private static String toHexString(byte[] hash) {
+    public static String toHexString(byte[] hash) {
         BigInteger number = new BigInteger(1, hash);
         StringBuilder hexString = new StringBuilder(number.toString(16));
 
@@ -24,5 +26,23 @@ public class HashUtils {
             hexString.insert(0, '0');
 
         return hexString.toString();
+    }
+
+    public static byte[] Sign(String text, PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        Signature signature = Signature.getInstance("SHA256withRSA");
+        signature.initSign(key);
+
+        byte[] bytes = text.getBytes();
+        signature.update(bytes);
+        return signature.sign();
+    }
+
+    public static boolean Verify(String text, byte[] signed, PublicKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        Signature signature = Signature.getInstance("SHA256withRSA");
+        signature.initVerify(key);
+
+        byte[] bytes = text.getBytes();
+        signature.update(bytes);
+        return signature.verify(signed);
     }
 }
