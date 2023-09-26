@@ -1,3 +1,5 @@
+import Utils.HashUtils;
+
 import java.security.*;
 
 public class Transaction {
@@ -38,7 +40,15 @@ public class Transaction {
 
         byte[] bytes = text.getBytes();
         signature.update(bytes);
-        return signature.verify(signed);
+        return signature.verify(signed) && VerifyTransaction(GetAddress(text), key);
+    }
+
+    private static boolean VerifyTransaction(String address, PublicKey key) {
+        return address.equals(HashUtils.Hash(key.toString()));
+    }
+
+    private static String GetAddress(String transaction) {
+        return transaction.substring(0, transaction.indexOf(' '));
     }
 
 }
