@@ -25,22 +25,23 @@ public class Transaction {
         return key;
     }
 
-    public static byte[] Sign(String text, PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public static byte[] Sign(String transaction, PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         Signature signature = Signature.getInstance("SHA256withRSA");
         signature.initSign(key);
 
-        byte[] bytes = text.getBytes();
+        byte[] bytes = transaction.getBytes();
         signature.update(bytes);
         return signature.sign();
     }
 
-    public static boolean Verify(String text, byte[] signed, PublicKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public static boolean Verify(Transaction transaction) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         Signature signature = Signature.getInstance("SHA256withRSA");
-        signature.initVerify(key);
+        signature.initVerify(transaction.getKey());
 
-        byte[] bytes = text.getBytes();
+        byte[] bytes = transaction.getTransaction().getBytes();
         signature.update(bytes);
-        return signature.verify(signed) && VerifyTransaction(GetAddress(text), key);
+        return signature.verify(transaction.getSignature())
+                && VerifyTransaction(GetAddress(transaction.getTransaction()), transaction.getKey());
     }
 
     private static boolean VerifyTransaction(String address, PublicKey key) {

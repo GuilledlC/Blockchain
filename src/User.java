@@ -4,7 +4,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.*;
 
-public class Client {
+public class User {
 
     private final String uid;
     private PrivateKey priv;
@@ -13,7 +13,7 @@ public class Client {
     private final String privatePath;
     private final String publicPath;
 
-    public Client(String userID) throws Exception {
+    public User(String userID) throws Exception {
         uid = userID;
         privatePath = "./" + uid + ".key";
         publicPath = "./" + uid + ".pub";
