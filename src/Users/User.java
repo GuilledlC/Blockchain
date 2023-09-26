@@ -1,3 +1,5 @@
+package Users;
+
 import Utils.HashUtils;
 import Utils.KeyUtils;
 import java.nio.file.Files;
@@ -43,8 +45,8 @@ public class User {
         }
     }
 
-    public Transaction Send(int money, String receiver) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
-        String transaction = address + " " + money + " " + receiver;
+    public Transaction Vote(String receiver) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+        String transaction = address + " " + receiver;
         byte[] signature = Transaction.Sign(transaction, priv);
         return new Transaction(transaction, signature, pub);
     }

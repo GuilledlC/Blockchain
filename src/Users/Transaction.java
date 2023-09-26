@@ -1,5 +1,6 @@
-import Utils.HashUtils;
+package Users;
 
+import Utils.HashUtils;
 import java.security.*;
 
 public class Transaction {
