@@ -28,21 +28,4 @@ public class HashUtils {
         return hexString.toString();
     }
 
-    public static byte[] Sign(String text, PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        Signature signature = Signature.getInstance("SHA256withRSA");
-        signature.initSign(key);
-
-        byte[] bytes = text.getBytes();
-        signature.update(bytes);
-        return signature.sign();
-    }
-
-    public static boolean Verify(String text, byte[] signed, PublicKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        Signature signature = Signature.getInstance("SHA256withRSA");
-        signature.initVerify(key);
-
-        byte[] bytes = text.getBytes();
-        signature.update(bytes);
-        return signature.verify(signed);
-    }
 }

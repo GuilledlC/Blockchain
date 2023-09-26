@@ -45,7 +45,7 @@ public class Client {
 
     public Transaction Send(int money, String receiver) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
         String transaction = address + " " + money + " " + receiver;
-        byte[] signature = HashUtils.Sign(transaction, priv);
+        byte[] signature = Transaction.Sign(transaction, priv);
         return new Transaction(transaction, signature, pub);
     }
 

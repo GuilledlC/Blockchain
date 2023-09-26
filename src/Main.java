@@ -14,6 +14,6 @@ public class Main {
         System.out.println("\nSignature : " + t1.getSignature());
         System.out.println("\nPublic Key : " + t1.getKey());
 
-        System.out.println("\nVerified : " + HashUtils.Verify(t1.getTransaction(), t1.getSignature(), t1.getKey()));
+        System.out.println("\nVerified : " + Transaction.Verify(t1.getTransaction(), t1.getSignature(), t1.getKey()));
     }
 }
