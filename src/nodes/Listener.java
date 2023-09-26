@@ -1,4 +1,4 @@
-package Nodes;
+package nodes;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -7,14 +7,14 @@ import java.util.ArrayList;
 
 public class Listener {
 
-    private static ArrayList<Socket> BootstrapNodes;
+    private static ArrayList<Socket> bootstrapNodes;
     private ArrayList<Socket> connectedNodes;
     private ServerSocket serverSocket;
 
     public Listener(int port) throws IOException {
         this.serverSocket = new ServerSocket(port);
 
-        BootstrapNodes.add(new Socket("localhost", 8008));
+        bootstrapNodes.add(new Socket("localhost", 8008));
     }
 
     public void startListening() {

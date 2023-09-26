@@ -1,7 +1,7 @@
-package Users;
+package users;
 
-import Utils.HashUtils;
-import Utils.KeyUtils;
+import utils.HashUtils;
+import utils.KeyUtils;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.*;
@@ -19,35 +19,35 @@ public class User {
         uid = userID;
         privatePath = "./" + uid + ".key";
         publicPath = "./" + uid + ".pub";
-        Init();
+        init();
     }
 
-    private void Init() throws Exception {
-        CheckKeys();
-        address = HashUtils.Hash(pub.toString());
+    private void init() throws Exception {
+        checkKeys();
+        address = HashUtils.hash(pub.toString());
     }
 
-    private void CheckKeys() throws Exception {
+    private void checkKeys() throws Exception {
         if(Files.exists(Paths.get(privatePath))) {
-            priv = KeyUtils.PrivateKeyReader(privatePath);
+            priv = KeyUtils.privateKeyReader(privatePath);
             if(Files.exists(Paths.get(publicPath)))
-                pub = KeyUtils.PublicKeyReader(publicPath);
+                pub = KeyUtils.publicKeyReader(publicPath);
             else {
-                pub = KeyUtils.PublicKeyFromPrivate(priv);
-                KeyUtils.SaveKey(pub, publicPath);
+                pub = KeyUtils.publicKeyFromPrivate(priv);
+                KeyUtils.saveKey(pub, publicPath);
             }
         } else {
-            KeyPair keyPair = KeyUtils.KeyPairGenerator();
+            KeyPair keyPair = KeyUtils.keyPairGenerator();
             priv = keyPair.getPrivate();
-            KeyUtils.SaveKey(priv, privatePath);
+            KeyUtils.saveKey(priv, privatePath);
             pub = keyPair.getPublic();
-            KeyUtils.SaveKey(pub, publicPath);
+            KeyUtils.saveKey(pub, publicPath);
         }
     }
 
-    public Transaction Vote(String receiver) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+    public Transaction vote(String receiver) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
         String transaction = address + " " + receiver;
-        byte[] signature = Transaction.Sign(transaction, priv);
+        byte[] signature = Transaction.sign(transaction, priv);
         return new Transaction(transaction, signature, pub);
     }
 

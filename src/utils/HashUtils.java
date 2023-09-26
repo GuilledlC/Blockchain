@@ -1,11 +1,11 @@
-package Utils;
+package utils;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
 import java.security.*;
 
 public class HashUtils {
-    public static String Hash(String string) {
+    public static String hash(String string) {
         return toHexString(hexHash(string));
     }
 

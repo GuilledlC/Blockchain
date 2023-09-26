@@ -1,6 +1,6 @@
-package Users;
+package users;
 
-import Utils.HashUtils;
+import utils.HashUtils;
 import java.security.*;
 
 public class Transaction {
@@ -26,7 +26,7 @@ public class Transaction {
         return key;
     }
 
-    public static byte[] Sign(String transaction, PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public static byte[] sign(String transaction, PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         Signature signature = Signature.getInstance("SHA256withRSA");
         signature.initSign(key);
 
@@ -35,21 +35,21 @@ public class Transaction {
         return signature.sign();
     }
 
-    public static boolean Verify(Transaction transaction) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public static boolean verify(Transaction transaction) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         Signature signature = Signature.getInstance("SHA256withRSA");
         signature.initVerify(transaction.getKey());
 
         byte[] bytes = transaction.getTransaction().getBytes();
         signature.update(bytes);
         return signature.verify(transaction.getSignature())
-                && VerifyTransaction(GetAddress(transaction.getTransaction()), transaction.getKey());
+                && verifyTransaction(getAddress(transaction.getTransaction()), transaction.getKey());
     }
 
-    private static boolean VerifyTransaction(String address, PublicKey key) {
-        return address.equals(HashUtils.Hash(key.toString()));
+    private static boolean verifyTransaction(String address, PublicKey key) {
+        return address.equals(HashUtils.hash(key.toString()));
     }
 
-    private static String GetAddress(String transaction) {
+    private static String getAddress(String transaction) {
         return transaction.substring(0, transaction.indexOf(' '));
     }
 
