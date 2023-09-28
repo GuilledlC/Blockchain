@@ -16,7 +16,6 @@ public class PeerHandler implements Runnable {
             this.socket = socket;
             this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            this.id = bufferedReader.readLine();
             peerHandlers.add(this);
         } catch (IOException e) {
             close();
@@ -25,10 +24,14 @@ public class PeerHandler implements Runnable {
 
     @Override
     public void run() {
+        receiveMessages();
+    }
+
+    private void receiveMessages() {
         while(socket.isConnected()) {
             try {
                 String message = bufferedReader.readLine();
-                sendMessage(message);
+                printMessage(message);
             } catch (IOException e) {
                 close();
                 break;
@@ -36,17 +39,23 @@ public class PeerHandler implements Runnable {
         }
     }
 
-    private void sendMessage(String message) {
+    private void printMessage(String message) {
+        System.out.println(message);
+    }
+
+    protected static void sendMessages(String message) {
         for(PeerHandler peerHandler : peerHandlers) {
-            try {
-                if(!peerHandler.equals(this)) {
-                    peerHandler.bufferedWriter.write(message);
-                    peerHandler.bufferedWriter.newLine();
-                    peerHandler.bufferedWriter.flush();
-                }
-            } catch (IOException e) {
-                close();
-            }
+            peerHandler.sendMessage(message);
+        }
+    }
+
+    private void sendMessage(String message) {
+        try {
+            bufferedWriter.write(message);
+            bufferedWriter.newLine();
+            bufferedWriter.flush();
+        } catch (IOException e) {
+            close();
         }
     }
 

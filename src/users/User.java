@@ -2,9 +2,12 @@ package users;
 
 import utils.HashUtils;
 import utils.KeyUtils;
+
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.*;
+import java.security.spec.InvalidKeySpecException;
 
 public class User {
 
@@ -15,19 +18,19 @@ public class User {
     private final String privatePath;
     private final String publicPath;
 
-    public User(String userID) throws Exception {
+    public User(String userID) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         uid = userID;
         privatePath = "./" + uid + ".key";
         publicPath = "./" + uid + ".pub";
         init();
     }
 
-    private void init() throws Exception {
+    private void init() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         checkKeys();
         address = HashUtils.hash(pub.toString());
     }
 
-    private void checkKeys() throws Exception {
+    private void checkKeys() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         if(Files.exists(Paths.get(privatePath))) {
             priv = KeyUtils.privateKeyReader(privatePath);
             if(Files.exists(Paths.get(publicPath)))
