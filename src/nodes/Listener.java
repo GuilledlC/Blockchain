@@ -24,7 +24,7 @@ public class Listener {
                 try {
                     while(!serverSocket.isClosed()) {
                         Socket peerSocket = serverSocket.accept();
-                        System.out.println("Peer connected from " + peerSocket.getInetAddress());
+                        System.out.println("Peer connected from " + peerSocket.getInetAddress() + ":" + peerSocket.getPort());
 
                         PeerHandler peer = new PeerHandler(peerSocket);
                         Thread peerThread = new Thread(peer);
@@ -40,7 +40,7 @@ public class Listener {
 
     public void connectTo(String ip, int port) throws IOException {
         Socket socket = new Socket(ip, port);
-        System.out.println("Connected to peer at " + socket.getInetAddress());
+        System.out.println("Connected to peer at " + socket.getInetAddress() + ":" + socket.getPort());
         PeerHandler peer = new PeerHandler(socket);
         Thread peerThread = new Thread(peer);
         peerThread.start();

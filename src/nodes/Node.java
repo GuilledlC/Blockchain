@@ -1,7 +1,6 @@
 package nodes;
 
 import java.io.IOException;
-import java.net.Socket;
 import java.util.Scanner;
 
 public class Node {
@@ -11,7 +10,6 @@ public class Node {
 
     public Node(String id) {
         this.id = id;
-
         ioSystem();
     }
 
@@ -39,43 +37,46 @@ public class Node {
 
                 String text = scanner.nextLine();
                 while(text != "/close") {
-                    switch (text.charAt(0)) {
-                        case '/':
-                            try {
-                                processCommand(text.substring(1));
-                            } catch (IOException e) {
-                                throw new RuntimeException(e);
-                            }
-                            break;
-                        default:
-                            listener.sendMessage(text);
-                            break;
-                    }
+                    try {processCommand(text);}
+                    catch (IOException e) {throw new RuntimeException(e);}
 
                     text = scanner.nextLine();
                 }
             }
+
+            private void processCommand(String text) throws IOException {
+
+                int endCMDIndex = text.indexOf(' ');
+                if(endCMDIndex == -1)
+                    endCMDIndex = text.length();
+
+                String command = text.substring(0, endCMDIndex).toLowerCase();
+
+                switch (command) {
+                    case "/help":
+                        displayHelp();
+                        break;
+                    case "/hello":
+                        System.out.println("Hello world!");
+                        break;
+                    case "/connect":
+                        connectTo(text.substring(text.indexOf(' ') + 1));
+                        break;
+                    default:
+                        listener.sendMessage(command);
+                        break;
+                }
+            }
+
+            private void displayHelp() {
+                System.out.println("""
+                        /help: This command displays the help.
+                        /hello: This command says "Hello world!".
+                        /connect X:Y: This command connects to the port "Y" at the IP "X".
+                        """);
+            }
+
         }).start();
-    }
-
-    private void processCommand(String text) throws IOException {
-
-        int endCMDIndex = text.indexOf(' ');
-        if(endCMDIndex == -1)
-            endCMDIndex = text.length();
-
-        String command = text.substring(0, endCMDIndex).toLowerCase();
-
-        switch (command) {
-            case "hello":
-                System.out.println("Hello world!");
-                break;
-            case "connect":
-                connectTo(text.substring(text.indexOf(' ') + 1));
-                break;
-            default:
-                break;
-        }
     }
 
     private void connectTo(String address) throws IOException {
