@@ -19,12 +19,13 @@ public class UserView implements Runnable {
 
         try {
             user = new User(text);
-            displayHelp();
 
-            while(text != "/close") {
-                processCommand(text);
+            displayHelp();
+            do {
                 text = scanner.nextLine();
-            }
+                processCommand(text);
+            } while(!text.equals("/close"));
+
         } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException e) {
             throw new RuntimeException(e);}
     }
@@ -53,6 +54,9 @@ public class UserView implements Runnable {
                 else
                     System.out.println("You haven't voted yet!");
                 break;
+            case "/close":
+                System.out.println("Goodbye!");
+                break;
             default:
                 break;
         }
@@ -60,9 +64,10 @@ public class UserView implements Runnable {
 
     private void displayHelp() {
         System.out.println("""
-                /help: This command displays the help.
-                /vote X: This command votes for the candidate "X".
-                /viewvote: This command shows who you voted for.
+                /help: Displays the help.
+                /vote X: Votes for the candidate "X".
+                /viewvote: Shows who you voted for.
+                /close: Closes the program.
                 """);
     }
 
