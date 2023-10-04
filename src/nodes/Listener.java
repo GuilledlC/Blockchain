@@ -9,15 +9,16 @@ public class Listener {
 
     private static ArrayList<Socket> bootstrapNodes;
     private ArrayList<Socket> connectedNodes;
-    private ServerSocket serverSocket;
+    private final ServerSocket serverSocket;
 
     public Listener(int port) throws IOException {
         this.serverSocket = new ServerSocket(port);
         bootstrapNodes = new ArrayList<Socket>();
+        connectedNodes = new ArrayList<Socket>();
         //bootstrapNodes.add(new Socket("localhost", 8008));
     }
 
-    public void startListening() {
+    protected void startListening() {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -25,10 +26,7 @@ public class Listener {
                     while(!serverSocket.isClosed()) {
                         Socket peerSocket = serverSocket.accept();
                         System.out.println("Peer connected from " + peerSocket.getInetAddress() + ":" + peerSocket.getPort());
-
-                        PeerHandler peer = new PeerHandler(peerSocket);
-                        Thread peerThread = new Thread(peer);
-                        peerThread.start();
+                        handlePeer(peerSocket);
                     }
                 } catch (IOException e) {
                     closeListener();
@@ -38,12 +36,17 @@ public class Listener {
 
     }
 
-    public void connectTo(String ip, int port) throws IOException {
-        Socket socket = new Socket(ip, port);
-        System.out.println("Connected to peer at " + socket.getInetAddress() + ":" + socket.getPort());
-        PeerHandler peer = new PeerHandler(socket);
+    protected void connectTo(String ip, int port) throws IOException {
+        Socket peerSocket = new Socket(ip, port);
+        System.out.println("Connected to peer at " + peerSocket.getInetAddress() + ":" + peerSocket.getPort());
+        handlePeer(peerSocket);
+    }
+
+    private void handlePeer(Socket peerSocket) {
+        PeerHandler peer = new PeerHandler(peerSocket);
         Thread peerThread = new Thread(peer);
         peerThread.start();
+        connectedNodes.add(peerSocket);
     }
 
     protected void sendMessage(String message) {

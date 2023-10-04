@@ -1,17 +1,13 @@
-import nodes.Node;
 import users.*;
-import utils.HashUtils;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Scanner;
 
 public class Main {
-    public static void main(String[] args) throws Exception {
-        Node n = new Node("Guille");
+    public static void main(String[] args) {
     }
 
     private void testTransaction() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, SignatureException, InvalidKeyException {
