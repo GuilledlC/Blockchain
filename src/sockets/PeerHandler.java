@@ -10,21 +10,16 @@ import java.security.SignatureException;
 import java.util.ArrayList;
 
 public class PeerHandler implements Runnable {
-    private static ArrayList<PeerHandler> peerHandlers = new ArrayList<>();
+    private static final ArrayList<PeerHandler> peerHandlers = new ArrayList<>();
     private Socket socket;
-    protected BufferedReader bufferedReader;
-    protected BufferedWriter bufferedWriter;
-    protected ObjectOutputStream oos;
     protected ObjectInputStream ois;
-    private String id;
+    protected ObjectOutputStream oos;
 
     public PeerHandler(Socket socket) {
         try {
             this.socket = socket;
-            this.bufferedReader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            this.bufferedWriter = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            this.oos = new ObjectOutputStream(socket.getOutputStream());
             this.ois = new ObjectInputStream(socket.getInputStream());
+            this.oos = new ObjectOutputStream(socket.getOutputStream());
             peerHandlers.add(this);
         } catch (IOException e) {
             close();
@@ -33,63 +28,43 @@ public class PeerHandler implements Runnable {
 
     @Override
     public void run() {
-        //receiveMessages();
-        receiveTransactions();
+        receiveObjects();
     }
 
-    private void receiveMessages() {
+
+    private void receiveObjects() {
         while(socket.isConnected()) {
             try {
-                String message = bufferedReader.readLine();
-                printMessage(message);
-            } catch (IOException e) {
+                Object object = ois.readObject();
+                handleObjects(object);
+            } catch (IOException | ClassNotFoundException e) {
                 close();
                 break;
             }
         }
     }
 
-    private void receiveTransactions() {
-        while(socket.isConnected()) {
+    private void handleObjects(Object object) {
+        if(object instanceof Transaction transaction) {
             try {
-                Transaction transaction = (Transaction)ois.readObject();
-                printMessage(Transaction.displayTransaction(transaction));
-            } catch (IOException | ClassNotFoundException | NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
-                close();
-                break;
+                System.out.println(Transaction.displayTransaction(transaction));
+            } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
+                throw new RuntimeException(e);
             }
+        } else if (object instanceof String string) {
+            System.out.println(string);
         }
     }
 
-    private void printMessage(String message) {
-        System.out.println(message);
-    }
-
-    protected static void sendMessages(String message) {
+    protected static void sendObjects(Serializable object) {
         for(PeerHandler peerHandler : peerHandlers) {
-            peerHandler.sendMessage(message);
+            peerHandler.sendObject(object);
         }
     }
 
-    private void sendMessage(String message) {
+    private void sendObject(Serializable object) {
         try {
-            bufferedWriter.write(message);
-            bufferedWriter.newLine();
-            bufferedWriter.flush();
-        } catch (IOException e) {
-            close();
-        }
-    }
-
-    protected static void sendTransactions(Transaction transaction) {
-        for(PeerHandler peerHandler : peerHandlers) {
-            peerHandler.sendTransaction(transaction);
-        }
-    }
-
-    private void sendTransaction(Transaction transaction) {
-        try {
-            oos.writeObject(transaction);
+            oos.writeObject(object);
         } catch (IOException e) {
             close();
         }
@@ -98,10 +73,10 @@ public class PeerHandler implements Runnable {
     private void close() {
         peerHandlers.remove(this);
         try {
-            if(bufferedReader != null)
-                bufferedReader.close();
-            if(bufferedWriter != null)
-                bufferedWriter.close();
+            if(ois != null)
+                ois.close();
+            if(oos != null)
+                oos.close();
             if(socket != null)
                 socket.close();
         } catch (IOException e) {

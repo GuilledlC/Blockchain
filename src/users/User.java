@@ -60,7 +60,7 @@ public class User extends NetworkUser {
         String transactionString = address + " " + receiver;
         byte[] signature = Transaction.sign(transactionString, priv);
         transaction = new Transaction(transactionString, signature, pub);
-        sendTransaction(transaction);
+        sendObject(transaction);
     }
 
     protected String getAddress() {

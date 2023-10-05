@@ -1,8 +1,7 @@
 package sockets;
 
-import users.Transaction;
-
 import java.io.IOException;
+import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -48,12 +47,8 @@ public class Listener {
         connectedNodes.add(peerSocket);
     }
 
-    public void sendMessage(String message) {
-        PeerHandler.sendMessages(message);
-    }
-
-    public void sendTransaction(Transaction transaction) {
-        PeerHandler.sendTransactions(transaction);
+    public void sendObject(Serializable object) {
+        PeerHandler.sendObjects(object);
     }
 
     private void closeListener() {

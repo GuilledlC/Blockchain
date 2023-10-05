@@ -37,6 +37,7 @@ public class View implements Runnable {
                 int port = Integer.parseInt(args);
                 try {
                     networkUser.startListener(port);
+                    System.out.println("Listening at port " + port);
                 } catch (IOException e) {
                     System.out.println("Unable to start listening on port " + port);
                 }
@@ -53,7 +54,7 @@ public class View implements Runnable {
                     System.out.println("You are currently offline! Start listening with /start \"port\"");
             }
             case "/close" -> System.out.println("Goodbye!");
-            default -> networkUser.sendMessage(command);
+            default -> networkUser.sendObject(command);
         }
     }
 

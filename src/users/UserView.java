@@ -43,6 +43,7 @@ public class UserView extends View {
                 else {
                     try {
                         user.vote(args);
+                        System.out.println("Vote recorded. Type /viewvote to view your vote.");
                     } catch (NoSuchAlgorithmException e) {
                         throw new RuntimeException(e);
                     } catch (SignatureException e) {
@@ -67,15 +68,14 @@ public class UserView extends View {
                 else
                     System.out.println("You haven't voted yet!");
             }
-            default -> user.sendMessage(command);
+            default -> super.processCommand(text);
         }
     }
 
     protected void displayHelp() {
-        System.out.println("""
+        System.out.print("""
                 /vote X: Votes for the candidate "X".
-                /viewvote: Shows who you voted for.
-                """);
+                /viewvote: Shows who you voted for.""");
         super.displayHelp();
     }
 

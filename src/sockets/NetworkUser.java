@@ -1,8 +1,7 @@
 package sockets;
 
-import users.Transaction;
-
 import java.io.IOException;
+import java.io.Serializable;
 
 public class NetworkUser {
 
@@ -28,14 +27,9 @@ public class NetworkUser {
         listener.connectTo(ip, port);
     }
 
-    public void sendMessage(String message) {
+    public void sendObject(Serializable object) {
         if(isListening())
-            listener.sendMessage(message);
-    }
-
-    public void sendTransaction(Transaction transaction) {
-        if(isListening())
-            listener.sendTransaction(transaction);
+            listener.sendObject(object);
     }
 
     public boolean isListening() {

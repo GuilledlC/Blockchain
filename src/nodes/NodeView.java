@@ -32,7 +32,7 @@ public class NodeView extends View {
     }
 
     protected void displayHelp() {
-        System.out.println("""
+        System.out.print("""
                 """);
         super.displayHelp();
     }
