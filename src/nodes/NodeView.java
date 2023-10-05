@@ -22,6 +22,7 @@ public class NodeView implements Runnable {
             } while(!text.equals("/close"));
 
         } catch (IOException e) {
+            System.out.println(e);
             throw new RuntimeException();
         }
     }
@@ -62,13 +63,13 @@ public class NodeView implements Runnable {
 
     private void displayHelp() {
         System.out.println("""
-                        /help: Displays the help.
-                        /hello: Says "Hello world!".
-                        /start P: Starts listening on port "P".
-                        /connect X:Y: Connects to the port "Y" at the IP "X".
-                        /close: Closes the program.
-                        Anything else: sends everything to all the nodes
-                        """);
+                /help: Displays the help.
+                /hello: Says "Hello world!".
+                /start P: Starts listening on port "P".
+                /connect X:Y: Connects to the port "Y" at the IP "X".
+                /close: Closes the program.
+                Anything else: sends everything to all the connected nodes.
+                """);
     }
 
     public static void main(String[] args) {

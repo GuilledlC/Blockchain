@@ -1,5 +1,6 @@
 package users;
 
+import sockets.networkUser;
 import utils.HashUtils;
 import utils.KeyUtils;
 
@@ -8,9 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Scanner;
 
-public class User {
+public class User extends networkUser {
 
     private final String uid;
     private PrivateKey priv;
@@ -57,17 +57,17 @@ public class User {
         System.out.println("Done!\n");
     }
 
-    public void vote(String receiver) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+    protected void vote(String receiver) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
         String transactionString = address + " " + receiver;
         byte[] signature = Transaction.sign(transactionString, priv);
         transaction = new Transaction(transactionString, signature, pub);
     }
 
-    public String getAddress() {
+    protected String getAddress() {
         return address;
     }
 
-    public Transaction getTransaction() {
+    protected Transaction getTransaction() {
         return transaction;
     }
 }

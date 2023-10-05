@@ -1,4 +1,4 @@
-package nodes;
+package sockets;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -18,7 +18,7 @@ public class Listener {
         //bootstrapNodes.add(new Socket("localhost", 8008));
     }
 
-    protected void startListening() {
+    public void startListening() {
         new Thread(new Runnable() {
             @Override
             public void run() {
@@ -36,7 +36,7 @@ public class Listener {
 
     }
 
-    protected void connectTo(String ip, int port) throws IOException {
+    public void connectTo(String ip, int port) throws IOException {
         Socket peerSocket = new Socket(ip, port);
         System.out.println("Connected to peer at " + peerSocket.getInetAddress() + ":" + peerSocket.getPort());
         handlePeer(peerSocket);
@@ -49,7 +49,7 @@ public class Listener {
         connectedNodes.add(peerSocket);
     }
 
-    protected void sendMessage(String message) {
+    public void sendMessage(String message) {
         PeerHandler.sendMessages(message);
     }
 
