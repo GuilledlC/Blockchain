@@ -4,10 +4,8 @@ import sockets.NetworkUser;
 
 public class Node extends NetworkUser {
 
-    private String id;
-
     public Node(String id) {
-        this.id = id;
+        super(id);
     }
 
     /**another 'ask' to send data*/

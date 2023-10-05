@@ -12,7 +12,6 @@ import java.security.spec.InvalidKeySpecException;
 
 public class User extends NetworkUser {
 
-    private final String uid;
     private PrivateKey priv;
     private PublicKey pub;
     private String address;
@@ -20,14 +19,14 @@ public class User extends NetworkUser {
     private String privatePath;
     private String publicPath;
 
-    public User(String userID) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        uid = userID;
+    public User(String id) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+        super(id);
         init();
     }
 
     private void init() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        privatePath = "./" + uid + ".key";
-        publicPath = "./" + uid + ".pub";
+        privatePath = "./" + id + ".key";
+        publicPath = "./" + id + ".pub";
         checkKeys();
         address = HashUtils.hash(pub.toString());
     }

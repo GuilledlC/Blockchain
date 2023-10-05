@@ -1,5 +1,7 @@
 package users;
 
+import utils.View;
+
 import java.io.IOException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -7,82 +9,74 @@ import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Scanner;
 
-public class UserView implements Runnable {
+public class UserView extends View {
 
-    private User user;
 
     @Override
     public void run() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("\nWhat do you wish to be called?");
         String text = scanner.nextLine();
-
         try {
-            user = new User(text);
-
-            displayHelp();
-            do {
-                text = scanner.nextLine();
-                processCommand(text);
-            } while(!text.equals("/close"));
-
-        } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException | InvalidKeyException | SignatureException e) {
+            networkUser = new User(text);
+        } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new RuntimeException(e);}
+        super.run();
     }
 
-    private void processCommand(String text) throws IOException, NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+    protected void processCommand(String text) {
 
         int endCMDIndex = text.indexOf(' ');
         if(endCMDIndex == -1)
             endCMDIndex = text.length();
 
         String command = text.substring(0, endCMDIndex).toLowerCase();
-        Transaction t = user.getTransaction();;
+        String args = text.substring(text.indexOf(' ') + 1);
+
+        User user = ((User)networkUser);
+        Transaction t = user.getTransaction();
         switch (command) {
-            case "/help":
-                displayHelp();
-                break;
-            case "/vote":
-                if(t != null)
+            case "/help" -> displayHelp();
+            case "/vote" -> {
+                if (t != null)
                     System.out.println("You have already voted!");
-                else
-                    user.vote(text.substring(endCMDIndex + 1));
-                break;
-            case "/viewvote":
-                if(t != null)
-                    System.out.println(Transaction.displayTransaction(t));
+                else {
+                    try {
+                        user.vote(args);
+                    } catch (NoSuchAlgorithmException e) {
+                        throw new RuntimeException(e);
+                    } catch (SignatureException e) {
+                        throw new RuntimeException(e);
+                    } catch (InvalidKeyException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
+            }
+            case "/viewvote" -> {
+                if (t != null) {
+                    try {
+                        System.out.println(Transaction.displayTransaction(t));
+                    } catch (NoSuchAlgorithmException e) {
+                        throw new RuntimeException(e);
+                    } catch (SignatureException e) {
+                        throw new RuntimeException(e);
+                    } catch (InvalidKeyException e) {
+                        throw new RuntimeException(e);
+                    }
+                }
                 else
                     System.out.println("You haven't voted yet!");
-                break;
-            case "/start":
-                int port = Integer.parseInt(text.substring(text.indexOf(' ') + 1));
-                user.startListener(port);
-                break;
-            case "/connect":
-                if(user.isListening())
-                    user.connectTo(text.substring(text.indexOf(' ') + 1));
-                else
-                    System.out.println("You are currently offline! Start listening with /start \"port\"");
-                break;
-            case "/close":
-                System.out.println("Goodbye!");
-                break;
-            default:
-                user.sendMessage(command);
-                break;
+            }
+            default -> user.sendMessage(command);
         }
     }
 
-    private void displayHelp() {
+    protected void displayHelp() {
         System.out.println("""
-                /help: Displays the help.
                 /vote X: Votes for the candidate "X".
                 /viewvote: Shows who you voted for.
-                /start P: Starts listening on port "P".
-                /connect X:Y: Connects to the port "Y" at the IP "X".
-                /close: Closes the program.
-                Anything else: sends everything to all the connected users.
                 """);
+        super.displayHelp();
     }
 
     public static void main(String[] args) throws Exception {

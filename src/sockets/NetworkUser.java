@@ -5,7 +5,13 @@ import users.Transaction;
 import java.io.IOException;
 
 public class NetworkUser {
+
+    protected final String id;
     private Listener listener = null;
+
+    public NetworkUser(String id) {
+        this.id = id;
+    }
 
     public void startListener(int port) throws IOException {
         listener = new Listener(port);

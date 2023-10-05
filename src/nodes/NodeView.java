@@ -1,75 +1,40 @@
 package nodes;
 
+import utils.View;
 import java.io.IOException;
 import java.util.Scanner;
 
-public class NodeView implements Runnable {
-
-    private Node node;
+public class NodeView extends View {
 
     @Override
     public void run() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("\nWhat do you wish to call yourself");
+        System.out.println("\nWhat do you wish to be called?");
         String text = scanner.nextLine();
-        try {
-            node = new Node(text);
+        networkUser = new Node(text);
+        super.run();
 
-            displayHelp();
-            do {
-                text = scanner.nextLine();
-                processCommand(text);
-            } while(!text.equals("/close"));
-
-        } catch (IOException e) {
-            System.out.println(e);
-            throw new RuntimeException();
-        }
     }
 
-    private void processCommand(String text) throws IOException {
+    protected void processCommand(String text) {
 
         int endCMDIndex = text.indexOf(' ');
         if(endCMDIndex == -1)
             endCMDIndex = text.length();
 
         String command = text.substring(0, endCMDIndex).toLowerCase();
+        String args = text.substring(text.indexOf(' ') + 1);
 
         switch (command) {
-            case "/help":
-                displayHelp();
-                break;
-            case "/hello":
-                System.out.println("Hello world!");
-                break;
-            case "/start":
-                int port = Integer.parseInt(text.substring(text.indexOf(' ') + 1));
-                node.startListener(port);
-                break;
-            case "/connect":
-                if(node.isListening())
-                    node.connectTo(text.substring(text.indexOf(' ') + 1));
-                else
-                    System.out.println("You are currently offline! Start listening with /start \"port\"");
-                break;
-            case "/close":
-                System.out.println("Goodbye!");
-                break;
-            default:
-                node.sendMessage(command);
-                break;
+            case "/help" -> displayHelp();
+            default -> super.processCommand(text);
         }
     }
 
-    private void displayHelp() {
+    protected void displayHelp() {
         System.out.println("""
-                /help: Displays the help.
-                /hello: Says "Hello world!".
-                /start P: Starts listening on port "P".
-                /connect X:Y: Connects to the port "Y" at the IP "X".
-                /close: Closes the program.
-                Anything else: sends everything to all the connected nodes.
                 """);
+        super.displayHelp();
     }
 
     public static void main(String[] args) {

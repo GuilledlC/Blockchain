@@ -15,24 +15,21 @@ public class Listener {
 
     public Listener(int port) throws IOException {
         this.serverSocket = new ServerSocket(port);
-        bootstrapNodes = new ArrayList<Socket>();
-        connectedNodes = new ArrayList<Socket>();
+        bootstrapNodes = new ArrayList<>();
+        connectedNodes = new ArrayList<>();
         //bootstrapNodes.add(new Socket("localhost", 8008));
     }
 
     public void startListening() {
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                try {
-                    while(!serverSocket.isClosed()) {
-                        Socket peerSocket = serverSocket.accept();
-                        System.out.println("Peer connected from " + peerSocket.getInetAddress() + ":" + peerSocket.getPort());
-                        handlePeer(peerSocket);
-                    }
-                } catch (IOException e) {
-                    closeListener();
+        new Thread(() -> {
+            try {
+                while(!serverSocket.isClosed()) {
+                    Socket peerSocket = serverSocket.accept();
+                    System.out.println("Peer connected from " + peerSocket.getInetAddress() + ":" + peerSocket.getPort());
+                    handlePeer(peerSocket);
                 }
+            } catch (IOException e) {
+                closeListener();
             }
         }).start();
 
@@ -61,8 +58,7 @@ public class Listener {
 
     private void closeListener() {
         try {
-            if(serverSocket != null)
-                serverSocket.close();
+            serverSocket.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
