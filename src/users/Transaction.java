@@ -5,11 +5,11 @@ import utils.HashUtils;
 import java.io.Serializable;
 import java.security.*;
 
-public class Transaction implements Serializable {
+public class Transaction implements Serializable, Comparable<Transaction> {
     private final String transactionString;
     private final byte[] signature;
     private final PublicKey key;
-    private long time;
+    private final long time;
 
     public Transaction(String transaction, byte[] signature, PublicKey key) {
         this.transactionString = transaction;
@@ -32,6 +32,11 @@ public class Transaction implements Serializable {
 
     public long getTime() {
         return time;
+    }
+
+    @Override
+    public int compareTo(Transaction transaction) {
+        return Long.compare(this.getTime(), transaction.getTime());
     }
 
     public static byte[] sign(String transaction, PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
