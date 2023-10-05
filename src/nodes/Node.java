@@ -1,8 +1,8 @@
 package nodes;
 
-import sockets.networkUser;
+import sockets.NetworkUser;
 
-public class Node extends networkUser {
+public class Node extends NetworkUser {
 
     private String id;
 

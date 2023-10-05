@@ -1,5 +1,7 @@
 package sockets;
 
+import users.Transaction;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -51,6 +53,10 @@ public class Listener {
 
     public void sendMessage(String message) {
         PeerHandler.sendMessages(message);
+    }
+
+    public void sendTransaction(Transaction transaction) {
+        PeerHandler.sendTransactions(transaction);
     }
 
     private void closeListener() {

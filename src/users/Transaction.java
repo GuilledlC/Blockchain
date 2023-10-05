@@ -1,9 +1,11 @@
 package users;
 
 import utils.HashUtils;
+
+import java.io.Serializable;
 import java.security.*;
 
-public class Transaction {
+public class Transaction implements Serializable {
     private final String transactionString;
     private final byte[] signature;
     private final PublicKey key;
@@ -59,13 +61,11 @@ public class Transaction {
         return transaction.substring(0, transaction.indexOf(' '));
     }
 
-    public static void displayTransaction(Transaction transaction) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
-        System.out.println(
-                "\nTransaction : " + transaction.getTransactionString() +
+    public static String displayTransaction(Transaction transaction) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+        return  "\nTransaction : " + transaction.getTransactionString() +
                 "\nTime        : " + transaction.getTime() +
                 "\nSignature   : " + HashUtils.toHexString(transaction.getSignature()) +
                 "\nPublic Key  : " + transaction.getKey() +
-                "\nVerified : " + Transaction.verify(transaction)
-        );
+                "\nVerified    : " + Transaction.verify(transaction);
     }
 }

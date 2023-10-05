@@ -1,6 +1,6 @@
 package users;
 
-import sockets.networkUser;
+import sockets.NetworkUser;
 import utils.HashUtils;
 import utils.KeyUtils;
 
@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 
-public class User extends networkUser {
+public class User extends NetworkUser {
 
     private final String uid;
     private PrivateKey priv;
@@ -61,6 +61,7 @@ public class User extends networkUser {
         String transactionString = address + " " + receiver;
         byte[] signature = Transaction.sign(transactionString, priv);
         transaction = new Transaction(transactionString, signature, pub);
+        sendTransaction(transaction);
     }
 
     protected String getAddress() {

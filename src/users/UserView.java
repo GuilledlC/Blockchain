@@ -50,7 +50,7 @@ public class UserView implements Runnable {
                 break;
             case "/viewvote":
                 if(t != null)
-                    Transaction.displayTransaction(t);
+                    System.out.println(Transaction.displayTransaction(t));
                 else
                     System.out.println("You haven't voted yet!");
                 break;
@@ -96,6 +96,6 @@ public class UserView implements Runnable {
 
         a.vote(b.getAddress());
         Transaction t1 = a.getTransaction();
-        Transaction.displayTransaction(t1);
+        System.out.println(Transaction.displayTransaction(t1));
     }
 }

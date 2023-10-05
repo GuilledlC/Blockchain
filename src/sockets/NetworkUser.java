@@ -1,10 +1,10 @@
 package sockets;
 
-import sockets.Listener;
+import users.Transaction;
 
 import java.io.IOException;
 
-public class networkUser {
+public class NetworkUser {
     private Listener listener = null;
 
     public void startListener(int port) throws IOException {
@@ -25,6 +25,11 @@ public class networkUser {
     public void sendMessage(String message) {
         if(isListening())
             listener.sendMessage(message);
+    }
+
+    public void sendTransaction(Transaction transaction) {
+        if(isListening())
+            listener.sendTransaction(transaction);
     }
 
     public boolean isListening() {
