@@ -38,19 +38,16 @@ public class UserView extends View {
         switch (command) {
             case "/help" -> displayHelp();
             case "/vote" -> {
-                if (t != null)
-                    System.out.println("You have already voted!");
-                else {
-                    try {
-                        user.vote(args);
-                        System.out.println("Vote recorded. Type /viewvote to view your vote.");
-                    } catch (NoSuchAlgorithmException e) {
-                        throw new RuntimeException(e);
-                    } catch (SignatureException e) {
-                        throw new RuntimeException(e);
-                    } catch (InvalidKeyException e) {
-                        throw new RuntimeException(e);
-                    }
+                try {
+                    user.vote(args);
+                    System.out.println("Vote recorded. Type /viewvote to view your vote.");
+                    /**Check if vote has been received*/
+                } catch (NoSuchAlgorithmException e) {
+                    throw new RuntimeException(e);
+                } catch (SignatureException e) {
+                    throw new RuntimeException(e);
+                } catch (InvalidKeyException e) {
+                    throw new RuntimeException(e);
                 }
             }
             case "/viewvote" -> {
