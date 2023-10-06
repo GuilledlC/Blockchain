@@ -12,14 +12,14 @@ import java.util.ArrayList;
 public class PeerHandler implements Runnable {
     private static final ArrayList<PeerHandler> peerHandlers = new ArrayList<>();
     private Socket socket;
-    protected ObjectInputStream ois;
     protected ObjectOutputStream oos;
+    protected ObjectInputStream ois;
 
     public PeerHandler(Socket socket) {
         try {
             this.socket = socket;
-            this.ois = new ObjectInputStream(socket.getInputStream());
             this.oos = new ObjectOutputStream(socket.getOutputStream());
+            this.ois = new ObjectInputStream(socket.getInputStream());
             peerHandlers.add(this);
         } catch (IOException e) {
             close();
