@@ -24,14 +24,17 @@ public class NodeView extends View {
         String command = text.substring(0, endCMDIndex).toLowerCase();
         String args = text.substring(text.indexOf(' ') + 1);
 
+        Node node = (Node)networkUser;
         switch (command) {
             case "/help" -> displayHelp();
+            case "/viewtransactions" -> System.out.println(node.getTransactions());
             default -> super.processCommand(text);
         }
     }
 
     protected void displayHelp() {
         System.out.print("""
+                /viewtransactions: Shows a list of the transactions received.
                 """);
         super.displayHelp();
     }

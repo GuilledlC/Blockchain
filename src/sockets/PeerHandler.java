@@ -8,9 +8,11 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class PeerHandler implements Runnable {
     private static final ArrayList<PeerHandler> peerHandlers = new ArrayList<>();
+    private static final ArrayList<Object> objects = new ArrayList<>();
     private Socket socket;
     protected ObjectOutputStream oos;
     protected ObjectInputStream ois;
@@ -37,6 +39,7 @@ public class PeerHandler implements Runnable {
             try {
                 Object object = ois.readObject();
                 handleObjects(object);
+                objects.add(object);
             } catch (IOException | ClassNotFoundException e) {
                 close();
                 break;
@@ -82,6 +85,10 @@ public class PeerHandler implements Runnable {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    protected static ArrayList<Object> getObjects() {
+        return objects;
     }
 
 }

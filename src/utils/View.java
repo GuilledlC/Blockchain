@@ -53,7 +53,6 @@ public class View implements Runnable {
                     System.out.println("You are currently offline! Start listening with /start \"port\"");
             }
             case "/close" -> System.out.println("Goodbye!");
-            default -> networkUser.sendObject(command);
         }
     }
 
@@ -64,7 +63,6 @@ public class View implements Runnable {
                 /connect X:Y: Connects to the port "Y" at the IP "X".
                 /close: Closes the program.
                 /help: Displays the help.
-                Anything else: sends everything to all the connected nodes.
                 """);
     }
 }

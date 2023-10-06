@@ -5,11 +5,12 @@ import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Listener {
 
     private static ArrayList<Socket> bootstrapNodes;
-    private ArrayList<Socket> connectedNodes;
+    private ArrayList<PeerHandler> connectedNodes;
     private final ServerSocket serverSocket;
 
     public Listener(int port) throws IOException {
@@ -44,11 +45,15 @@ public class Listener {
         PeerHandler peer = new PeerHandler(peerSocket);
         Thread peerThread = new Thread(peer);
         peerThread.start();
-        connectedNodes.add(peerSocket);
+        connectedNodes.add(peer);
     }
 
     public void sendObject(Serializable object) {
         PeerHandler.sendObjects(object);
+    }
+
+    public ArrayList<Object> getObjects() {
+        return PeerHandler.getObjects();
     }
 
     private void closeListener() {

@@ -72,7 +72,8 @@ public class UserView extends View {
     protected void displayHelp() {
         System.out.print("""
                 /vote X: Votes for the candidate "X".
-                /viewvote: Shows who you voted for.""");
+                /viewvote: Shows who you voted for.
+                """);
         super.displayHelp();
     }
 
