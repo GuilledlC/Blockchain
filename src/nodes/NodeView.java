@@ -1,7 +1,6 @@
 package nodes;
 
 import utils.View;
-import java.io.IOException;
 import java.util.Scanner;
 
 public class NodeView extends View {

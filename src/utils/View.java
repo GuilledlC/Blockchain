@@ -1,6 +1,5 @@
 package utils;
 
-import nodes.Node;
 import sockets.NetworkUser;
 
 import java.io.IOException;
