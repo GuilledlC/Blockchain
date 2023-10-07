@@ -55,15 +55,15 @@ public class Vote implements Serializable, Comparable<Vote> {
         byte[] bytes = vote.getVoteString().getBytes();
         signature.update(bytes);
         return signature.verify(vote.getSignature())
-                && verifyVote(getAddress(vote.getVoteString()), vote.getKey());
+                && verifyVote(vote.getAddress(), vote.getKey());
     }
 
     private static boolean verifyVote(String address, PublicKey key) {
         return address.equals(HashUtils.hash(key.toString()));
     }
 
-    private static String getAddress(String vote) {
-        return vote.substring(0, vote.indexOf(' '));
+    private String getAddress() {
+        return voteString.substring(0, voteString.indexOf(' '));
     }
 
     public String displayVote() throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
@@ -75,7 +75,8 @@ public class Vote implements Serializable, Comparable<Vote> {
     }
 
     public String displayVoteShort() {
-        String shortAddress = getVoteString().substring(0, 8);
+        String address = getAddress();
+        String shortAddress = address.substring(0, 4) + "-" + address.substring(address.length() - 4);
         String vote = getVoteString().substring(getVoteString().indexOf(' '));
         return shortAddress + vote;
     }
