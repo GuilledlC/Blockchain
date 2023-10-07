@@ -1,7 +1,7 @@
 package nodes;
 
 import ledger.Block;
-import users.Transaction;
+import users.Vote;
 import utils.View;
 import java.util.Scanner;
 
@@ -30,8 +30,8 @@ public class NodeView extends View {
         switch (command) {
             case "/help" -> displayHelp();
             case "/viewvotes" -> {
-                for (Transaction t: node.getTransactions()) {
-                    System.out.println(t.displayTransactionShort());
+                for (Vote t: node.getVotes()) {
+                    System.out.println(t.displayVoteShort());
                 }
             }
             case "/viewblocks" -> {
@@ -45,7 +45,7 @@ public class NodeView extends View {
 
     protected void displayHelp() {
         System.out.print("""
-                /viewvotes: Shows a list of the transactions received.
+                /viewvotes: Shows a list of the votes received.
                 /viewblocks: Shows a list of the blocks created.
                 """);
         super.displayHelp();

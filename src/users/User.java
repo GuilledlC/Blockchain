@@ -15,7 +15,7 @@ public class User extends NetworkUser {
     private PrivateKey priv;
     private PublicKey pub;
     private String address;
-    private Transaction transaction;
+    private Vote vote;
     private String privatePath;
     private String publicPath;
 
@@ -57,17 +57,17 @@ public class User extends NetworkUser {
     }
 
     protected void vote(String receiver) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
-        String transactionString = address + " " + receiver;
-        byte[] signature = Transaction.sign(transactionString, priv);
-        transaction = new Transaction(transactionString, signature, pub);
-        sendObject(transaction);
+        String voteString = address + " " + receiver;
+        byte[] signature = Vote.sign(voteString, priv);
+        vote = new Vote(voteString, signature, pub);
+        sendObject(vote);
     }
 
     protected String getAddress() {
         return address;
     }
 
-    protected Transaction getTransaction() {
-        return transaction;
+    protected Vote getVote() {
+        return vote;
     }
 }

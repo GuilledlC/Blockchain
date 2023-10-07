@@ -2,7 +2,7 @@ package nodes;
 
 import ledger.Block;
 import sockets.NetworkUser;
-import users.Transaction;
+import users.Vote;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
@@ -10,32 +10,32 @@ import java.util.concurrent.TimeUnit;
 
 public class Node extends NetworkUser {
 
-    static final int CHECK_TRANSACTION_DELAY_S = 5;
+    static final int CHECK_VOTE_DELAY_S = 5;
     static final int BLOCK_BUILD_TIME_S = 5;
-    static final int MIN_TRANSACTIONS_BLOCK = 2;
+    static final int MIN_VOTES_BLOCK = 2;
 
-    private final ArrayList<Transaction> transactions;
+    private final ArrayList<Vote> votes;
 
     private final ArrayList<Block> blocks;
 
     public Node(String id) {
         super(id);
-        transactions = new ArrayList<>();
+        votes = new ArrayList<>();
         blocks = new ArrayList<>();
         buildBlocks();
     }
 
-    private void syncTransactions() {
+    private void syncVotes() {
         for (Object o: listener.getObjects()) {
-            if(o instanceof Transaction t && !transactions.contains(t)) {
-                transactions.add(t);
+            if(o instanceof Vote t && !votes.contains(t)) {
+                votes.add(t);
             }
         }
     }
 
-    protected ArrayList<Transaction> getTransactions() {
-        syncTransactions();
-        return transactions;
+    protected ArrayList<Vote> getVotes() {
+        syncVotes();
+        return votes;
     }
 
     public ArrayList<Block> getBlocks() {
@@ -44,18 +44,18 @@ public class Node extends NetworkUser {
 
     protected void buildBlocks() {
         new Thread(() -> {
-            while(transactions.isEmpty()) {
+            while(votes.isEmpty()) {
                 try {
-                    TimeUnit.SECONDS.sleep(CHECK_TRANSACTION_DELAY_S);
+                    TimeUnit.SECONDS.sleep(CHECK_VOTE_DELAY_S);
                 } catch (InterruptedException ignored) {}
-                syncTransactions();
+                syncVotes();
             }
 
             Timer timer = new Timer();
             timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
-                    if(transactions.size() >= MIN_TRANSACTIONS_BLOCK)
+                    if(votes.size() >= MIN_VOTES_BLOCK)
                         buildBlock();
                 }
             }, BLOCK_BUILD_TIME_S * 1000, BLOCK_BUILD_TIME_S * 1000);
@@ -63,10 +63,10 @@ public class Node extends NetworkUser {
     }
 
     private void buildBlock() {
-        syncTransactions();
-        Block block = new Block(transactions);
+        syncVotes();
+        Block block = new Block(votes);
         blocks.add(block);
-        transactions.clear();
+        votes.clear();
     }
 
     /**another 'ask' to send data*/

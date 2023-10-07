@@ -34,7 +34,7 @@ public class UserView extends View {
         String args = text.substring(text.indexOf(' ') + 1);
 
         User user = ((User)networkUser);
-        Transaction t = user.getTransaction();
+        Vote t = user.getVote();
         switch (command) {
             case "/help" -> displayHelp();
             case "/vote" -> {
@@ -53,7 +53,7 @@ public class UserView extends View {
             case "/viewvote" -> {
                 if (t != null) {
                     try {
-                        System.out.println(t.displayTransaction());
+                        System.out.println(t.displayVote());
                     } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
                         throw new RuntimeException(e);
                     }
@@ -78,12 +78,12 @@ public class UserView extends View {
         uv.run();
     }
 
-    private void testTransaction() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, SignatureException, InvalidKeyException {
+    private void testVote() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, SignatureException, InvalidKeyException {
         User a = new User("Guille");
         User b = new User("Carlos");
 
         a.vote(b.getAddress());
-        Transaction t1 = a.getTransaction();
-        System.out.println(t1.displayTransaction());
+        Vote t1 = a.getVote();
+        System.out.println(t1.displayVote());
     }
 }

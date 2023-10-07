@@ -1,32 +1,32 @@
 package ledger;
 
-import users.Transaction;
+import users.Vote;
 import java.util.ArrayList;
 import java.util.Collection;
 
 public class Block {
 
-    private final ArrayList<Transaction> transactions;
+    private final ArrayList<Vote> votes;
 
     public Block() {
-        this.transactions = new ArrayList<>();
+        this.votes = new ArrayList<>();
     }
 
-    public Block(Collection<Transaction> transactions) {
+    public Block(Collection<Vote> votes) {
         this();
-        this.transactions.addAll(transactions);
+        this.votes.addAll(votes);
     }
 
     public String displayBlock() {
-        String block = "\nNumber of transactions in block: " + transactions.size();
-        for(Transaction t: transactions) {
-            block += "\n" + t.displayTransactionShort();
+        String block = "\nNumber of votes in block: " + votes.size();
+        for(Vote t: votes) {
+            block += "\n" + t.displayVoteShort();
         }
         return block;
     }
 
-    public ArrayList<Transaction> getTransactions() {
-        return transactions;
+    public ArrayList<Vote> getVotes() {
+        return votes;
     }
 
 }

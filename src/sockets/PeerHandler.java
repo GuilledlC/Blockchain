@@ -1,6 +1,6 @@
 package sockets;
 
-import users.Transaction;
+import users.Vote;
 
 import java.io.*;
 import java.net.Socket;
@@ -44,8 +44,8 @@ public class PeerHandler implements Runnable {
     }
 
     private void handleObjects(Object object) {
-        if(object instanceof Transaction transaction)
-            System.out.println("Received vote from " + socket.getInetAddress() + ": " + transaction.displayTransactionShort());
+        if(object instanceof Vote vote)
+            System.out.println("Received vote from " + socket.getInetAddress() + ": " + vote.displayVoteShort());
         else if (object instanceof String string)
             System.out.println(string);
     }
