@@ -26,9 +26,10 @@ public class Node extends NetworkUser {
     }
 
     private void syncVotes() {
-        for (Object o: listener.getObjects()) {
-            if(o instanceof Vote t && !votes.contains(t)) {
-                votes.add(t);
+        if(isListening()) {
+            for (Object o: listener.getObjects()) {
+                if(o instanceof Vote t && !votes.contains(t))
+                    votes.add(t);
             }
         }
     }
@@ -55,8 +56,13 @@ public class Node extends NetworkUser {
             timer.scheduleAtFixedRate(new TimerTask() {
                 @Override
                 public void run() {
-                    if(votes.size() >= MIN_VOTES_BLOCK)
-                        buildBlock();
+                    while (votes.size() < MIN_VOTES_BLOCK) {
+                        try {
+                            TimeUnit.SECONDS.sleep(CHECK_VOTE_DELAY_S);
+                        } catch (InterruptedException ignored) {}
+                        syncVotes();
+                    }
+                    buildBlock();
                 }
             }, BLOCK_BUILD_TIME_S * 1000, BLOCK_BUILD_TIME_S * 1000);
         }).start();

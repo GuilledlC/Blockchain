@@ -29,14 +29,13 @@ public class NodeView extends View {
         Node node = (Node)networkUser;
         switch (command) {
             case "/help" -> displayHelp();
-            case "/viewvotes" -> {
-                for (Vote t: node.getVotes()) {
-                    System.out.println(t.displayVoteShort());
-                }
-            }
-            case "/viewblocks" -> {
-                for(Block b: node.getBlocks()) {
-                    System.out.println(b.displayBlock());
+            case "/view" -> {
+                if(args.equals("votes")) {
+                    for (Vote t: node.getVotes())
+                        System.out.println(t.displayVoteShort());
+                } else if(args.equals("blocks")) {
+                    for(Block b: node.getBlocks())
+                        System.out.println(b.displayBlock());
                 }
             }
             default -> super.processCommand(text);
@@ -45,8 +44,8 @@ public class NodeView extends View {
 
     protected void displayHelp() {
         System.out.print("""
-                /viewvotes: Shows a list of the votes received.
-                /viewblocks: Shows a list of the blocks created.
+                /view votes: Shows a list of the votes received.
+                /view blocks: Shows a list of the blocks created.
                 """);
         super.displayHelp();
     }

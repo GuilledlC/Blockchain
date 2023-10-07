@@ -76,7 +76,7 @@ public class Vote implements Serializable, Comparable<Vote> {
 
     public String displayVoteShort() {
         String shortAddress = getVoteString().substring(0, 8);
-        String vote = getVoteString().substring(getVoteString().indexOf(' '), getVoteString().length());
+        String vote = getVoteString().substring(getVoteString().indexOf(' '));
         return shortAddress + vote;
     }
 }

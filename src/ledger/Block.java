@@ -18,11 +18,11 @@ public class Block {
     }
 
     public String displayBlock() {
-        String block = "\nNumber of votes in block: " + votes.size();
+        StringBuilder block = new StringBuilder("\nNumber of votes in block: " + votes.size());
         for(Vote t: votes) {
-            block += "\n" + t.displayVoteShort();
+            block.append("\n").append(t.displayVoteShort());
         }
-        return block;
+        return block.toString();
     }
 
     public ArrayList<Vote> getVotes() {

@@ -50,16 +50,20 @@ public class UserView extends View {
                     throw new RuntimeException(e);
                 }
             }
-            case "/viewvote" -> {
-                if (t != null) {
-                    try {
-                        System.out.println(t.displayVote());
-                    } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
-                        throw new RuntimeException(e);
+            case "/view" -> {
+                if(args.equals("vote")) {
+                    if (t != null) {
+                        try {
+                            System.out.println(t.displayVote());
+                        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
+                            throw new RuntimeException(e);
+                        }
                     }
+                    else
+                        System.out.println("You haven't voted yet!");
+                } else if(args.equals("address")) {
+                    System.out.println(user.getAddress());
                 }
-                else
-                    System.out.println("You haven't voted yet!");
             }
             default -> super.processCommand(text);
         }
@@ -68,7 +72,8 @@ public class UserView extends View {
     protected void displayHelp() {
         System.out.print("""
                 /vote X: Votes for the candidate "X".
-                /viewvote: Shows who you voted for.
+                /view vote: Shows who you voted for.
+                /view address: Shows your address.
                 """);
         super.displayHelp();
     }
