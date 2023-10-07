@@ -1,5 +1,7 @@
 package nodes;
 
+import ledger.Block;
+import users.Transaction;
 import utils.View;
 import java.util.Scanner;
 
@@ -27,14 +29,24 @@ public class NodeView extends View {
         Node node = (Node)networkUser;
         switch (command) {
             case "/help" -> displayHelp();
-            case "/viewtransactions" -> System.out.println(node.getTransactions());
+            case "/viewvotes" -> {
+                for (Transaction t: node.getTransactions()) {
+                    System.out.println(t.displayTransactionShort());
+                }
+            }
+            case "/viewblocks" -> {
+                for(Block b: node.getBlocks()) {
+                    System.out.println(b.displayBlock());
+                }
+            }
             default -> super.processCommand(text);
         }
     }
 
     protected void displayHelp() {
         System.out.print("""
-                /viewtransactions: Shows a list of the transactions received.
+                /viewvotes: Shows a list of the transactions received.
+                /viewblocks: Shows a list of the blocks created.
                 """);
         super.displayHelp();
     }

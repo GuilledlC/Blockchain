@@ -4,11 +4,7 @@ import users.Transaction;
 
 import java.io.*;
 import java.net.Socket;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class PeerHandler implements Runnable {
     private static final ArrayList<PeerHandler> peerHandlers = new ArrayList<>();
@@ -48,21 +44,15 @@ public class PeerHandler implements Runnable {
     }
 
     private void handleObjects(Object object) {
-        if(object instanceof Transaction transaction) {
-            try {
-                System.out.println(Transaction.displayTransaction(transaction));
-            } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
-                throw new RuntimeException(e);
-            }
-        } else if (object instanceof String string) {
+        if(object instanceof Transaction transaction)
+            System.out.println("Received vote from " + socket.getInetAddress() + ": " + transaction.displayTransactionShort());
+        else if (object instanceof String string)
             System.out.println(string);
-        }
     }
 
     protected static void sendObjects(Serializable object) {
-        for(PeerHandler peerHandler : peerHandlers) {
+        for(PeerHandler peerHandler : peerHandlers)
             peerHandler.sendObject(object);
-        }
     }
 
     private void sendObject(Serializable object) {
@@ -88,7 +78,9 @@ public class PeerHandler implements Runnable {
     }
 
     protected static ArrayList<Object> getObjects() {
-        return objects;
+        ArrayList<Object> aux = new ArrayList<>(objects);
+        objects.clear();
+        return aux;
     }
 
 }

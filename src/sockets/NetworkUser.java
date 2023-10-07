@@ -2,12 +2,11 @@ package sockets;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 
 public class NetworkUser {
 
     protected final String id;
-    private Listener listener = null;
+    protected Listener listener = null;
 
     public NetworkUser(String id) {
         this.id = id;
@@ -31,10 +30,6 @@ public class NetworkUser {
     public void sendObject(Serializable object) {
         if(isListening())
             listener.sendObject(object);
-    }
-
-    public ArrayList<Object> getObjects() {
-        return listener.getObjects();
     }
 
     public boolean isListening() {

@@ -53,12 +53,8 @@ public class UserView extends View {
             case "/viewvote" -> {
                 if (t != null) {
                     try {
-                        System.out.println(Transaction.displayTransaction(t));
-                    } catch (NoSuchAlgorithmException e) {
-                        throw new RuntimeException(e);
-                    } catch (SignatureException e) {
-                        throw new RuntimeException(e);
-                    } catch (InvalidKeyException e) {
+                        System.out.println(t.displayTransaction());
+                    } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
                         throw new RuntimeException(e);
                     }
                 }
@@ -88,6 +84,6 @@ public class UserView extends View {
 
         a.vote(b.getAddress());
         Transaction t1 = a.getTransaction();
-        System.out.println(Transaction.displayTransaction(t1));
+        System.out.println(t1.displayTransaction());
     }
 }

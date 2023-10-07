@@ -66,11 +66,17 @@ public class Transaction implements Serializable, Comparable<Transaction> {
         return transaction.substring(0, transaction.indexOf(' '));
     }
 
-    public static String displayTransaction(Transaction transaction) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
-        return  "\nTransaction : " + transaction.getTransactionString() +
-                "\nTime        : " + transaction.getTime() +
-                "\nSignature   : " + HashUtils.toHexString(transaction.getSignature()) +
-                "\nPublic Key  : " + transaction.getKey() +
-                "\nVerified    : " + Transaction.verify(transaction);
+    public String displayTransaction() throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+        return  "\nTransaction : " + getTransactionString() +
+                "\nTime        : " + getTime() +
+                "\nSignature   : " + HashUtils.toHexString(getSignature()) +
+                "\nPublic Key  : " + getKey() +
+                "\nVerified    : " + Transaction.verify(this);
+    }
+
+    public String displayTransactionShort() {
+        String shortAddress = getTransactionString().substring(0, 8);
+        String vote = getTransactionString().substring(getTransactionString().indexOf(' '), getTransactionString().length());
+        return shortAddress + vote;
     }
 }
