@@ -1,15 +1,16 @@
 import database.Database;
 
-import javax.xml.crypto.Data;
+import java.io.File;
 import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-        Database database = new Database();
         try {
-            database.openDatabase();
-        } catch (IOException hey){
-            System.out.println("hey");
+            File file = new File("./src/main/resources/publicKeys.txt");
+            Database database = new Database();
+            database.loadData(file);
+        } catch (IOException error){
+            error.printStackTrace();
         }
     }
 }
