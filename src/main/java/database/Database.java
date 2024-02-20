@@ -7,7 +7,7 @@ import static org.iq80.leveldb.impl.Iq80DBFactory.*;
 import java.io.*;
 
 public class Database {
-    DB db;
+    private DB db;
 
     public Database() throws IOException {
         this.openDatabase();
@@ -20,10 +20,6 @@ public class Database {
             while ((key = br.readLine()) != null) {
                 this.changeValue(key, "0");
             }
-
-            //check correct insert
-            System.out.println(getValue("99185536K"));
-            System.out.println(getValue("99744054Y"));
         } finally {
             this.closeDatabase();
         }
