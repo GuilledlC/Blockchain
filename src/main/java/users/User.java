@@ -9,12 +9,13 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
 
 public class User extends NetworkUser {
 
     private PrivateKey priv;
     private PublicKey pub;
-    private String address;
+    private byte[] address;
     private Vote vote;
     private String privatePath;
     private String publicPath;
@@ -28,7 +29,7 @@ public class User extends NetworkUser {
         privatePath = "./" + id + ".key";
         publicPath = "./" + id + ".pub";
         checkKeys();
-        address = HashUtils.hash(pub.toString());
+        address = HashUtils.hashString(pub.toString());
     }
 
     private void checkKeys() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
@@ -57,13 +58,13 @@ public class User extends NetworkUser {
     }
 
     protected void vote(String receiver) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
-        String voteString = address + " " + receiver;
+        String voteString = HashUtils.toHexString(address) + " " + receiver;
         byte[] signature = Vote.sign(voteString, priv);
-        vote = new Vote(voteString, signature, pub);
+        vote = new Vote(address, voteString, signature, pub);
         sendObject(vote);
     }
 
-    protected String getAddress() {
+    protected byte[] getAddress() {
         return address;
     }
 
