@@ -17,15 +17,13 @@ public class KeyUtils {
         return keyPairGenerator.generateKeyPair();
     }
 
-    public static PrivateKey privateKeyReader(String filename) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        byte[] keyBytes = Files.readAllBytes(Paths.get(filename));
+    public static PrivateKey privateKeyReader(byte[] keyBytes) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         EncodedKeySpec spec = new PKCS8EncodedKeySpec(keyBytes);
         KeyFactory factory = KeyFactory.getInstance(RSA);
         return factory.generatePrivate(spec);
     }
 
-    public static PublicKey publicKeyReader(String filename) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
-        byte[] keyBytes = Files.readAllBytes(Paths.get(filename));
+    public static PublicKey publicKeyReader(byte[] keyBytes) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         EncodedKeySpec spec = new X509EncodedKeySpec(keyBytes);
         KeyFactory factory = KeyFactory.getInstance(RSA);
         return factory.generatePublic(spec);

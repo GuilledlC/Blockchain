@@ -38,10 +38,10 @@ public class User extends NetworkUser {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             if(Files.exists(Paths.get(privatePath))) {
                 System.out.println("Private key found");
-                priv = KeyUtils.privateKeyReader(privatePath);
+                //priv = KeyUtils.privateKeyReader(privatePath);
                 if(Files.exists(Paths.get(publicPath))) {
                     System.out.println("Public key found");
-                    pub = KeyUtils.publicKeyReader(publicPath);
+                    //pub = KeyUtils.publicKeyReader(publicPath);
                 }
                 else {
                     System.out.println("Public key not found, generating public key...");
