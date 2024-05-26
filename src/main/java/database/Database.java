@@ -17,7 +17,7 @@ public class Database {
         BufferedReader br = new BufferedReader(new FileReader(publicKeyFile));
         String key;
         while ((key = br.readLine()) != null) {
-            this.changeValue(key, "0");
+            this.changeValue(key, false);
         }
     }
 
@@ -31,11 +31,15 @@ public class Database {
         this.db.close();
     }
 
-    public void changeValue(String key, String value) {
-        this.db.put(bytes(key), bytes(value));
+    public void changeValue(String key, boolean value) {
+        this.db.put(bytes(key), new byte[]{(byte) (value ? 1 : 0)});
     }
 
-    public String getValue(String key) {
-        return asString(this.db.get(bytes(key)));
+    public boolean hasVoted(String key) {
+        try {
+            return this.db.get(bytes(key))[0] == 1;
+        } catch (NullPointerException e) {
+            return true;
+        }
     }
 }
