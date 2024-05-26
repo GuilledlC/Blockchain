@@ -1,5 +1,3 @@
-import sockets.PeerHandler;
-
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -7,37 +5,20 @@ import java.util.ArrayList;
 
 public class NewNode {
 
-	private final ArrayList<PeerHandler> connectedNodes;
+	private final ArrayList<NewPeerHandler> connectedNodes;
 	private static ArrayList<Socket> bootstrapNodes;
-	private final ServerSocket userListener;
-	private final ServerSocket nodeListener;
+	private final NewListener userListener;
+	private final NewListener nodeListener;
 
 	public NewNode(int userPort, int nodePort) throws IOException {
-		this.userListener = new ServerSocket(userPort);
-		this.nodeListener = new ServerSocket(nodePort);
+		this.userListener =  new NewListener(new ServerSocket(userPort));
+		this.nodeListener =  new NewListener(new ServerSocket(nodePort));
 		this.connectedNodes = new ArrayList<>();
 	}
 
 	public void startListeners() {
-		NewListener userThread = new NewListener(userListener);
-		userThread.run();
-		NewListener nodeThread = new NewListener(nodeListener);
-		nodeThread.run();
-	}
-
-	private void handlePeer(Socket peerSocket) {
-		PeerHandler peer = new PeerHandler(peerSocket);
-		Thread peerThread = new Thread(peer);
-		peerThread.start();
-		connectedNodes.add(peer);
-	}
-
-	private void closeListener(ServerSocket listener) {
-		try {
-			listener.close();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
-		}
+		userListener.run();
+		nodeListener.run();
 	}
 
 	private class NewListener implements Runnable {
@@ -57,7 +38,22 @@ public class NewNode {
 					handlePeer(peerSocket);
 				}
 			} catch (IOException e) {
-				closeListener(listener);
+				closeListener();
+			}
+		}
+
+		private void handlePeer(Socket peerSocket) {
+			NewPeerHandler peer = new NewPeerHandler(peerSocket);
+			Thread peerThread = new Thread(peer);
+			peerThread.start();
+			connectedNodes.add(peer);
+		}
+
+		private void closeListener() {
+			try {
+				listener.close();
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
 		}
 	}
