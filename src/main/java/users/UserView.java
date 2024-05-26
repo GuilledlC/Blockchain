@@ -1,5 +1,6 @@
 package users;
 
+import utils.HashUtils;
 import utils.View;
 
 import java.io.IOException;
@@ -40,16 +41,12 @@ public class UserView extends View {
             case "/vote" -> {
                 try {
                     user.vote(args);
-                    System.out.println("Vote recorded. Type /viewvote to view your vote.");
+                    System.out.println("Vote recorded. Type /view vote to view your vote.");
                     /**Check if vote has been received*/
-                } catch (NoSuchAlgorithmException e) {
-                    throw new RuntimeException(e);
-                } catch (SignatureException e) {
-                    throw new RuntimeException(e);
-                } catch (InvalidKeyException e) {
+                } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
                     throw new RuntimeException(e);
                 }
-            }
+			}
             case "/view" -> {
                 if(args.equals("vote")) {
                     if (t != null) {
@@ -62,7 +59,7 @@ public class UserView extends View {
                     else
                         System.out.println("You haven't voted yet!");
                 } else if(args.equals("address")) {
-                    System.out.println(user.getAddress());
+                    System.out.println(HashUtils.toHexString(user.getAddress()));
                 }
             }
             default -> super.processCommand(text);
@@ -87,7 +84,7 @@ public class UserView extends View {
         User a = new User("Guille");
         User b = new User("Carlos");
 
-        a.vote(b.getAddress());
+        //a.vote(b.getAddress());
         Vote t1 = a.getVote();
         System.out.println(t1.displayVote());
     }

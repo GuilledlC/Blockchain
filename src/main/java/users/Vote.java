@@ -4,15 +4,18 @@ import utils.HashUtils;
 
 import java.io.Serializable;
 import java.security.*;
+import java.util.Arrays;
 
 public class Vote implements Serializable, Comparable<Vote> {
+	private final byte[] address;
     private final String voteString;
     private final byte[] signature;
     private final PublicKey key;
     private final long time;
 
-    public Vote(String vote, byte[] signature, PublicKey key) {
-        this.voteString = vote;
+    public Vote(byte[] address, String vote, byte[] signature, PublicKey key) {
+        this.address = address;
+		this.voteString = vote;
         this.signature = signature;
         this.key = key;
         this.time = System.currentTimeMillis();
@@ -58,12 +61,12 @@ public class Vote implements Serializable, Comparable<Vote> {
                 && verifyVote(vote.getAddress(), vote.getKey());
     }
 
-    private static boolean verifyVote(String address, PublicKey key) {
-        return address.equals(HashUtils.hash(key.toString()));
+    private static boolean verifyVote(byte[] address, PublicKey key) {
+        return Arrays.equals(address, HashUtils.hashString(key.toString()));
     }
 
-    private String getAddress() {
-        return voteString.substring(0, voteString.indexOf(' '));
+    private byte[] getAddress() {
+		return address;
     }
 
     public String displayVote() throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
@@ -75,9 +78,14 @@ public class Vote implements Serializable, Comparable<Vote> {
     }
 
     public String displayVoteShort() {
-        String address = getAddress();
+        String address = HashUtils.toHexString(getAddress());
         String shortAddress = address.substring(0, 4) + "-" + address.substring(address.length() - 4);
         String vote = getVoteString().substring(getVoteString().indexOf(' '));
         return shortAddress + vote;
     }
+
+	public byte[] getTXID() {
+		String dataToHash = voteString + Arrays.toString(signature) + key.toString() + time;
+		return HashUtils.hashString(dataToHash);
+	}
 }
