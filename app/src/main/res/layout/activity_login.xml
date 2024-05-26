@@ -4,10 +4,73 @@
     android:layout_height="match_parent"
     android:padding="16dp">
 
-    <Button
-        android:id="@+id/btnSelectFile"
+
+    <TextView
+        android:id="@+id/tvSelectPublicKey"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Seleccionar Archivo"/>
+        android:text="Seleccionar Clave Pública"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"/>
 
+
+    <Button
+        android:id="@+id/btnSelectPublicKey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Seleccionar Archivo"
+        android:layout_below="@id/tvSelectPublicKey"
+        android:layout_marginTop="8dp"
+        android:layout_centerHorizontal="true"/>
+
+    <ImageView
+        android:id="@+id/ivTickPublicKey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_tick_green"
+        android:layout_toEndOf="@id/btnSelectPublicKey"
+        android:layout_alignBottom="@id/btnSelectPublicKey"
+        android:layout_marginStart="8dp"
+        android:visibility="gone"/>
+
+    <!-- Texto descriptivo para seleccionar clave privada -->
+    <TextView
+        android:id="@+id/tvSelectPrivateKey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Seleccionar Clave Privada"
+        android:layout_below="@id/btnSelectPublicKey"
+        android:layout_marginTop="16dp"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- Botón para seleccionar clave privada -->
+    <Button
+        android:id="@+id/btnSelectPrivateKey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Seleccionar Archivo"
+        android:layout_below="@id/tvSelectPrivateKey"
+        android:layout_marginTop="8dp"
+        android:layout_centerHorizontal="true"/>
+
+    <!-- ImageView para mostrar tick verde al seleccionar clave privada -->
+    <ImageView
+        android:id="@+id/ivTickPrivateKey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_tick_green"
+        android:layout_toEndOf="@id/btnSelectPrivateKey"
+        android:layout_alignBottom="@id/btnSelectPrivateKey"
+        android:layout_marginStart="8dp"
+        android:visibility="gone"/>
+
+    <!-- Botón para comprobar -->
+    <Button
+        android:id="@+id/btnCheck"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Comprobar"
+        android:layout_below="@id/btnSelectPrivateKey"
+        android:layout_marginTop="32dp"
+        android:layout_centerHorizontal="true"/>
 </RelativeLayout>

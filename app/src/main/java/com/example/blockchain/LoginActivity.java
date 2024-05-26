@@ -1,15 +1,20 @@
 package com.example.blockchain;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Toast;
 
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.compose.ui.state.ToggleableState;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -21,61 +26,102 @@ import utils.KeyUtils;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private static final int FILE_SELECT_CODE = 0;
+    private ActivityResultLauncher<Intent> fileChooserLauncherPublic;
+    private ActivityResultLauncher<Intent> fileChooserLauncherPrivate;
+    private boolean[] files;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
-        Button btnSelectFile = findViewById(R.id.btnSelectFile);
-        btnSelectFile.setOnClickListener(new View.OnClickListener() {
+        this.files = new boolean[2];
+
+        Button btnSelectPublicKey = findViewById(R.id.btnSelectPublicKey);
+        Button btnSelectPrivateKey = findViewById(R.id.btnSelectPrivateKey);
+        Button btnCheck = findViewById(R.id.btnCheck);
+
+
+        this.initializerPublic();
+        this.initializerPrivate();
+
+        btnSelectPublicKey.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showFileChooser();
+                showFileChooserPublic();
+            }
+        });
+        btnSelectPrivateKey.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showFileChooserPrivate();
+            }
+        });
+
+        btnCheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                manager();
             }
         });
     }
 
-    private void showFileChooser() {
+    private void showFileChooserPublic() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("*/*");
+        intent.setType("application/vnd.exstream-package");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-
-        try {
-            startActivityForResult(
-                    Intent.createChooser(intent, "Select a file to upload"),
-                    FILE_SELECT_CODE
-            );
-        } catch (android.content.ActivityNotFoundException ex) {
-            Toast.makeText(this, "Please install a File Manager.", Toast.LENGTH_SHORT).show();
-        }
+        fileChooserLauncherPublic.launch(Intent.createChooser(intent, "Select a file to upload"));
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
+    private void showFileChooserPrivate() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("application/pgp-keys");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        fileChooserLauncherPrivate.launch(Intent.createChooser(intent, "Select a file to upload"));
 
-        if (requestCode == FILE_SELECT_CODE && resultCode == RESULT_OK) {
-            if (data != null) {
-                Uri uri = data.getData();
-                String type = getContentResolver().getType(uri);
-                String path = getPathFromUri(uri);
+    }
 
-                try {
-                    System.out.println(KeyUtils.publicKeyReader(readBytesFromUri(
-                            this, uri)).getAlgorithm());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                } catch (NoSuchAlgorithmException e) {
-                    throw new RuntimeException(e);
-                } catch (InvalidKeySpecException e) {
-                    throw new RuntimeException(e);
+    private void initializerPublic() {
+        fileChooserLauncherPublic = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        if (data != null) {
+                            ImageView ivTickPublic = findViewById(R.id.ivTickPublicKey);
+                            ivTickPublic.setVisibility(View.VISIBLE);
+                            files[0] = true;
+                        }
+                    }
                 }
+        );
+    }
 
-                System.out.println("File Path: " + path + " File Type: " + type);
-            }
-        }
+    private void initializerPrivate() {
+        fileChooserLauncherPrivate = registerForActivityResult(
+                new ActivityResultContracts.StartActivityForResult(),
+                result -> {
+                    if (result.getResultCode() == Activity.RESULT_OK) {
+                        Intent data = result.getData();
+                        if (data != null) {
+                            ImageView ivTickPrivateKey = findViewById(R.id.ivTickPrivateKey);
+                            ivTickPrivateKey.setVisibility(View.VISIBLE);
+                            files[1] = true;
+                        }
+                    }
+                }
+        );
+    }
+
+    private void manager() {
+        if(this.files[0] && this.files[1]){
+            //enviar los files al nodo;
+            Toast.makeText(this, "Safety Checks Underway",
+                    Toast.LENGTH_SHORT).show();
+        } else
+            Toast.makeText(this, "Please, Insert all the files",
+                    Toast.LENGTH_SHORT).show();
     }
 
     public static byte[] readBytesFromUri(Context context, Uri uri) throws IOException {
