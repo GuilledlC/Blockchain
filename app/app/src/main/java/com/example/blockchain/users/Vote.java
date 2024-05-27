@@ -1,6 +1,6 @@
 package com.example.blockchain.users;
 
-import utils.HashUtils;
+import com.example.blockchain.utils.HashUtils;
 
 import java.io.Serializable;
 import java.security.*;

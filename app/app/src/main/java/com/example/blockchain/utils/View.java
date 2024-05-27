@@ -1,4 +1,4 @@
-package utils;
+package com.example.blockchain.utils;
 
 import com.example.blockchain.sockets.NetworkUser;
 

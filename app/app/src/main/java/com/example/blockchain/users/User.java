@@ -3,15 +3,14 @@ package com.example.blockchain.users;
 import android.os.Build;
 
 import com.example.blockchain.sockets.NetworkUser;
-import utils.HashUtils;
-import utils.KeyUtils;
+import com.example.blockchain.utils.HashUtils;
+import com.example.blockchain.utils.KeyUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
-import java.util.Arrays;
 
 public class User extends NetworkUser {
 

@@ -1,7 +1,7 @@
 package com.example.blockchain.users;
 
-import utils.HashUtils;
-import utils.View;
+import com.example.blockchain.utils.HashUtils;
+import com.example.blockchain.utils.View;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;

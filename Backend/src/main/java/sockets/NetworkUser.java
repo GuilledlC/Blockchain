@@ -1,4 +1,4 @@
-package com.example.blockchain.sockets;
+package sockets;
 
 import java.io.IOException;
 import java.io.Serializable;

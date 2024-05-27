@@ -1,4 +1,4 @@
-package com.example.blockchain.users;
+package users;
 
 import utils.HashUtils;
 import utils.View;

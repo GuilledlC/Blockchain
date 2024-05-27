@@ -22,7 +22,7 @@ import java.io.InputStream;
 import java.security.NoSuchAlgorithmException;
 import java.security.spec.InvalidKeySpecException;
 
-import utils.KeyUtils;
+import com.example.blockchain.utils.KeyUtils;
 
 public class LoginActivity extends AppCompatActivity {
 

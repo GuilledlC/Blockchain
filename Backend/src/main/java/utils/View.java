@@ -1,6 +1,6 @@
 package utils;
 
-import com.example.blockchain.sockets.NetworkUser;
+import sockets.NetworkUser;
 
 import java.io.IOException;
 import java.util.Scanner;

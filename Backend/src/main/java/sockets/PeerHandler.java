@@ -1,8 +1,6 @@
-package com.example.blockchain.sockets;
+package sockets;
 
-
-
-import com.example.blockchain.users.Vote;
+import users.Vote;
 
 import java.io.*;
 import java.net.Socket;
