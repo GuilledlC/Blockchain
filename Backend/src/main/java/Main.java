@@ -19,10 +19,17 @@ public class Main {
             //generateData(file);
             //votesCheck.loadData(file);
 
-            //System.out.println(votesCheck.hasVoted("27384915E"));
+
 
             long millis = System.currentTimeMillis();
             //getValues(votesCheck);
+
+            votesCheck.changeValue("27384915E", "0");
+            System.out.println(votesCheck.hasVoted("27384915E"));
+            votesCheck.changeValue("27384915E", "1");
+            System.out.println(votesCheck.hasVoted("27384915E"));
+            votesCheck.changeValue("27384915E", "2");
+            System.out.println(votesCheck.hasVoted("27384915E"));
 
             long millis2 = System.currentTimeMillis();
             System.out.println(millis2 - millis);
