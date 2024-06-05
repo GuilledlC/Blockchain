@@ -1,3 +1,5 @@
+package newVersion;
+
 import ledger.Block;
 import users.Vote;
 
@@ -13,22 +15,18 @@ import java.util.concurrent.TimeUnit;
 
 public class NewNode {
 
-	public NewNode(int userPort, int nodePort) throws IOException {
-		this.userListener =  new NewListener(new ServerSocket(userPort));
-		this.nodeListener =  new NewListener(new ServerSocket(nodePort));
+	public NewNode(int userPort) throws IOException {
 		this.votes = new ArrayList<>();
 		this.blocks = new ArrayList<>();
+		this.userListener =  new NewClientListener(userPort);
 		setNonMinedBlocks(bootstrapNodes);
 	}
 
 	private void syncVotes() {
-		for (Vote v: NewPeerHandler.getVotes()) {
-			if(!votes.contains(v))
-				votes.add(v);
-		}
+		votes.addAll(NewClientHandler.getVotes());
 	}
 
-	protected ArrayList<Vote> getVotes() {
+	private ArrayList<Vote> getVotes() {
 		syncVotes();
 		return votes;
 	}
@@ -39,22 +37,20 @@ public class NewNode {
 
 	protected void buildBlocks() {
 		new Thread(() -> {
-			while(votes.isEmpty()) {
+			while(getVotes().isEmpty()) {
 				try {
 					TimeUnit.SECONDS.sleep(CHECK_VOTE_DELAY_S);
 				} catch (InterruptedException ignored) {}
-				syncVotes();
 			}
 
 			Timer timer = new Timer();
 			timer.scheduleAtFixedRate(new TimerTask() {
 				@Override
 				public void run() {
-					while (votes.size() < MIN_VOTES_BLOCK) {
+					while (getVotes().size() < MIN_VOTES_BLOCK) {
 						try {
 							TimeUnit.SECONDS.sleep(CHECK_VOTE_DELAY_S);
 						} catch (InterruptedException ignored) {}
-						syncVotes();
 					}
 					buildBlock();
 				}
@@ -63,8 +59,7 @@ public class NewNode {
 	}
 
 	private void buildBlock() {
-		syncVotes();
-		Block block = new Block(votes);
+		Block block = new Block(new ArrayList<>(getVotes()));
 		blocks.add(block);
 		votes.clear();
 	}
@@ -133,15 +128,15 @@ public class NewNode {
 		}
 	}
 
-	private boolean mining(){
+	private boolean myTurnToMine(){
 		return ip.equals(actualminer);
 	}
 
-	private void nodeExecution(){
+	private void nodeExecution() {
 		Block minedblock;
 
 		if (actualminer != null){
-			if (mining()){
+			if (myTurnToMine()){
 				minedblock = new Block(getVotes());
 				blocks.add(minedblock);
 				//delete votes and update voted users
@@ -152,28 +147,24 @@ public class NewNode {
 				else {punishNode(actualminer);}
 			}
 		}
+
 		Random random = new Random();
-		int randomnumber = random.nextInt(getNonMinedBlocksModule());
+		int randomNumber = random.nextInt(getNonMinedBlocksModule());
 		//todo send randomnumber
 		int result = 0;//todo receive random numbers from nodes and change result
 		proofOfConsensus(moduleOf(result, getNonMinedBlocksModule()));
 		addEveryoneExcept(actualminer);
 	}
 
-	public void startListeners() {
-		userListener.run();
-		nodeListener.run();
-	}
 
-	private class NewListener implements Runnable {
+	private class NewClientListener implements Runnable {
 
 		private final ServerSocket listener;
 		private boolean isListening = false;
-		private final ArrayList<NewPeerHandler> connectedPeers;
 
-		public NewListener(ServerSocket listener) {
-			this.listener = listener;
-			this.connectedPeers = new ArrayList<>();
+		public NewClientListener(int port) throws IOException {
+			this.listener = new ServerSocket(port);
+			this.run();
 		}
 
 		@Override
@@ -181,20 +172,19 @@ public class NewNode {
 			try {
 				while(!listener.isClosed()) {
 					isListening = true;
-					Socket peerSocket = listener.accept();
-					System.out.println("Peer connected from " + peerSocket.getInetAddress() + ":" + peerSocket.getPort());
-					handlePeer(peerSocket);
+					Socket clientSocket = listener.accept();
+					System.out.println("Client connected from " + clientSocket.getInetAddress() + ":" + clientSocket.getPort());
+					handleClient(clientSocket);
 				}
 			} catch (IOException e) {
 				closeListener();
 			}
 		}
 
-		private void handlePeer(Socket peerSocket) {
-			NewPeerHandler peer = new NewPeerHandler(peerSocket);
+		private void handleClient(Socket peerSocket) {
+			NewClientHandler peer = new NewClientHandler(peerSocket);
 			Thread peerThread = new Thread(peer);
 			peerThread.start();
-			connectedPeers.add(peer);
 		}
 
 		private void closeListener() {
@@ -209,12 +199,12 @@ public class NewNode {
 		public boolean isListening() {
 			return isListening;
 		}
+
 	}
 
 
 	private static ArrayList<Socket> bootstrapNodes;
-	private final NewListener userListener;
-	private final NewListener nodeListener;
+	private final NewClientListener userListener;
 	static final int CHECK_VOTE_DELAY_S = 5;
 	static final int BLOCK_BUILD_TIME_S = 5;
 	static final int MIN_VOTES_BLOCK = 2;

@@ -7,7 +7,7 @@ import java.security.*;
 import java.util.Arrays;
 
 public class Vote implements Serializable, Comparable<Vote> {
-	private final byte[] address;
+    private final byte[] address;
     private final String voteString;
     private final byte[] signature;
     private final PublicKey key;
@@ -15,7 +15,7 @@ public class Vote implements Serializable, Comparable<Vote> {
 
     public Vote(byte[] address, String vote, byte[] signature, PublicKey key) {
         this.address = address;
-		this.voteString = vote;
+        this.voteString = vote;
         this.signature = signature;
         this.key = key;
         this.time = System.currentTimeMillis();
@@ -42,6 +42,14 @@ public class Vote implements Serializable, Comparable<Vote> {
         return Long.compare(this.getTime(), vote.getTime());
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Vote vote)
+            return Arrays.equals(this.address, vote.address);
+        else
+            return super.equals(obj);
+    }
+
     public static byte[] sign(String vote, PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         Signature signature = Signature.getInstance("SHA256withRSA");
         signature.initSign(key);
@@ -66,7 +74,7 @@ public class Vote implements Serializable, Comparable<Vote> {
     }
 
     private byte[] getAddress() {
-		return address;
+        return address;
     }
 
     public String displayVote() throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
@@ -84,8 +92,8 @@ public class Vote implements Serializable, Comparable<Vote> {
         return shortAddress + vote;
     }
 
-	public byte[] getTXID() {
-		String dataToHash = voteString + Arrays.toString(signature) + key.toString() + time;
-		return HashUtils.hashString(dataToHash);
-	}
+    public byte[] getTXID() {
+        String dataToHash = voteString + Arrays.toString(signature) + key.toString() + time;
+        return HashUtils.hashString(dataToHash);
+    }
 }
