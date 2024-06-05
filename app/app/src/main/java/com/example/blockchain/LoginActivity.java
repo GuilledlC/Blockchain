@@ -174,7 +174,7 @@ public class LoginActivity extends AppCompatActivity {
         signature.update(bytes);
         return signature.sign();
     }
-    
+
     public static boolean verify(String num, PublicKey publicKey, byte[] givenSignature)
             throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         Signature signature = Signature.getInstance("SHA256withRSA");
