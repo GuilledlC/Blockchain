@@ -27,6 +27,7 @@ import java.security.Signature;
 import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
+import java.util.Random;
 
 import com.example.blockchain.users.Vote;
 import com.example.blockchain.utils.KeyUtils;
@@ -78,6 +79,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void showFileChooserPublic() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        //todo wtf android
         intent.setType("application/vnd.exstream-package");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         fileChooserLauncherPublic.launch(Intent.createChooser(intent,
@@ -86,6 +88,7 @@ public class LoginActivity extends AppCompatActivity {
 
     private void showFileChooserPrivate() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        //todo wtf android
         intent.setType("application/pgp-keys");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         fileChooserLauncherPrivate.launch(Intent.createChooser(intent,
@@ -139,7 +142,8 @@ public class LoginActivity extends AppCompatActivity {
                 PublicKey puk = KeyUtils.publicKeyReader(publicKey);
                 PrivateKey prk = KeyUtils.privateKeyReader(privateKey);
 
-                String num = "33";
+                String num = String.valueOf((new Random().nextInt(34)));
+                System.out.println(num);
 
                 byte[] signature = sign(num, prk);
                 System.out.println(verify(num, puk, signature));
