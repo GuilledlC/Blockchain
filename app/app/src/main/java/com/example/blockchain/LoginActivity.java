@@ -19,9 +19,16 @@ import androidx.compose.ui.state.ToggleableState;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.Signature;
+import java.security.SignatureException;
 import java.security.spec.InvalidKeySpecException;
+import java.util.Arrays;
 
+import com.example.blockchain.users.Vote;
 import com.example.blockchain.utils.KeyUtils;
 
 public class LoginActivity extends AppCompatActivity {
@@ -29,6 +36,8 @@ public class LoginActivity extends AppCompatActivity {
     private ActivityResultLauncher<Intent> fileChooserLauncherPublic;
     private ActivityResultLauncher<Intent> fileChooserLauncherPrivate;
     private boolean[] files;
+    private Uri uriPublic;
+    private Uri uriPrivate;
 
 
     @Override
@@ -71,14 +80,16 @@ public class LoginActivity extends AppCompatActivity {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("application/vnd.exstream-package");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        fileChooserLauncherPublic.launch(Intent.createChooser(intent, "Select a file to upload"));
+        fileChooserLauncherPublic.launch(Intent.createChooser(intent,
+                "Select a file to upload"));
     }
 
     private void showFileChooserPrivate() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
         intent.setType("application/pgp-keys");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
-        fileChooserLauncherPrivate.launch(Intent.createChooser(intent, "Select a file to upload"));
+        fileChooserLauncherPrivate.launch(Intent.createChooser(intent,
+                "Select a file to upload"));
 
     }
 
@@ -89,6 +100,7 @@ public class LoginActivity extends AppCompatActivity {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         Intent data = result.getData();
                         if (data != null) {
+                            this.uriPublic = data.getData();
                             ImageView ivTickPublic = findViewById(R.id.ivTickPublicKey);
                             ivTickPublic.setVisibility(View.VISIBLE);
                             files[0] = true;
@@ -105,6 +117,7 @@ public class LoginActivity extends AppCompatActivity {
                     if (result.getResultCode() == Activity.RESULT_OK) {
                         Intent data = result.getData();
                         if (data != null) {
+                            this.uriPrivate = data.getData();
                             ImageView ivTickPrivateKey = findViewById(R.id.ivTickPrivateKey);
                             ivTickPrivateKey.setVisibility(View.VISIBLE);
                             files[1] = true;
@@ -116,15 +129,32 @@ public class LoginActivity extends AppCompatActivity {
 
     private void manager() {
         if(this.files[0] && this.files[1]){
-            //enviar los files al nodo;
+            //send files to the node;
             Toast.makeText(this, "Safety Checks Underway",
                     Toast.LENGTH_SHORT).show();
+            try {
+                byte[] publicKey = this.readBytesFromUri(this, this.uriPublic);
+                byte[] privateKey = this.readBytesFromUri(this, this.uriPrivate);
+
+                PublicKey puk = KeyUtils.publicKeyReader(publicKey);
+                PrivateKey prk = KeyUtils.privateKeyReader(privateKey);
+
+                String num = "33";
+
+                byte[] signature = sign(num, prk);
+                System.out.println(verify(num, puk, signature));
+
+            } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException |
+                     SignatureException | InvalidKeyException  e) {
+                System.out.println("Mal");
+            }
+
         } else
             Toast.makeText(this, "Please, Insert all the files",
                     Toast.LENGTH_SHORT).show();
     }
 
-    public static byte[] readBytesFromUri(Context context, Uri uri) throws IOException {
+    public byte[] readBytesFromUri(Context context, Uri uri) throws IOException {
         InputStream inputStream = context.getContentResolver().openInputStream(uri);
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         byte[] buffer = new byte[1024];
@@ -136,11 +166,23 @@ public class LoginActivity extends AppCompatActivity {
         return byteArrayOutputStream.toByteArray();
     }
 
-    private String getPathFromUri(Uri uri) {
-        String path = uri.getPath();
-        // Implementación para obtener la ruta del archivo en el sistema de archivos del dispositivo.
-        // Nota: La implementación específica puede variar según el proveedor de contenido.
-        return path;
+    public static byte[] sign(String num, PrivateKey key) throws NoSuchAlgorithmException,
+            InvalidKeyException, SignatureException {
+        Signature signature = Signature.getInstance("SHA256withRSA");
+        signature.initSign(key);
+        byte[] bytes = num.getBytes();
+        signature.update(bytes);
+        return signature.sign();
+    }
+    
+    public static boolean verify(String num, PublicKey publicKey, byte[] givenSignature)
+            throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+        Signature signature = Signature.getInstance("SHA256withRSA");
+        signature.initVerify(publicKey);
+
+        byte[] bytes = num.getBytes();
+        signature.update(bytes);
+        return signature.verify(givenSignature);
     }
 }
 
