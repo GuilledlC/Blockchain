@@ -40,7 +40,11 @@ public class Database {
     }
 
     public boolean hasVoted(String key) {
-        String value = new String(this.db.get(bytes(key)));
-        return value.equals("2");
+        try {
+            String value = new String(this.db.get(bytes(key)));
+            return value.equals("2");
+        } catch (NullPointerException e) {
+            return true;
+        }
     }
 }

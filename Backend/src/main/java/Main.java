@@ -1,5 +1,6 @@
 import database.Database;
 import org.iq80.leveldb.DBIterator;
+import users.Vote;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -12,30 +13,24 @@ public class Main {
     public static void main(String[] args) {
         try {
 			Database votesCheck = new Database("votesCheck");
-            //Database poolVotes = new Database("poolVotes");
 
             File file = new File("publicKeys.txt");
-
             //generateData(file);
             //votesCheck.loadData(file);
 
-
-
             long millis = System.currentTimeMillis();
-            //getValues(votesCheck);
 
             votesCheck.changeValue("27384915E", "0");
             System.out.println(votesCheck.hasVoted("27384915E"));
             votesCheck.changeValue("27384915E", "1");
             System.out.println(votesCheck.hasVoted("27384915E"));
             votesCheck.changeValue("27384915E", "2");
-            System.out.println(votesCheck.hasVoted("27384915E"));
+            System.out.println(votesCheck.hasVoted("0"));
 
             long millis2 = System.currentTimeMillis();
             System.out.println(millis2 - millis);
 
             votesCheck.closeDatabase();
-            //poolVotes.closeDatabase();
         } catch (IOException error){
             error.printStackTrace();
         }
@@ -50,21 +45,14 @@ public class Main {
         bw.close();
     }
 
+
     /** FOR ANGUS
-    private static boolean getValues(Database db) {
-        Random rand = new Random();
-        ArrayList<String> votantes = new ArrayList<>();
-        try {
-            for(String v : votantes){
-                if (!db.hasVoted(v)){
-                    db.changeValue("pibe", true);
-                } else
-                    throw new NullPointerException();
-            }
-            return true;
-        }catch (NullPointerException e) {
-            System.out.println("nodo malo");
-            return false;
-        }
-    }**/
+    private boolean getValues(ArrayList<Vote> votos) {
+        boolean aux = false;
+        int counter = 0;
+        while (!aux)
+            aux = db.hasVoted(votos.get(counter++).getKey());
+        return !aux;
+    }
+     */
 }
