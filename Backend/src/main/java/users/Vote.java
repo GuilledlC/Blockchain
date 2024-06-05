@@ -42,7 +42,15 @@ public class Vote implements Serializable, Comparable<Vote> {
         return Long.compare(this.getTime(), vote.getTime());
     }
 
-    public static byte[] sign(String vote, PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Vote vote)
+			return Arrays.equals(this.address, vote.address);
+		else
+			return super.equals(obj);
+	}
+
+	public static byte[] sign(String vote, PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         Signature signature = Signature.getInstance("SHA256withRSA");
         signature.initSign(key);
 

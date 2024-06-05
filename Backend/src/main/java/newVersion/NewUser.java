@@ -1,3 +1,5 @@
+package newVersion;
+
 import users.Vote;
 import utils.HashUtils;
 
