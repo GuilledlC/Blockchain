@@ -93,7 +93,7 @@ public class NewNode {
 
 	private void setNonMinedBlocks(ArrayList<Socket> sockets) {
 		for (Socket socket : sockets)
-			nonminedblocks.add(new Object[]{socket.getInetAddress(), 1});
+			nonminedblocks.add(new Object[]{socket.getInetAddress(), 1, 0});
 	}
 
 	private static void addEveryoneExcept(InetAddress ip){
@@ -132,8 +132,10 @@ public class NewNode {
 		return aux;
 	}
 
-	private int moduleOf(int number, int module){
-		return number % module;
+	private void resetNodes(){
+		for (Object[] item : nonminedblocks){
+			item[2] = 0;
+		}
 	}
 
 	private void proofOfConsensus(int magicNumber){
@@ -147,6 +149,22 @@ public class NewNode {
 				break;
 			}
 		}
+	}
+
+	private void recieveActualMiner(){
+		//Hacer que dure una cantidad de tiempo determinada
+	}
+
+	private InetAddress chooseActualMiner(){
+		InetAddress ip = null;
+		int aux = 0;
+		for (Object[] obj : nonminedblocks){
+			if (aux < (Integer) obj[2]){
+				ip = (InetAddress) obj[1];
+				aux = (Integer) obj[2];
+			}
+		}
+		return ip;
 	}
 
 	private boolean myTurnToMine(){
@@ -171,9 +189,10 @@ public class NewNode {
 
 		Random random = new Random();
 		int randomNumber = random.nextInt(getNonMinedBlocksModule());
-		//todo send randomnumber
-		int result = 0;//todo receive random numbers from nodes and change result
-		proofOfConsensus(moduleOf(result, getNonMinedBlocksModule()));
+		proofOfConsensus(randomNumber);
+		//todo send actualminer to nodes
+		//todo receive actualminer from nodes recieveActualMiner();
+		actualminer = chooseActualMiner();
 		addEveryoneExcept(actualminer);
 	}
 
