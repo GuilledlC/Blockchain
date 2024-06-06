@@ -193,6 +193,7 @@ public class NewNode {
 		//todo send actualminer to nodes
 		//todo receive actualminer from nodes recieveActualMiner();
 		actualminer = chooseActualMiner();
+		resetNodes();
 		addEveryoneExcept(actualminer);
 	}
 
