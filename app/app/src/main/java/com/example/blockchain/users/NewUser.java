@@ -1,13 +1,14 @@
-package newVersion;
-
-import users.Vote;
-import utils.HashUtils;
+package com.example.blockchain.users;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.security.*;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SignatureException;
 import java.util.ArrayList;
 
 public class NewUser {

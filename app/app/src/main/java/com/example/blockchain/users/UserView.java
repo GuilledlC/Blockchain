@@ -19,7 +19,7 @@ public class UserView extends View {
         System.out.println("\nWhat do you wish to be called?");
         String text = scanner.nextLine();
         try {
-            networkUser = new User(text);
+            networkUser = new OldUser(text);
         } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new RuntimeException(e);}
         super.run();
@@ -34,7 +34,7 @@ public class UserView extends View {
         String command = text.substring(0, endCMDIndex).toLowerCase();
         String args = text.substring(text.indexOf(' ') + 1);
 
-        User user = ((User)networkUser);
+        OldUser user = ((OldUser)networkUser);
         Vote t = user.getVote();
         switch (command) {
             case "/help" -> displayHelp();
@@ -81,8 +81,8 @@ public class UserView extends View {
     }
 
     private void testVote() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, SignatureException, InvalidKeyException {
-        User a = new User("Guille");
-        User b = new User("Carlos");
+        OldUser a = new OldUser("Guille");
+        OldUser b = new OldUser("Carlos");
 
         //a.vote(b.getAddress());
         Vote t1 = a.getVote();

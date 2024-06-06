@@ -7,14 +7,12 @@ import java.security.*;
 import java.util.Arrays;
 
 public class Vote implements Serializable, Comparable<Vote> {
-	private final byte[] address;
     private final String voteString;
     private final byte[] signature;
     private final PublicKey key;
     private final long time;
 
-    public Vote(byte[] address, String vote, byte[] signature, PublicKey key) {
-        this.address = address;
+    public Vote(String vote, byte[] signature, PublicKey key) {
 		this.voteString = vote;
         this.signature = signature;
         this.key = key;
@@ -45,7 +43,7 @@ public class Vote implements Serializable, Comparable<Vote> {
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof Vote vote)
-			return Arrays.equals(this.address, vote.address);
+			return this.getKey().equals(vote.getKey());
 		else
 			return super.equals(obj);
 	}
@@ -65,16 +63,7 @@ public class Vote implements Serializable, Comparable<Vote> {
 
         byte[] bytes = vote.getVoteString().getBytes();
         signature.update(bytes);
-        return signature.verify(vote.getSignature())
-                && verifyVote(vote.getAddress(), vote.getKey());
-    }
-
-    private static boolean verifyVote(byte[] address, PublicKey key) {
-        return Arrays.equals(address, HashUtils.hashString(key.toString()));
-    }
-
-    private byte[] getAddress() {
-		return address;
+        return signature.verify(vote.getSignature());
     }
 
     public String displayVote() throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
@@ -86,10 +75,7 @@ public class Vote implements Serializable, Comparable<Vote> {
     }
 
     public String displayVoteShort() {
-        String address = HashUtils.toHexString(getAddress());
-        String shortAddress = address.substring(0, 4) + "-" + address.substring(address.length() - 4);
-        String vote = getVoteString().substring(getVoteString().indexOf(' '));
-        return shortAddress + vote;
+		return getVoteString().substring(getVoteString().indexOf(' '));
     }
 
 	public byte[] getTXID() {

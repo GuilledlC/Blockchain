@@ -10,7 +10,7 @@ import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 
-public class User extends NetworkUser {
+public class OldUser extends NetworkUser {
 
     private PrivateKey priv;
     private PublicKey pub;
@@ -19,7 +19,7 @@ public class User extends NetworkUser {
     private String privatePath;
     private String publicPath;
 
-    public User(String id) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public OldUser(String id) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         super(id);
         init();
     }
@@ -59,7 +59,7 @@ public class User extends NetworkUser {
     protected void vote(String receiver) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
         String voteString = HashUtils.toHexString(address) + " " + receiver;
         byte[] signature = Vote.sign(voteString, priv);
-        vote = new Vote(address, voteString, signature, pub);
+        vote = new Vote(/*address, */voteString, signature, pub);
         sendObject(vote);
     }
 
