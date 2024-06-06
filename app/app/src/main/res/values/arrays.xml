@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <array name="partidos">
+        <item>PP</item>
+        <item>PSOE</item>
+        <item>VOX</item>
+        <item>Sumar</item>
+        <item>ERC</item>
+        <item>Junts</item>
+        <item>EH Bildu</item>
+        <item>EAJ-PNV</item>
+        <item>BNG</item>
+        <item>CC</item>
+        <item>UPN</item>
+    </array>
+</resources>

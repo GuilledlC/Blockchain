@@ -29,6 +29,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Random;
 
+import com.example.blockchain.users.NewUser;
 import com.example.blockchain.users.Vote;
 import com.example.blockchain.utils.KeyUtils;
 
@@ -146,11 +147,21 @@ public class LoginActivity extends AppCompatActivity {
                 System.out.println(num);
 
                 byte[] signature = sign(num, prk);
-                System.out.println(verify(num, puk, signature));
 
+                if(verify(num, puk, signature)) {
+                    NewUser user = new NewUser(prk, puk);
+                    Intent intent = new Intent(LoginActivity.this,
+                            MainMenuActivity.class);
+                    intent.putExtra("user", user);
+                    startActivity(intent);
+                    finish();
+                }
+                else
+                    throw new IOException();
             } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException |
                      SignatureException | InvalidKeyException  e) {
-                System.out.println("Mal");
+                Toast.makeText(this, "Wrong keys",
+                        Toast.LENGTH_SHORT).show();
             }
 
         } else
