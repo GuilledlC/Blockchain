@@ -4,15 +4,9 @@ import database.Database;
 import ledger.Block;
 import users.Vote;
 
-import javax.swing.table.TableRowSorter;
-import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
-import java.net.ServerSocket;
 import java.net.Socket;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
-import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
@@ -21,19 +15,22 @@ import java.util.concurrent.TimeUnit;
 
 public class NewNode {
 
-
-	public NewNode(int userPort) throws IOException {
+	public NewNode() throws IOException {
 		this.votes = new ArrayList<>();
+		this.database = new Database("votesCheck");
 		this.blocks = new ArrayList<>();
-		this.userListener =  new NewClientListener(userPort);
+
+		this.userListener = new NewClientListener(8888);
 		this.userListener.run();
+
+		this.nodeListener = new NewNodeListener(9999);
+		nodeListener.run();
+
 		setNonMinedBlocks(bootstrapNodes);
 
-		this.database = new Database("votesCheck");
 	}
 
 	private void syncVotes() {
-
 		ArrayList<Vote> tempVotes = new ArrayList<>();
 		tempVotes.addAll(NewClientHandler.getVotes());
 		tempVotes.addAll(NewNodeHandler.getVotes());
@@ -93,17 +90,15 @@ public class NewNode {
 
 	private void setNonMinedBlocks(ArrayList<Socket> sockets) {
 		for (Socket socket : sockets)
-			nonminedblocks.add(new Object[]{socket.getInetAddress(), 1, 0});
+			nonminedblocks.add(new NonMinedBlock(socket.getInetAddress(), 1, 0));
 	}
 
 	private static void addEveryoneExcept(InetAddress ip){
-		for (Object[] item : nonminedblocks){
-			if ((int)item[1] != 0) {
-				item[1] = (double) item[1] + 1;
-			}
-			if (item[0].equals(ip)){
-				item[1] = (double)item[1] - 1;
-			}
+		for (NonMinedBlock item : nonminedblocks){
+			if (item.getNonMinedBlocks() != 0)
+				item.setNonMinedBlocks(item.getNonMinedBlocks() + 1);
+			if (item.getIp().equals(ip))
+				item.setNonMinedBlocks(item.getNonMinedBlocks() - 1);
 		}
 	}
 
@@ -117,33 +112,31 @@ public class NewNode {
 	}
 
 	private void punishNode(InetAddress ip){
-		for (Object[] item : nonminedblocks){
-			if (item[0].equals(ip)){
-				item[1] = 0;
-			}
+		for (NonMinedBlock item : nonminedblocks){
+			if (item.getIp().equals(ip))
+				item.setNonMinedBlocks(0);
 		}
 	}
 
 	private int getNonMinedBlocksModule(){
 		int aux = 0;
-		for (Object[] item : nonminedblocks){
-			aux += (int)item[1];
+		for (NonMinedBlock item : nonminedblocks){
+			aux += item.getNonMinedBlocks();
 		}
 		return aux;
 	}
 
 	private void resetNodes(){
-		for (Object[] item : nonminedblocks){
-			item[2] = 0;
-		}
+		for (NonMinedBlock item : nonminedblocks)
+			item.setMagicNumberCount(0);
 	}
 
 	private void proofOfConsensus(int magicNumber){
 		int aux = -1;
 		InetAddress miner = null;
-		for (Object[] item : nonminedblocks){
-			aux += (int)item[1];
-			miner = (InetAddress)item[0];
+		for (NonMinedBlock item : nonminedblocks){
+			aux += item.getNonMinedBlocks();
+			miner = item.getIp();
 			if (aux >= magicNumber){
 				actualminer = miner;
 				break;
@@ -158,10 +151,10 @@ public class NewNode {
 	private InetAddress chooseActualMiner(){
 		InetAddress ip = null;
 		int aux = 0;
-		for (Object[] obj : nonminedblocks){
-			if (aux < (Integer) obj[2]){
-				ip = (InetAddress) obj[1];
-				aux = (Integer) obj[2];
+		for (NonMinedBlock item : nonminedblocks){
+			if (aux < item.getMagicNumberCount()){
+				ip = item.getIp();
+				aux = item.getMagicNumberCount();
 			}
 		}
 		return ip;
@@ -172,39 +165,71 @@ public class NewNode {
 	}
 
 	private void nodeExecution() {
-		Block minedblock;
+		while (true) {
+			Block minedblock;
 
-		if (actualminer != null){
-			if (myTurnToMine()){
-				minedblock = new Block(getVotes());
-				blocks.add(minedblock);
-				//delete votes and update voted users
+			if (actualminer != null){
+				if (myTurnToMine()){
+					minedblock = new Block(getVotes());
+					blocks.add(minedblock);
+					//delete votes and update voted users
+				}
+				else{
+					minedblock = recieveBlockFromMiner(actualminer);
+					if (correctBlock(minedblock)){blocks.add(minedblock);}
+					else {punishNode(actualminer);}
+				}
 			}
-			else{
-				minedblock = recieveBlockFromMiner(actualminer);
-				if (correctBlock(minedblock)){blocks.add(minedblock);}
-				else {punishNode(actualminer);}
-			}
+
+			Random random = new Random();
+			int randomNumber = random.nextInt(getNonMinedBlocksModule());
+			proofOfConsensus(randomNumber);
+			//todo send actualminer to nodes
+			//todo receive actualminer from nodes recieveActualMiner();
+			actualminer = chooseActualMiner();
+			resetNodes();
+			addEveryoneExcept(actualminer);
+		}
+	}
+
+	private class NonMinedBlock {
+		private final InetAddress ip;
+		private int nonMinedBlocks;
+		private int magicNumberCount;
+
+		public NonMinedBlock(InetAddress ip, int nonMinedBlocks, int magicNumberCount) {
+			this.ip = ip;
+			this.nonMinedBlocks = nonMinedBlocks;
+			this.magicNumberCount = magicNumberCount;
 		}
 
-		Random random = new Random();
-		int randomNumber = random.nextInt(getNonMinedBlocksModule());
-		proofOfConsensus(randomNumber);
-		//todo send actualminer to nodes
-		//todo receive actualminer from nodes recieveActualMiner();
-		actualminer = chooseActualMiner();
-		resetNodes();
-		addEveryoneExcept(actualminer);
+		public InetAddress getIp() {
+			return ip;
+		}
+		public int getNonMinedBlocks() {
+			return nonMinedBlocks;
+		}
+		public void setNonMinedBlocks(int nonMinedBlocks) {
+			this.nonMinedBlocks = nonMinedBlocks;
+		}
+		public int getMagicNumberCount() {
+			return magicNumberCount;
+		}
+		public void setMagicNumberCount(int magicNumberCount) {
+			this.magicNumberCount = magicNumberCount;
+		}
+
 	}
 
 	private static ArrayList<Socket> bootstrapNodes;
 	private final NewClientListener userListener;
+	private final NewNodeListener nodeListener;
 	static final int CHECK_VOTE_DELAY_S = 5;
 	static final int BLOCK_BUILD_TIME_S = 5;
 	static final int MIN_VOTES_BLOCK = 2;
 	private static InetAddress ip = null;
 	private static InetAddress actualminer = null;
-	private static ArrayList<Object[]> nonminedblocks = new ArrayList<>();
+	private static final ArrayList<NonMinedBlock> nonminedblocks = new ArrayList<>();
 	private final ArrayList<Vote> votes;
 	private final ArrayList<Block> blocks;
 	Database database;
