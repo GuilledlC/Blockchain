@@ -1,12 +1,18 @@
 package newVersion;
 
+import database.Database;
 import ledger.Block;
 import users.Vote;
 
+import javax.swing.table.TableRowSorter;
+import java.io.File;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.SignatureException;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.Timer;
@@ -15,15 +21,30 @@ import java.util.concurrent.TimeUnit;
 
 public class NewNode {
 
+
 	public NewNode(int userPort) throws IOException {
 		this.votes = new ArrayList<>();
 		this.blocks = new ArrayList<>();
 		this.userListener =  new NewClientListener(userPort);
+		this.userListener.run();
 		setNonMinedBlocks(bootstrapNodes);
+
+		this.database = new Database("votesCheck");
 	}
 
 	private void syncVotes() {
-		votes.addAll(NewClientHandler.getVotes());
+
+		ArrayList<Vote> tempVotes = new ArrayList<>();
+		tempVotes.addAll(NewClientHandler.getVotes());
+		tempVotes.addAll(NewNodeHandler.getVotes());
+
+		for (Vote v : tempVotes) {
+			if(database.notExists(v.getKey().toString()) && Vote.verify(v)) { //Cambiar .getKey().toString()
+				votes.add(v);
+				database.changeValue(v.getKey().toString(), "1");
+				NewNodeHandler.sendVoteToAll(v);
+			}
+		}
 	}
 
 	private ArrayList<Vote> getVotes() {
@@ -166,6 +187,7 @@ public class NewNode {
 	private static ArrayList<Object[]> nonminedblocks = new ArrayList<>();
 	private final ArrayList<Vote> votes;
 	private final ArrayList<Block> blocks;
+	Database database;
 
 
 }

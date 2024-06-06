@@ -6,11 +6,12 @@ import utils.HashUtils;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.Socket;
 import java.security.*;
 import java.util.ArrayList;
 
-public class NewUser {
+public class NewUser implements Serializable {
 	private PrivateKey priv;
 	private PublicKey pub;
 	private Vote vote;

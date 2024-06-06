@@ -57,13 +57,17 @@ public class Vote implements Serializable, Comparable<Vote> {
         return signature.sign();
     }
 
-    public static boolean verify(Vote vote) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        Signature signature = Signature.getInstance("SHA256withRSA");
-        signature.initVerify(vote.getKey());
+    public static boolean verify(Vote vote) {
+        try {
+			Signature signature = Signature.getInstance("SHA256withRSA");
+			signature.initVerify(vote.getKey());
 
-        byte[] bytes = vote.getVoteString().getBytes();
-        signature.update(bytes);
-        return signature.verify(vote.getSignature());
+			byte[] bytes = vote.getVoteString().getBytes();
+			signature.update(bytes);
+			return signature.verify(vote.getSignature());
+		} catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
+			return false;
+		}
     }
 
     public String displayVote() throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {

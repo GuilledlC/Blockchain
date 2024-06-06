@@ -11,7 +11,6 @@ public class NewClientListener implements Runnable {
 
 	public NewClientListener(int port) throws IOException {
 		this.listener = new ServerSocket(port);
-		this.run();
 	}
 
 	@Override

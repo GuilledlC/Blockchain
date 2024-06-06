@@ -47,4 +47,13 @@ public class Database {
             return true;
         }
     }
+
+	public boolean notExists(String key) {
+		try {
+			String value = new String(this.db.get(bytes(key)));
+			return value.equals("0");
+		} catch (NullPointerException e) {
+			return false;
+		}
+	}
 }
