@@ -21,6 +21,10 @@ public class Block {
         this.votes.addAll(votes);
     }
 
+	public Block(Block block) {
+		this(block.getVotes());
+	}
+
     public String displayBlock() {
         StringBuilder block = new StringBuilder("\nNumber of votes in block: " + votes.size());
         for(Vote t: votes) {

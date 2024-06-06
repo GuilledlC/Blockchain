@@ -9,16 +9,19 @@ import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 
 public class NewNodeHandler implements Runnable {
 
 	private Socket socket;
 	private ObjectOutputStream oos;
 	private ObjectInputStream ois;
-	private static final ArrayList<Vote> votes = new ArrayList<>();
-	private static final ArrayList<Block> blocks = new ArrayList<>();
-	private static final ArrayList<Integer> randomNumbers = new ArrayList<>();
 	private static final ArrayList<NewNodeHandler> nodes = new ArrayList<>();
+	private static final ArrayList<Vote> votes = new ArrayList<>();
+	private static Block block;
+	private static final ArrayList<InetAddress> chosenOnes = new ArrayList<>();
 
 
 	public static ArrayList<Vote> getVotes() {
@@ -26,24 +29,39 @@ public class NewNodeHandler implements Runnable {
 		votes.clear();
 		return returnVotes;
 	}
-
-	public static ArrayList<Block> getBlocks() {
-		ArrayList<Block> returnBlocks = new ArrayList<>(blocks);
-		blocks.clear();
-		return returnBlocks;
-	}
-
-	public static ArrayList<Integer> getRandomNumbers() {
-		ArrayList<Integer> returnRandomNumbers = new ArrayList<>(randomNumbers);
-		randomNumbers.clear();
-		return returnRandomNumbers;
-	}
-
 	public static void sendVoteToAll(Vote vote) {
 		for(NewNodeHandler handler : nodes) {
 			handler.sendVote(vote);
 		}
 	}
+
+	public static Block getBlock() {
+		Block returnBlock = new Block(block);
+		block = null;
+		return returnBlock;
+	}
+	public static void sendBlockToAll(Block block) {
+		for(NewNodeHandler handler : nodes) {
+			handler.sendBlock(block);
+		}
+	}
+
+	public static ArrayList<InetAddress> getChosenOnes() {
+		ArrayList<InetAddress> returnChosenOnes = new ArrayList<>(chosenOnes);
+		returnChosenOnes.sort(new Comparator<InetAddress>() {
+			@Override
+			public int compare(InetAddress o1, InetAddress o2) {
+				return o1.toString().compareTo(o2.toString());
+			}
+		});
+		chosenOnes.clear();
+		return returnChosenOnes;
+	}
+	public static void sendChosenOneToAll(InetAddress chosenOne) {
+		for(NewNodeHandler handler : nodes)
+			handler.sendChosenOne(chosenOne);
+	}
+
 
 	public NewNodeHandler(Socket socket) {
 		try {
@@ -74,14 +92,30 @@ public class NewNodeHandler implements Runnable {
 		if (object instanceof Vote vote)
 			votes.add(vote);
 		else if(object instanceof Block block)
-			blocks.add(block);
-		else if(object instanceof Integer integer)
-			randomNumbers.add(integer);
+			this.block = new Block(block);
+		else if(object instanceof InetAddress ip)
+			chosenOnes.add(ip);
 	}
 
 	public void sendVote(Vote vote) {
 		try {
 			oos.writeObject(vote);
+		} catch (IOException e) {
+			close();
+		}
+	}
+
+	public void sendBlock(Block block) {
+		try {
+			oos.writeObject(block);
+		} catch (IOException e) {
+			close();
+		}
+	}
+
+	public void sendChosenOne(InetAddress ip) {
+		try {
+			oos.writeObject(ip);
 		} catch (IOException e) {
 			close();
 		}
