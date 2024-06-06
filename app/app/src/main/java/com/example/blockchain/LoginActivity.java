@@ -80,7 +80,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private void showFileChooserPublic() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        //todo wtf android
         intent.setType("application/vnd.exstream-package");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         fileChooserLauncherPublic.launch(Intent.createChooser(intent,
@@ -89,7 +88,6 @@ public class LoginActivity extends AppCompatActivity {
 
     private void showFileChooserPrivate() {
         Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        //todo wtf android
         intent.setType("application/pgp-keys");
         intent.addCategory(Intent.CATEGORY_OPENABLE);
         fileChooserLauncherPrivate.launch(Intent.createChooser(intent,

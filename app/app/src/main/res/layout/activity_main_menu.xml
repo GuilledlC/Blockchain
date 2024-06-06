@@ -6,46 +6,59 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
 
-    <TextView
-        android:id="@+id/tvVote"
+    <LinearLayout
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_alignParentTop="true"
-        android:layout_centerHorizontal="true"
-        android:text="Haga click para votar"
+        android:layout_height="match_parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center_horizontal"
+        android:orientation="vertical" >
+    
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvVote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="128dp"
+            android:text="Haga click para votar"
+            android:textSize="24sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"/>
+    
+        <Button
+            android:id="@+id/btnVote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Votar"
+            app:layout_constraintStart_toStartOf="@+id/tvVote"
+            app:layout_constraintTop_toBottomOf="@+id/tvVote"/>
+    
+    
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/tvCheckVote"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="Comprobar su voto"
+            android:textSize="24sp"
+            tools:layout_editor_absoluteX="45dp"
+            tools:layout_editor_absoluteY="158dp"
+            app:layout_constraintStart_toStartOf="@+id/btnVote"
+            app:layout_constraintTop_toBottomOf="@+id/btnVote"/>
+    
+        <Button
+            android:id="@+id/btnCheckVote"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerHorizontal="true"
+            android:text="Comprobar"
+            tools:layout_editor_absoluteX="151dp"
+            tools:layout_editor_absoluteY="306dp"
+            app:layout_constraintStart_toStartOf="@+id/tvCheckVote"
+            app:layout_constraintTop_toBottomOf="@+id/tvCheckVote"/>
 
-    <Button
-        android:id="@+id/btnVote"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:text="Votar"
-        app:layout_constraintStart_toStartOf="@+id/tvVote"
-        app:layout_constraintTop_toBottomOf="@+id/tvVote"/>
-
-
-    <TextView
-        android:id="@+id/tvCheckVote"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:text="Comprobar su voto"
-        tools:layout_editor_absoluteX="45dp"
-        tools:layout_editor_absoluteY="158dp"
-        app:layout_constraintStart_toStartOf="@+id/btnVote"
-        app:layout_constraintTop_toBottomOf="@+id/btnVote"/>
-
-    <Button
-        android:id="@+id/btnCheckVote"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:text="Comprobar"
-        tools:layout_editor_absoluteX="151dp"
-        tools:layout_editor_absoluteY="306dp"
-        app:layout_constraintStart_toStartOf="@+id/tvCheckVote"
-        app:layout_constraintTop_toBottomOf="@+id/tvCheckVote"/>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
