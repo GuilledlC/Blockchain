@@ -2,6 +2,7 @@ package ledger;
 
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
@@ -20,6 +21,35 @@ public class Ledger {
 
     private static final String BLOCKS_DIRECTORY = "blocks/";
 
+	private static int counter = -1;
+
+	public static Block getLastBlock() {
+		return getBlock(counter);
+	}
+
+	public static void addBlocks(ArrayList<Block> blocks) {
+		counter = 0;
+		for(Block block : blocks)
+			storeBlock(block);
+	}
+
+	public static void dropBlocks() {
+		File directory = new File(BLOCKS_DIRECTORY);
+		for(File file : directory.listFiles())
+			file.delete();
+		directory.delete();
+	}
+
+	public static Block getBlock(int position) {
+		ObjectMapper objectMapper = new ObjectMapper();
+
+		try {
+			return objectMapper.readValue(BLOCKS_DIRECTORY + position + ".json", Block.class);
+		} catch (JsonProcessingException e) {
+			throw new RuntimeException(e);
+		}
+	}
+
     public static void storeBlock(Block block) {
         ObjectMapper objectMapper = new ObjectMapper();
         File directory = new File(BLOCKS_DIRECTORY);
@@ -30,7 +60,7 @@ public class Ledger {
         }
 
         // Generate a file name based on block hash (you can adjust this according to your requirements)
-        String fileName = BLOCKS_DIRECTORY + byteArrayToHexString(block.getHash()) + ".json";
+        String fileName = BLOCKS_DIRECTORY + ++counter + ".json";
         File file = new File(fileName);
 
         try {
@@ -51,9 +81,8 @@ public class Ledger {
         return sb.toString();
     }
 
-
-    public Vote searchVote(Vote voteSearched) {
-        final Vote[] result = new Vote[1];
+    public boolean searchVote(Vote voteSearched) {
+		final boolean[] result = {false};
 
         File directory = new File(BLOCKS_DIRECTORY);
 
@@ -92,7 +121,7 @@ public class Ledger {
                                 if (block.isTimeBetweenVotes(timeToCheck)) {
                                     if (voteIdIndex.containsKey(voteSearched.getKey()) &&
                                             voteIdIndex.get(voteSearched.getKey()).contains(file)) {
-                                        result[0] = objectMapper.readValue(jsonParser, Vote.class);
+                                        result[0] = objectMapper.readValue(jsonParser, Vote.class).equals(voteSearched);
                                         System.out.println("File: " + file.getName() + " - Vote ID found in block.");
                                         break;
                                     }
@@ -110,4 +139,5 @@ public class Ledger {
         }
         return result[0];
     }
+
 }

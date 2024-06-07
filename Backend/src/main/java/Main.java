@@ -11,7 +11,7 @@ import java.util.Random;
 
 public class Main {
     public static void main(String[] args) {
-        try {
+        /*try {
 			Database votesCheck = new Database("votesCheck");
 
             File file = new File("publicKeys.txt");
@@ -33,7 +33,7 @@ public class Main {
             votesCheck.closeDatabase();
         } catch (IOException error){
             error.printStackTrace();
-        }
+        }*/
     }
 
     private static void generateData(File dnis) throws IOException {

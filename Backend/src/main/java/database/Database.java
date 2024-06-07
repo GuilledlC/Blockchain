@@ -1,7 +1,5 @@
 package database;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
 import org.iq80.leveldb.*;
 import static org.iq80.leveldb.impl.Iq80DBFactory.*;
 import java.io.*;
@@ -13,13 +11,14 @@ public class Database {
         this.openDatabase(path);
     }
 
-    public void loadData(File publicKeyFile) throws IOException {
+	//todo borrar
+    /*public void loadData(File publicKeyFile) throws IOException {
         BufferedReader br = new BufferedReader(new FileReader(publicKeyFile));
         String key;
         while ((key = br.readLine()) != null) {
             this.changeValue(key, "0");
         }
-    }
+    }*/
 
     public void openDatabase(String path) throws IOException {
         Options options = new Options();
@@ -31,29 +30,46 @@ public class Database {
         this.db.close();
     }
 
-    public void changeValue(String key, String value) {
+    public void putValue(byte[] key, State value) {
         // The value indicates the state of the user
         // 0 means the user is not on the vote pool, and it has not voted yet
         // 1 means the user is on the vote pool, and it has not voted yet
         // 2 means the user has voted
-        this.db.put(bytes(key), bytes(value));
+        this.db.put(key, bytes(value.getValue()));
     }
 
-    public boolean hasVoted(String key) {
+    public boolean hasVoted(byte[] key) {
         try {
-            String value = new String(this.db.get(bytes(key)));
+            String value = new String(this.db.get(key));
             return value.equals("2");
         } catch (NullPointerException e) {
             return true;
         }
     }
 
-	public boolean notExists(String key) {
+	public boolean notExists(byte[] key) {
 		try {
-			String value = new String(this.db.get(bytes(key)));
+			String value = new String(this.db.get(key));
 			return value.equals("0");
 		} catch (NullPointerException e) {
 			return false;
 		}
+	}
+
+	public enum State {
+		Exists("0"),
+		InPool("1"),
+		Voted("2");
+
+		private final String value;
+
+		State(String value) {
+			this.value = value;
+		}
+
+		public String getValue() {
+			return value;
+		}
+
 	}
 }
