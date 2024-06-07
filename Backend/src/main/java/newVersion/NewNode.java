@@ -41,11 +41,6 @@ public class NewNode {
 		}
 	}
 
-	private ArrayList<Vote> getVotes() {
-		syncVotes();
-		return votes;
-	}
-
 	private void syncChosenOnes() {
 		ArrayList<InetAddress> tempChosenOnes = NewNodeHandler.getChosenOnes();
 		int count = 0;
@@ -74,7 +69,8 @@ public class NewNode {
 		return blocks;
 	}
 
-	protected void buildBlocks() {
+	//todo delete old methods
+	/*protected void buildBlocks() {
 		new Thread(() -> {
 			while(getVotes().isEmpty()) {
 				try {
@@ -95,13 +91,12 @@ public class NewNode {
 				}
 			}, BLOCK_BUILD_TIME_S * 1000, BLOCK_BUILD_TIME_S * 1000);
 		}).start();
-	}
-
-	private void buildBlock() {
+	}*/
+	/*private void buildBlock() {
 		Block block = new Block(new ArrayList<>(getVotes()));
 		blocks.add(block);
 		votes.clear();
-	}
+	}*/
 
 	private void setNonMinedBlocks(ArrayList<Socket> sockets) {
 		for (Socket socket : sockets)
@@ -124,26 +119,33 @@ public class NewNode {
 	}
 
 	private boolean correctBlock (Block block) {
-		//todo Not done yet
 		/**La comprobacion se basará en comprobar si el hash del bloque anterior
 		 * es igual que el del bloque anterior de la blockchain del nodo,
 		 * si cada voto pertenece a un votante que no ha votado aun
 		 * y comprobar que los votos sean correctos (que la firma funcione con la publica).**/
-		boolean aux = true;
-		while (aux) {
-			//todo checkBlock
+		ArrayList<Vote> tempVotes = block.getVotes();
+		boolean aux = Arrays.equals(block.getPreviousHash(), getLastBlock().getHash());
+		int count = 0;
+		while (aux && count < tempVotes.size()) {
+			Vote tempVote = tempVotes.get(count);
+			aux = !database.hasVoted(tempVote.getKey().toString()) && Vote.verify(tempVote);
+			count++;
 		}
 		return aux;
 	}
 
-	private void punishNode(InetAddress ip){
+	private Block getLastBlock() {
+		return blocks.get(blocks.size() - 1);
+	}
+
+	private void punishNode(InetAddress ip) {
 		for (NonMinedBlock item : nonminedblocks){
 			if (item.getIp().equals(ip))
 				item.setNonMinedBlocks(0);
 		}
 	}
 
-	private int getNonMinedBlocksModule(){
+	private int getNonMinedBlocksModule() {
 		int aux = 0;
 		for (NonMinedBlock item : nonminedblocks){
 			aux += item.getNonMinedBlocks();
@@ -151,12 +153,12 @@ public class NewNode {
 		return aux;
 	}
 
-	private void resetNodes(){
+	private void resetNodes() {
 		for (NonMinedBlock item : nonminedblocks)
 			item.setMagicNumberCount(0);
 	}
 
-	private void proofOfConsensus(int magicNumber){
+	private void proofOfConsensus(int magicNumber) {
 		int aux = -1;
 		InetAddress miner = null;
 		for (NonMinedBlock item : nonminedblocks){
@@ -169,11 +171,11 @@ public class NewNode {
 		}
 	}
 
-	private void recieveActualMiner(){
+	private void recieveActualMiner() {
 		//Hacer que dure una cantidad de tiempo determinada
 	}
 
-	private InetAddress chooseActualMiner(){
+	private InetAddress chooseActualMiner() {
 		InetAddress ip = null;
 		int aux = 0;
 		for (NonMinedBlock item : nonminedblocks){
@@ -192,11 +194,10 @@ public class NewNode {
 	private void nodeExecution() throws InterruptedException {
 		while (true) {
 			Block minedblock;
-
 			if (actualminer != null) {
 				if (myTurnToMine()){
-
-					minedblock = new Block(getVotes());
+					syncVotes();
+					minedblock = new Block(votes, getLastBlock());
 
 					//Add block to ledger
 					blocks.add(minedblock);

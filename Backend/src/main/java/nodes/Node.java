@@ -70,8 +70,8 @@ public class Node extends NetworkUser {
 
     private void buildBlock() {
         syncVotes();
-        Block block = new Block(votes);
-        blocks.add(block);
+        //Block block = new Block(votes);
+        //blocks.add(block);
         votes.clear();
     }
 

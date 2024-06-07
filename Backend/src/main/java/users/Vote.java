@@ -86,4 +86,13 @@ public class Vote implements Serializable, Comparable<Vote> {
 		String dataToHash = voteString + Arrays.toString(signature) + key.toString() + time;
 		return HashUtils.hashString(dataToHash);
 	}
+
+	@Override
+	public String toString() {
+		try {
+			return displayVote();
+		} catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException e) {
+			throw new RuntimeException(e);
+		}
+	}
 }

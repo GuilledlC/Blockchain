@@ -1,28 +1,38 @@
 package ledger;
 
+import com.google.common.primitives.Bytes;
 import users.Vote;
 import utils.HashUtils;
 
+import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.Arrays;
+import java.util.Collections;
 
-public class Block {
+public class Block implements Serializable {
 
-	private String hash;
-	private String previousHash;
-    private final ArrayList<Vote> votes;
+	private final byte[] hash;
+	private final byte[] previousHash;
+	private final Long youngestVote;
+	private final Long oldestVote;
+    private final ArrayList<Vote> votes = new ArrayList<>();
 
-    public Block() {
-        this.votes = new ArrayList<>();
-    }
-
-    public Block(Collection<Vote> votes) {
-        this();
+    public Block(ArrayList<Vote> votes, Block previous) {
         this.votes.addAll(votes);
+		Collections.sort(this.votes);
+		this.previousHash = previous.hash;
+		this.youngestVote = votes.get(0).getTime();
+		this.oldestVote = votes.get(votes.size() - 1).getTime();
+		this.hash = HashUtils.hash(Bytes.concat(previousHash, ("" + youngestVote + oldestVote + this.votes).getBytes()));
     }
 
-	public Block(Block block) {
-		this(block.getVotes());
+	//Copy
+	public Block(Block copy) {
+		this.votes.addAll(copy.votes);
+		this.previousHash = copy.previousHash;
+		this.youngestVote = copy.youngestVote;
+		this.oldestVote = copy.oldestVote;
+		this.hash = copy.hash;
 	}
 
     public String displayBlock() {
@@ -37,6 +47,15 @@ public class Block {
         return votes;
     }
 
+	public byte[] getHash() {
+		return hash;
+	}
+
+	public byte[] getPreviousHash() {
+		return previousHash;
+	}
+
+	//todo
 	public byte[] getMerkleRoot() {
 		ArrayList<byte[]> txids = new ArrayList<>();
 		for(Vote vote : votes)
