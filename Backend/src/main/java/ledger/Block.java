@@ -55,6 +55,10 @@ public class Block implements Serializable {
 		return previousHash;
 	}
 
+	public boolean isTimeBetweenVotes(long time) {
+		return time >= youngestVote && time <= oldestVote;
+	}
+
 	//todo
 	public byte[] getMerkleRoot() {
 		ArrayList<byte[]> txids = new ArrayList<>();
