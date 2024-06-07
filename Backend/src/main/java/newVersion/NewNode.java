@@ -160,17 +160,17 @@ public class NewNode {
 			item.setMagicNumberCount(0);
 	}
 
-	private void proofOfConsensus(int magicNumber) {
+	private InetAddress proofOfConsensus(int magicNumber) {
 		int aux = -1;
 		InetAddress miner = null;
 		for (NonMinedBlock item : nonMinedBlocks){
 			aux += item.getNonMinedBlocks();
 			miner = item.getIp();
 			if (aux >= magicNumber){
-				actualMiner = miner;
-				break;
+				return miner;
 			}
 		}
+		return null;
 	}
 
 	private InetAddress chooseActualMiner() {
@@ -189,42 +189,68 @@ public class NewNode {
 		return ip.equals(actualMiner);
 	}
 
-	//todo como hacemos que sea 1 minuto
+	//todo lidiar con la excepcion
 	private void nodeExecution() throws InterruptedException {
-		while (true) {
-			Block minedblock;
-			if (actualMiner != null) {
-				if (myTurnToMine()){
-					syncVotes();
-					minedblock = new Block(votes, getLastBlock());
+		Thread mineThread = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (true) {
+					try {
+						Block minedblock;
+						if (actualMiner != null) {
+							if (myTurnToMine()){
+								syncVotes();
+								minedblock = new Block(votes, getLastBlock());
 
-					//Add block to ledger
-					blocks.add(minedblock);
+								//Add block to ledger
+								blocks.add(minedblock);
 
-					//Delete votes and update voted users
-					for(Vote v : minedblock.getVotes()) {
-						database.putValue(v.getKey().getEncoded(), Database.State.Voted);
+								//Delete votes and update voted users
+								for(Vote v : minedblock.getVotes()) {
+									database.putValue(v.getKey().getEncoded(), Database.State.Voted);
+								}
+								votes.clear();
+
+								//Send block to everyone
+								NewNodeHandler.sendBlockToAll(minedblock);
+
+							}
+							else
+								syncBlock();
+
+							actualMiner = null;
+
+						} else
+							Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
 					}
-					votes.clear();
-
-					//Send block to everyone
-					NewNodeHandler.sendBlockToAll(minedblock);
-				}
-				else {
-					syncBlock();
 				}
 			}
+		});
+		mineThread.start();
 
-			Random random = new Random();
-			int randomNumber = random.nextInt(getNonMinedBlocksModule());
-			proofOfConsensus(randomNumber);
-			NewNodeHandler.sendChosenOneToAll(actualMiner); //Send actualMiner to nodes
-			wait(30000); //30s
-			syncChosenOnes(); //Receive actualMiner from nodes receiveActualMiner();
-			actualMiner = chooseActualMiner();
-			resetNodes();
-			addEveryoneExcept(actualMiner);
-		}
+		Thread minerElection = new Thread(new Runnable() {
+			@Override
+			public void run() {
+				while (true) {
+					try {
+						Random random = new Random();
+						int randomNumber = random.nextInt(getNonMinedBlocksModule());
+						InetAddress chosenMiner = proofOfConsensus(randomNumber);
+						NewNodeHandler.sendChosenOneToAll(chosenMiner); //Send chosen miner to nodes
+						Thread.sleep(60000); //60s
+						syncChosenOnes(); //Receive actualMiner from nodes receiveActualMiner();
+						actualMiner = chooseActualMiner();
+						resetNodes();
+						addEveryoneExcept(actualMiner);
+					} catch (InterruptedException e) {
+						throw new RuntimeException(e);
+					}
+				}
+			}
+		});
+		minerElection.start();
 	}
 
 	private class NonMinedBlock {
