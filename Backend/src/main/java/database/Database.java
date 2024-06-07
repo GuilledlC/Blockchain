@@ -11,15 +11,6 @@ public class Database {
         this.openDatabase(path);
     }
 
-	//todo borrar
-    /*public void loadData(File publicKeyFile) throws IOException {
-        BufferedReader br = new BufferedReader(new FileReader(publicKeyFile));
-        String key;
-        while ((key = br.readLine()) != null) {
-            this.changeValue(key, "0");
-        }
-    }*/
-
     public void openDatabase(String path) throws IOException {
         Options options = new Options();
         options.createIfMissing(true);

@@ -21,7 +21,7 @@ public class NewNode {
 		this.userListener = new NewClientListener(8888);
 		this.userListener.run();
 		this.nodeListener = new NewNodeListener(9999);
-		nodeListener.run();
+		this.nodeListener.run();
 
 		setNonMinedBlocks(bootstrapNodes);
 	}
@@ -67,35 +67,6 @@ public class NewNode {
 	public ArrayList<Block> getBlocks() {
 		return blocks;
 	}
-
-	//todo delete old methods
-	/*protected void buildBlocks() {
-		new Thread(() -> {
-			while(getVotes().isEmpty()) {
-				try {
-					TimeUnit.SECONDS.sleep(CHECK_VOTE_DELAY_S);
-				} catch (InterruptedException ignored) {}
-			}
-
-			Timer timer = new Timer();
-			timer.scheduleAtFixedRate(new TimerTask() {
-				@Override
-				public void run() {
-					while (getVotes().size() < MIN_VOTES_BLOCK) {
-						try {
-							TimeUnit.SECONDS.sleep(CHECK_VOTE_DELAY_S);
-						} catch (InterruptedException ignored) {}
-					}
-					buildBlock();
-				}
-			}, BLOCK_BUILD_TIME_S * 1000, BLOCK_BUILD_TIME_S * 1000);
-		}).start();
-	}*/
-	/*private void buildBlock() {
-		Block block = new Block(new ArrayList<>(getVotes()));
-		blocks.add(block);
-		votes.clear();
-	}*/
 
 	private void setNonMinedBlocks(ArrayList<Socket> sockets) {
 		for (Socket socket : sockets)
@@ -190,6 +161,7 @@ public class NewNode {
 		return ip.equals(actualMiner);
 	}
 
+	//todo como hacemos que sea 1 minuto
 	private void nodeExecution() throws InterruptedException {
 		while (true) {
 			Block minedblock;
@@ -218,9 +190,9 @@ public class NewNode {
 			Random random = new Random();
 			int randomNumber = random.nextInt(getNonMinedBlocksModule());
 			proofOfConsensus(randomNumber);
-			NewNodeHandler.sendChosenOneToAll(actualMiner); //todo send actualminer to nodes
+			NewNodeHandler.sendChosenOneToAll(actualMiner); //Send actualMiner to nodes
 			wait(30000); //30s
-			syncChosenOnes(); //todo receive actualminer from nodes recieveActualMiner();
+			syncChosenOnes(); //Receive actualMiner from nodes receiveActualMiner();
 			actualMiner = chooseActualMiner();
 			resetNodes();
 			addEveryoneExcept(actualMiner);

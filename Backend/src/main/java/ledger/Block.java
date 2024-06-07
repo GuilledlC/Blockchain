@@ -59,7 +59,7 @@ public class Block implements Serializable {
 		return time >= youngestVote && time <= oldestVote;
 	}
 
-	//todo
+	//todo merkle root
 	public byte[] getMerkleRoot() {
 		ArrayList<byte[]> txids = new ArrayList<>();
 		for(Vote vote : votes)
