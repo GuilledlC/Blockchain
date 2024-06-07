@@ -11,12 +11,12 @@ import java.util.*;
 
 public class NewNode {
 
-	public NewNode() throws IOException {
+	public NewNode() throws IOException, InterruptedException  {
 		this.votes = new ArrayList<>();
 		this.database = new Database("votesCheck");
 
-		//todo pedir toda la blockchain al resto
 		this.blocks = new ArrayList<>();
+		chooseBlockchain();
 
 		this.userListener = new NewClientListener(8888);
 		this.userListener.run();
@@ -24,6 +24,38 @@ public class NewNode {
 		this.nodeListener.run();
 
 		setNonMinedBlocks(bootstrapNodes);
+
+		nodeExecution();
+	}
+
+	private void chooseBlockchain() {
+		ArrayList<Block> chosenBlockchain = new ArrayList<>();
+		NewNodeHandler.requestBlockchainS();
+		ArrayList<ArrayList<Block>> blockchainS = NewNodeHandler.getBlockchainS();
+		HashMap<byte[], Integer> election = new HashMap<>();
+
+		//Por cada una de las listas de bloques que tengo (que asumo que estan ordenadas)
+		for (ArrayList<Block> blockchain : blockchainS) {
+			//Cojo el ultimo bloque
+			Block aux = blockchain.get(blockchain.size() - 1);
+			//Si no existe lo apunto
+			if(!election.containsKey(aux.getHash()))
+				election.put(aux.getHash(), 0);
+			//Le voto
+			election.put(aux.getHash(), election.get(aux.getHash()) + 1);
+		}
+
+		int max = 0;
+		for(ArrayList<Block> blockchain : blockchainS) {
+			Block aux = blockchain.get(blockchain.size() - 1);
+			int num = election.get(aux.getHash());
+			if(num > max) {
+				max = num;
+				chosenBlockchain = blockchain;
+			}
+		}
+
+		this.blocks.addAll(chosenBlockchain);
 	}
 
 	private void syncVotes() {
@@ -139,10 +171,6 @@ public class NewNode {
 				break;
 			}
 		}
-	}
-
-	private void recieveActualMiner() {
-		//Hacer que dure una cantidad de tiempo determinada
 	}
 
 	private InetAddress chooseActualMiner() {

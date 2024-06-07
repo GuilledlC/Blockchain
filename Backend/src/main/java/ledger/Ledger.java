@@ -23,6 +23,15 @@ public class Ledger {
 
 	private static int counter = -1;
 
+	public static ArrayList<Block> getAllBlocks() {
+		ArrayList<Block> returnBlocks = new ArrayList<>();
+
+		for(int i = 0; i <= counter; i++)
+			returnBlocks.add(getBlock(i));
+
+		return returnBlocks;
+	}
+
 	public static Block getLastBlock() {
 		return getBlock(counter);
 	}

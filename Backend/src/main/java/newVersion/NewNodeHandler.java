@@ -1,11 +1,13 @@
 package newVersion;
 
 import ledger.Block;
+import ledger.Ledger;
 import users.Vote;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
@@ -22,6 +24,7 @@ public class NewNodeHandler implements Runnable {
 	private static final ArrayList<Vote> votes = new ArrayList<>();
 	private static Block block;
 	private static final ArrayList<InetAddress> chosenOnes = new ArrayList<>();
+	private static final ArrayList<ArrayList<Block>> blockchainS = new ArrayList<>();
 
 
 	public static ArrayList<Vote> getVotes() {
@@ -31,7 +34,7 @@ public class NewNodeHandler implements Runnable {
 	}
 	public static void sendVoteToAll(Vote vote) {
 		for(NewNodeHandler handler : nodes) {
-			handler.sendVote(vote);
+			handler.sendObject(vote);
 		}
 	}
 
@@ -42,7 +45,7 @@ public class NewNodeHandler implements Runnable {
 	}
 	public static void sendBlockToAll(Block block) {
 		for(NewNodeHandler handler : nodes) {
-			handler.sendBlock(block);
+			handler.sendObject(block);
 		}
 	}
 
@@ -59,9 +62,18 @@ public class NewNodeHandler implements Runnable {
 	}
 	public static void sendChosenOneToAll(InetAddress chosenOne) {
 		for(NewNodeHandler handler : nodes)
-			handler.sendChosenOne(chosenOne);
+			handler.sendObject(chosenOne);
 	}
 
+	public static ArrayList<ArrayList<Block>> getBlockchainS() {
+		ArrayList<ArrayList<Block>> returnBlockchainS = new ArrayList<>(blockchainS);
+		blockchainS.clear();
+		return returnBlockchainS;
+	}
+	public static void requestBlockchainS() {
+		for(NewNodeHandler handler : nodes)
+			handler.sendObject("request");
+	}
 
 	public NewNodeHandler(Socket socket) {
 		try {
@@ -95,27 +107,24 @@ public class NewNodeHandler implements Runnable {
 			this.block = new Block(block);
 		else if(object instanceof InetAddress ip)
 			chosenOnes.add(ip);
+		else if (object instanceof String string) {
+			if(string.equals("request"))
+				sendBlockchain();
+		} else if(object instanceof ArrayList<?> blockchain)
+			blockchainS.add((ArrayList<Block>)blockchain);
 	}
 
-	public void sendVote(Vote vote) {
+	public void sendObject(Serializable object) {
 		try {
-			oos.writeObject(vote);
+			oos.writeObject(object);
 		} catch (IOException e) {
 			close();
 		}
 	}
 
-	public void sendBlock(Block block) {
+	private void sendBlockchain() {
 		try {
-			oos.writeObject(block);
-		} catch (IOException e) {
-			close();
-		}
-	}
-
-	public void sendChosenOne(InetAddress ip) {
-		try {
-			oos.writeObject(ip);
+			oos.writeObject(Ledger.getAllBlocks());
 		} catch (IOException e) {
 			close();
 		}
@@ -137,4 +146,5 @@ public class NewNodeHandler implements Runnable {
 	public InetAddress getIp() {
 		return socket.getInetAddress();
 	}
+
 }
