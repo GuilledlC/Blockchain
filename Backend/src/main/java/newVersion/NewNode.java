@@ -189,7 +189,6 @@ public class NewNode {
 		return ip.equals(actualMiner);
 	}
 
-	//todo lidiar con la excepcion
 	private void nodeExecution() throws InterruptedException {
 		Thread mineThread = new Thread(new Runnable() {
 			@Override
@@ -222,9 +221,7 @@ public class NewNode {
 
 						} else
 							Thread.sleep(5000);
-					} catch (InterruptedException e) {
-						throw new RuntimeException(e);
-					}
+					} catch (InterruptedException ignored) {}
 				}
 			}
 		});
@@ -239,14 +236,12 @@ public class NewNode {
 						int randomNumber = random.nextInt(getNonMinedBlocksModule());
 						InetAddress chosenMiner = proofOfConsensus(randomNumber);
 						NewNodeHandler.sendChosenOneToAll(chosenMiner); //Send chosen miner to nodes
-						Thread.sleep(60000); //60s
+						Thread.sleep(30000); //30s
 						syncChosenOnes(); //Receive actualMiner from nodes receiveActualMiner();
 						actualMiner = chooseActualMiner();
 						resetNodes();
 						addEveryoneExcept(actualMiner);
-					} catch (InterruptedException e) {
-						throw new RuntimeException(e);
-					}
+					} catch (InterruptedException ignored) {}
 				}
 			}
 		});
@@ -284,9 +279,6 @@ public class NewNode {
 	private static ArrayList<Socket> bootstrapNodes;
 	private final NewClientListener userListener;
 	private final NewNodeListener nodeListener;
-	static final int CHECK_VOTE_DELAY_S = 5;
-	static final int BLOCK_BUILD_TIME_S = 5;
-	static final int MIN_VOTES_BLOCK = 2;
 	private static InetAddress ip = null;
 	private static InetAddress actualMiner = null;
 	private final ArrayList<NonMinedBlock> nonMinedBlocks = new ArrayList<>();
