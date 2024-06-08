@@ -30,7 +30,7 @@ public class NodeHandler implements Runnable {
 			this.oos = new ObjectOutputStream(socket.getOutputStream());
 			this.ois = new ObjectInputStream(socket.getInputStream());
 			nodes.add(this);
-			this.run();
+			//this.run();
 		} catch (IOException e) {
 			close();
 		}
@@ -49,8 +49,10 @@ public class NodeHandler implements Runnable {
 		while(socket.isConnected()) {
 			try {
 				Object object = ois.readObject();
+				System.out.println("He recibido un objeto");
 				handleObjects(object);
 			} catch (IOException | ClassNotFoundException e) {
+				System.out.println("close the nodehandler");
 				close();
 				break;
 			}
@@ -60,8 +62,10 @@ public class NodeHandler implements Runnable {
 	private void handleObjects(Object object) {
 		if (object instanceof Vote vote)
 			votes.add(vote);
-		else if(object instanceof Block block)
-			this.block = new Block(block);
+		else if(object instanceof Block blocka) {
+			System.out.println("Tengo un vloqyue");
+			block = new Block(blocka);
+		}
 		else if(object instanceof InetAddress ip)
 			chosenOnes.add(ip);
 		else if (object instanceof String string) {

@@ -57,8 +57,8 @@ public class Node {
 
 	private void initializeBootstrapNodes() {
 		//bootstrapNodes.add(new InetSocketAddress("localhost", 9999).getAddress());
+		bootstrapNodes.add(new InetSocketAddress("80.39.151.138", 9999).getAddress());
 		bootstrapNodes.add(new InetSocketAddress("88.27.144.170", 9999).getAddress());
-		bootstrapNodes.add(new InetSocketAddress("2.153.80.40", 9999).getAddress());
 	}
 
 	private void chooseBlockchain() {
@@ -129,6 +129,7 @@ public class Node {
 		while (block == null) {
 			try {
 				Thread.sleep(5000); //todo calibrar tiempo
+				System.out.println("esperando a un bloque");
 				block = NodeHandler.getBlock();
 			} catch (InterruptedException e) {throw new RuntimeException(e);}
 		}
@@ -258,6 +259,7 @@ public class Node {
 						if (actualMiner != null) {
 							System.out.println("We have a miner");
 							if (myTurnToMine()) {
+								System.out.println("ME toca minar");
 								syncVotes();
 								while (votes.isEmpty()) { //todo carlos no lo ve seguro
 									System.out.println("waiting for votes");
@@ -276,6 +278,7 @@ public class Node {
 								votes.clear();
 
 								//Send block to everyone
+								System.out.println("enviando bloque");
 								NodeHandler.sendBlockToAll(minedblock);
 							}
 							else
@@ -353,7 +356,7 @@ public class Node {
 	private final ArrayList<InetAddress> bootstrapNodes = new ArrayList<>();
 	private final ClientListener userListener;
 	private final NodeListener nodeListener;
-	private static InetAddress ip = new InetSocketAddress("localhost", 9999).getAddress();
+	private static InetAddress ip = new InetSocketAddress("88.27.144.170", 9999).getAddress();
 	private static InetAddress chosenMiner = null;
 	private static InetAddress actualMiner = null;
 	private final ArrayList<NonMinedBlock> nonMinedBlocks = new ArrayList<>();
