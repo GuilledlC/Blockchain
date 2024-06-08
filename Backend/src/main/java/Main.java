@@ -1,17 +1,23 @@
-import database.Database;
-import org.iq80.leveldb.DBIterator;
-import users.Vote;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Random;
 
 public class Main {
     public static void main(String[] args) {
-        /*try {
+
+    }
+
+    private static void generateData(File dnis) throws IOException {
+        BufferedWriter bw = new BufferedWriter(new FileWriter(dnis));
+        for(int i = 10000000; i < 30000000; ++i) {
+            String dni = i + "E\n";
+            bw.write(dni);
+        }
+        bw.close();
+    }
+
+	/*try {
 			Database votesCheck = new Database("votesCheck");
 
             File file = new File("publicKeys.txt");
@@ -34,16 +40,6 @@ public class Main {
         } catch (IOException error){
             error.printStackTrace();
         }*/
-    }
-
-    private static void generateData(File dnis) throws IOException {
-        BufferedWriter bw = new BufferedWriter(new FileWriter(dnis));
-        for(int i = 10000000; i < 30000000; ++i) {
-            String dni = i + "E\n";
-            bw.write(dni);
-        }
-        bw.close();
-    }
 
 
     /** FOR ANGUS

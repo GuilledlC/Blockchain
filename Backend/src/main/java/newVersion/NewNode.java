@@ -2,6 +2,7 @@ package newVersion;
 
 import database.Database;
 import ledger.Block;
+import ledger.Ledger;
 import users.Vote;
 
 import java.io.IOException;
@@ -29,6 +30,9 @@ public class NewNode {
 	}
 
 	private void chooseBlockchain() {
+
+		Ledger.dropBlocks();
+
 		ArrayList<Block> chosenBlockchain = new ArrayList<>();
 		NewNodeHandler.requestBlockchainS();
 		ArrayList<ArrayList<Block>> blockchainS = NewNodeHandler.getBlockchainS();
@@ -55,7 +59,12 @@ public class NewNode {
 			}
 		}
 
-		this.blocks.addAll(chosenBlockchain);
+		if(max == 0)
+			this.blocks.add(Block.getGenesis());
+		else
+			this.blocks.addAll(chosenBlockchain);
+
+		Ledger.addBlocks(blocks);
 	}
 
 	private void syncVotes() {

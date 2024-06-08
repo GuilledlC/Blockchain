@@ -17,6 +17,18 @@ public class Block implements Serializable {
 	private final Long oldestVote;
     private final ArrayList<Vote> votes = new ArrayList<>();
 
+	public static Block getGenesis() {
+		return new Block();
+	}
+
+	//Genesis
+	private Block() { //todo
+		this.hash = HashUtils.hash(("https://www.juntaelectoralcentral.es/cs/jec/eleccionesEnCurso/%20Europeas_junio2024").getBytes());
+		this.previousHash = null;
+		this.youngestVote = 0L;
+		this.oldestVote = 0L;
+	}
+
     public Block(ArrayList<Vote> votes, Block previous) {
         this.votes.addAll(votes);
 		Collections.sort(this.votes);
