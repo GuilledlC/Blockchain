@@ -20,6 +20,8 @@ public class Main {
 		Database database = new Database("votesCheck");
 		PublicKey pubk = KeyUtils.publicKeyReader(Files.readAllBytes(Paths.get("keys/Carlos.pub")));
 		database.putValue(pubk.getEncoded(), Database.State.Exists);
+		pubk = KeyUtils.publicKeyReader(Files.readAllBytes(Paths.get("keys/Guille.pub")));
+		database.putValue(pubk.getEncoded(), Database.State.Exists);
 		database.closeDatabase();
 		Node node = new Node();
 
