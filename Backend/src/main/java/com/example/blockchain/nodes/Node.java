@@ -30,6 +30,7 @@ public class Node {
 		Thread nodeThread = new Thread(this.nodeListener);
 		nodeThread.start();
 
+		//todo meter en un thread
 		initializeBootstrapNodes();
 		connectToBootstrapNodes();
 		setNonMinedBlocks(bootstrapNodes);

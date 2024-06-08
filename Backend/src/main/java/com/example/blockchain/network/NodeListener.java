@@ -20,7 +20,7 @@ public class NodeListener implements Runnable {
 			while(!listener.isClosed()) {
 				isListening = true;
 				Socket clientSocket = listener.accept();
-				System.out.println("Client connected from " + clientSocket.getInetAddress() + ":" + clientSocket.getPort());
+				System.out.println("Node connected from " + clientSocket.getInetAddress() + ":" + clientSocket.getPort());
 				handleNode(clientSocket);
 			}
 		} catch (IOException e) {
