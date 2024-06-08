@@ -29,6 +29,7 @@ public class Block implements Serializable {
 		this.oldestVote = 0L;
 	}
 
+	//todo arreglar que pasa cuando no hay votos (youngestVote, oldestvote)
     public Block(ArrayList<Vote> votes, Block previous) {
         this.votes.addAll(votes);
 		Collections.sort(this.votes);

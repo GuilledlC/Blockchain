@@ -7,6 +7,7 @@ import com.example.blockchain.users.Vote;
 
 import java.io.IOException;
 import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
@@ -27,15 +28,23 @@ public class NewNode {
 		Thread nodeThread = new Thread(this.nodeListener);
 		nodeThread.start();
 
+		initializeBootstrapNodes();
 		//todo connect to every node
-
 		setNonMinedBlocks(bootstrapNodes);
 
 		nodeExecution();
 	}
 
-	private void chooseBlockchain() {
+	private void initializeBootstrapNodes() {
+		try {
+			bootstrapNodes.add(new Socket("localhost", 9999));
+		} catch (IOException e) {
+			throw new RuntimeException(e);
+		}
+	}
 
+
+	private void chooseBlockchain() {
 		Ledger.dropBlocks();
 
 		ArrayList<Block> chosenBlockchain = new ArrayList<>();
@@ -65,13 +74,10 @@ public class NewNode {
 		}
 
 		if(max == 0)
-			this.blocks.add(Block.getGenesis());
+			storeBlock(Block.getGenesis());
 		else
-			this.blocks.addAll(chosenBlockchain);
-
+			storeBlocks(chosenBlockchain);
 		System.out.println("Blockchain chosen");
-
-		Ledger.addBlocks(blocks);
 	}
 
 	private void syncVotes() throws IOException, InvalidKeySpecException {
@@ -90,6 +96,7 @@ public class NewNode {
 
 	private void syncChosenOnes() {
 		ArrayList<InetAddress> tempChosenOnes = NewNodeHandler.getChosenOnes();
+		tempChosenOnes.add(chosenMiner);
 		int count = 0;
 		for(NonMinedBlock item : nonMinedBlocks) {
 			while(count < tempChosenOnes.size() && tempChosenOnes.get(count).equals(item.getIp())) {
@@ -100,9 +107,11 @@ public class NewNode {
 	}
 
 	private void syncBlock() throws IOException, InvalidKeySpecException {
+		//todo esperar 10s a que lo mande el nodo minero
 		Block block = NewNodeHandler.getBlock();
 		if (correctBlock(block)) {
 			blocks.add(block);
+			Ledger.storeBlock(block);
 			for(Vote v : block.getVotes()) {
 				votes.remove(v);
 				database.putValue(v.getKey(), Database.State.Voted);
@@ -118,8 +127,8 @@ public class NewNode {
 
 	private void setNonMinedBlocks(ArrayList<Socket> sockets) {
 		for (Socket socket : sockets)
-			nonMinedBlocks.add(new NonMinedBlock(socket.getInetAddress(), 1, 0));
-		nonMinedBlocks.sort(new Comparator<NonMinedBlock>() {
+			this.nonMinedBlocks.add(new NonMinedBlock(socket.getInetAddress(), 1, 0));
+		this.nonMinedBlocks.sort(new Comparator<NonMinedBlock>() {
 			@Override
 			public int compare(NonMinedBlock o1, NonMinedBlock o2) {
 				return o1.getIp().toString().compareTo(o2.getIp().toString());
@@ -154,6 +163,16 @@ public class NewNode {
 
 	private Block getLastBlock() {
 		return blocks.get(blocks.size() - 1);
+	}
+
+	private void storeBlocks(ArrayList<Block> blocks) {
+		this.blocks.addAll(blocks);
+		Ledger.storeBlocks(blocks);
+	}
+
+	private void storeBlock(Block block) {
+		this.blocks.add(block);
+		Ledger.storeBlock(block);
 	}
 
 	private void punishNode(InetAddress ip) {
@@ -214,12 +233,18 @@ public class NewNode {
 					try {
 						Block minedblock;
 						if (actualMiner != null) {
-							if (myTurnToMine()){
+							System.out.println("We have a miner");
+							if (myTurnToMine()) {
 								syncVotes();
+								while (votes.isEmpty()) { //todo carlos no lo ve seguro
+									System.out.println("waiting for votes");
+									Thread.sleep(1000);
+									syncVotes();
+								}
 								minedblock = new Block(votes, getLastBlock());
 
 								//Add block to ledger
-								blocks.add(minedblock);
+								storeBlock(minedblock);
 
 								//Delete votes and update voted users
 								for(Vote v : minedblock.getVotes()) {
@@ -229,15 +254,16 @@ public class NewNode {
 
 								//Send block to everyone
 								NewNodeHandler.sendBlockToAll(minedblock);
-
 							}
 							else
 								syncBlock();
 
 							actualMiner = null;
 
-						} else
+						} else {
+							System.out.println("Sleeping for 5s");
 							Thread.sleep(5000);
+						}
 					} catch (InterruptedException ignored) {} catch (IOException | InvalidKeySpecException e) {
 						throw new RuntimeException(e);
 					}
@@ -252,15 +278,19 @@ public class NewNode {
 				System.out.println("Start election thread");
 				while (true) {
 					try {
-						Random random = new Random();
-						int randomNumber = random.nextInt(getNonMinedBlocksModule());
-						InetAddress chosenMiner = proofOfConsensus(randomNumber);
-						NewNodeHandler.sendChosenOneToAll(chosenMiner); //Send chosen miner to nodes
-						Thread.sleep(30000); //30s
-						syncChosenOnes(); //Receive actualMiner from nodes receiveActualMiner();
-						actualMiner = chooseActualMiner();
-						resetNodes();
-						addEveryoneExcept(actualMiner);
+						//Para que no se elija minero mientras se está minando
+						if(actualMiner == null) {
+							Random random = new Random();
+							int randomNumber = random.nextInt(0, getNonMinedBlocksModule());
+							chosenMiner = proofOfConsensus(randomNumber);
+							NewNodeHandler.sendChosenOneToAll(chosenMiner); //Send chosen miner to nodes
+							System.out.println("Sleeping for 10s");
+							Thread.sleep(10000); //todo 30s
+							syncChosenOnes(); //Receive actualMiner from nodes receiveActualMiner();
+							actualMiner = chooseActualMiner();
+							resetNodes();
+							addEveryoneExcept(actualMiner);
+						}
 					} catch (InterruptedException ignored) {}
 				}
 			}
@@ -299,7 +329,8 @@ public class NewNode {
 	private final ArrayList<Socket> bootstrapNodes = new ArrayList<>();
 	private final NewClientListener userListener;
 	private final NewNodeListener nodeListener;
-	private static InetAddress ip = null;
+	private static InetAddress ip = new InetSocketAddress("localhost", 9999).getAddress();
+	private static InetAddress chosenMiner = null;
 	private static InetAddress actualMiner = null;
 	private final ArrayList<NonMinedBlock> nonMinedBlocks = new ArrayList<>();
 	private final ArrayList<Vote> votes;

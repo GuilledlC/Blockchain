@@ -39,13 +39,8 @@ public class Ledger {
 		return getBlock(counter);
 	}
 
-	public static void addBlocks(ArrayList<Block> blocks) {
-		counter = 0;
-		for(Block block : blocks)
-			storeBlock(block);
-	}
-
 	public static void dropBlocks() {
+		counter = 0;
 		File directory = new File(BLOCKS_DIRECTORY);
 		try {
 			for(File file : directory.listFiles())
@@ -62,6 +57,11 @@ public class Ledger {
 		} catch (JsonProcessingException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public static void storeBlocks(ArrayList<Block> blocks) {
+		for(Block block : blocks)
+			storeBlock(block);
 	}
 
     public static void storeBlock(Block block) {

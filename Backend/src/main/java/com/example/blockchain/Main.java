@@ -1,17 +1,30 @@
 package com.example.blockchain;
 
+import com.example.blockchain.database.Database;
 import com.example.blockchain.newVersion.NewNode;
 import com.example.blockchain.nodes.Node;
+import com.example.blockchain.utils.KeyUtils;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.NoSuchAlgorithmException;
+import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
+import java.util.Date;
 
 public class Main {
-    public static void main(String[] args) throws IOException, InterruptedException {
+    public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, InterruptedException {
 
+		Database database = new Database("votesCheck");
+		PublicKey pubk = KeyUtils.publicKeyReader(Files.readAllBytes(Paths.get("keys/Carlos.pub")));
+		database.putValue(pubk.getEncoded(), Database.State.Exists);
+		database.closeDatabase();
 		NewNode node = new NewNode();
+
     }
 
     private static void generateData(File dnis) throws IOException {

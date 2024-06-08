@@ -51,6 +51,7 @@ public class NewClientHandler implements Runnable {
 	private void handleObjects(Object object) {
 		if (object instanceof Vote vote) {
 			votes.add(vote);
+			//todo propagar votos a todos los nodos
 			System.out.println("Vote received");
 		}
 		close();
