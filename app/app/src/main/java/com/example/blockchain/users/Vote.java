@@ -1,21 +1,24 @@
 package com.example.blockchain.users;
 
 import com.example.blockchain.utils.HashUtils;
+import com.example.blockchain.utils.KeyUtils;
 
+import java.io.IOException;
 import java.io.Serializable;
 import java.security.*;
+import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 
 public class Vote implements Serializable, Comparable<Vote> {
     private final String voteString;
     private final byte[] signature;
-    private final PublicKey key;
+    private final byte[] key;
     private final long time;
 
     public Vote(String vote, byte[] signature, PublicKey key) {
         this.voteString = vote;
         this.signature = signature;
-        this.key = key;
+        this.key = key.getEncoded();
         this.time = System.currentTimeMillis();
     }
 
@@ -27,7 +30,7 @@ public class Vote implements Serializable, Comparable<Vote> {
         return signature;
     }
 
-    public PublicKey getKey() {
+    public byte[] getKey() {
         return key;
     }
 
@@ -57,16 +60,20 @@ public class Vote implements Serializable, Comparable<Vote> {
         return signature.sign();
     }
 
-    public static boolean verify(Vote vote) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
-        Signature signature = Signature.getInstance("SHA256withRSA");
-        signature.initVerify(vote.getKey());
+    public static boolean verify(Vote vote) throws IOException, InvalidKeySpecException {
+        try {
+            Signature signature = Signature.getInstance("SHA256withRSA");
+            signature.initVerify(KeyUtils.publicKeyReader(vote.getKey()));
 
-        byte[] bytes = vote.getVoteString().getBytes();
-        signature.update(bytes);
-        return signature.verify(vote.getSignature());
+            byte[] bytes = vote.getVoteString().getBytes();
+            signature.update(bytes);
+            return signature.verify(vote.getSignature());
+        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
+            return false;
+        }
     }
 
-    public String displayVote() throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+    public String displayVote() throws NoSuchAlgorithmException, SignatureException, InvalidKeyException, IOException, InvalidKeySpecException {
         return  "\nVote        : " + getVoteString() +
                 "\nTime        : " + getTime() +
                 "\nSignature   : " + HashUtils.toHexString(getSignature()) +
@@ -82,4 +89,14 @@ public class Vote implements Serializable, Comparable<Vote> {
         String dataToHash = voteString + Arrays.toString(signature) + key.toString() + time;
         return HashUtils.hashString(dataToHash);
     }
+
+    @Override
+    public String toString() {
+        try {
+            return displayVote();
+        } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException | IOException |
+				 InvalidKeySpecException e) {
+            throw new RuntimeException(e);
+        }
+	}
 }

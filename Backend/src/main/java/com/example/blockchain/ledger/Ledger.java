@@ -1,16 +1,19 @@
-package ledger;
+package com.example.blockchain.ledger;
 
+import com.example.blockchain.utils.KeyUtils;
 import com.fasterxml.jackson.core.JsonFactory;
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.JsonToken;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import users.Vote;
+import com.example.blockchain.users.Vote;
 
 import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
+import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -44,9 +47,11 @@ public class Ledger {
 
 	public static void dropBlocks() {
 		File directory = new File(BLOCKS_DIRECTORY);
-		for(File file : directory.listFiles())
-			file.delete();
-		directory.delete();
+		try {
+			for(File file : directory.listFiles())
+				file.delete();
+			directory.delete();
+		} catch (NullPointerException ignored) {}
 	}
 
 	public static Block getBlock(int position) {
@@ -122,7 +127,7 @@ public class Ledger {
 
                                 // Index vote IDs
                                 for (Vote vote : block.getVotes()) {
-                                    PublicKey voteId = vote.getKey();
+                                    PublicKey voteId = KeyUtils.publicKeyReader(vote.getKey());
                                     voteIdIndex.computeIfAbsent(voteId, k -> new ArrayList<>()).add(file);
                                 }
 
@@ -138,7 +143,7 @@ public class Ledger {
                             }
                         }
                         jsonParser.close();
-                    } catch (IOException e) {
+                    } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
                         e.printStackTrace();
                     }
                 }

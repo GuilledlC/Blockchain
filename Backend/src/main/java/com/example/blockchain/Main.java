@@ -1,10 +1,17 @@
+package com.example.blockchain;
+
+import com.example.blockchain.newVersion.NewNode;
+import com.example.blockchain.nodes.Node;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
 public class Main {
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException, InterruptedException {
+
+		NewNode node = new NewNode();
 
     }
 

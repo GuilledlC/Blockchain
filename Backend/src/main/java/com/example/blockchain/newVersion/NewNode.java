@@ -1,13 +1,14 @@
-package newVersion;
+package com.example.blockchain.newVersion;
 
-import database.Database;
-import ledger.Block;
-import ledger.Ledger;
-import users.Vote;
+import com.example.blockchain.database.Database;
+import com.example.blockchain.ledger.Block;
+import com.example.blockchain.ledger.Ledger;
+import com.example.blockchain.users.Vote;
 
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 
 public class NewNode {
@@ -23,6 +24,8 @@ public class NewNode {
 		this.userListener.run();
 		this.nodeListener = new NewNodeListener(9999);
 		this.nodeListener.run();
+
+		//todo connect to every node
 
 		setNonMinedBlocks(bootstrapNodes);
 
@@ -64,18 +67,20 @@ public class NewNode {
 		else
 			this.blocks.addAll(chosenBlockchain);
 
+		System.out.println("Blockchain chosen");
+
 		Ledger.addBlocks(blocks);
 	}
 
-	private void syncVotes() {
+	private void syncVotes() throws IOException, InvalidKeySpecException {
 		ArrayList<Vote> tempVotes = new ArrayList<>();
 		tempVotes.addAll(NewClientHandler.getVotes());
 		tempVotes.addAll(NewNodeHandler.getVotes());
 
 		for (Vote v : tempVotes) {
-			if(database.notExists(v.getKey().getEncoded()) && Vote.verify(v)) { //Cambiar .getKey().toString()
+			if(database.notExists(v.getKey()) && Vote.verify(v)) { //Cambiar .getKey().toString()
 				votes.add(v);
-				database.putValue(v.getKey().getEncoded(), Database.State.InPool);
+				database.putValue(v.getKey(), Database.State.InPool);
 				NewNodeHandler.sendVoteToAll(v);
 			}
 		}
@@ -92,13 +97,13 @@ public class NewNode {
 		}
 	}
 
-	private void syncBlock() {
+	private void syncBlock() throws IOException, InvalidKeySpecException {
 		Block block = NewNodeHandler.getBlock();
 		if (correctBlock(block)) {
 			blocks.add(block);
 			for(Vote v : block.getVotes()) {
 				votes.remove(v);
-				database.putValue(v.getKey().getEncoded(), Database.State.Voted);
+				database.putValue(v.getKey(), Database.State.Voted);
 			}
 		}
 		else
@@ -129,7 +134,7 @@ public class NewNode {
 		}
 	}
 
-	private boolean correctBlock (Block block) {
+	private boolean correctBlock (Block block) throws IOException, InvalidKeySpecException {
 		/**La comprobacion se basará en comprobar si el hash del bloque anterior
 		 * es igual que el del bloque anterior de la blockchain del nodo,
 		 * si cada voto pertenece a un votante que no ha votado aun
@@ -139,7 +144,7 @@ public class NewNode {
 		int count = 0;
 		while (aux && count < tempVotes.size()) {
 			Vote tempVote = tempVotes.get(count);
-			aux = !database.hasVoted(tempVote.getKey().getEncoded()) && Vote.verify(tempVote);
+			aux = !database.hasVoted(tempVote.getKey()) && Vote.verify(tempVote);
 			count++;
 		}
 		return aux;
@@ -202,6 +207,7 @@ public class NewNode {
 		Thread mineThread = new Thread(new Runnable() {
 			@Override
 			public void run() {
+				System.out.println("Start mining thread");
 				while (true) {
 					try {
 						Block minedblock;
@@ -215,7 +221,7 @@ public class NewNode {
 
 								//Delete votes and update voted users
 								for(Vote v : minedblock.getVotes()) {
-									database.putValue(v.getKey().getEncoded(), Database.State.Voted);
+									database.putValue(v.getKey(), Database.State.Voted);
 								}
 								votes.clear();
 
@@ -230,7 +236,9 @@ public class NewNode {
 
 						} else
 							Thread.sleep(5000);
-					} catch (InterruptedException ignored) {}
+					} catch (InterruptedException ignored) {} catch (IOException | InvalidKeySpecException e) {
+						throw new RuntimeException(e);
+					}
 				}
 			}
 		});
@@ -239,6 +247,7 @@ public class NewNode {
 		Thread minerElection = new Thread(new Runnable() {
 			@Override
 			public void run() {
+				System.out.println("Start election thread");
 				while (true) {
 					try {
 						Random random = new Random();
@@ -285,7 +294,7 @@ public class NewNode {
 		}
 	}
 
-	private static ArrayList<Socket> bootstrapNodes;
+	private final ArrayList<Socket> bootstrapNodes = new ArrayList<>();
 	private final NewClientListener userListener;
 	private final NewNodeListener nodeListener;
 	private static InetAddress ip = null;

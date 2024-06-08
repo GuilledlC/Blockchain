@@ -1,8 +1,8 @@
-package nodes;
+package com.example.blockchain.nodes;
 
-import ledger.Block;
-import users.Vote;
-import utils.View;
+import com.example.blockchain.ledger.Block;
+import com.example.blockchain.users.Vote;
+import com.example.blockchain.utils.View;
 import java.util.Scanner;
 
 public class NodeView extends View {

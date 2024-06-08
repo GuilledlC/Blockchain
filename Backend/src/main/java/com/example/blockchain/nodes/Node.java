@@ -1,8 +1,8 @@
-package nodes;
+package com.example.blockchain.nodes;
 
-import ledger.Block;
-import sockets.NetworkUser;
-import users.Vote;
+import com.example.blockchain.ledger.Block;
+import com.example.blockchain.sockets.NetworkUser;
+import com.example.blockchain.users.Vote;
 import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;

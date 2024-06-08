@@ -1,8 +1,8 @@
-package ledger;
+package com.example.blockchain.ledger;
 
 import com.google.common.primitives.Bytes;
-import users.Vote;
-import utils.HashUtils;
+import com.example.blockchain.users.Vote;
+import com.example.blockchain.utils.HashUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -72,7 +72,7 @@ public class Block implements Serializable {
 	}
 
 	//todo merkle root
-	public byte[] getMerkleRoot() {
+	/*public byte[] getMerkleRoot() {
 		ArrayList<byte[]> txids = new ArrayList<>();
 		for(Vote vote : votes)
 			txids.add(vote.getTXID());
@@ -108,6 +108,6 @@ public class Block implements Serializable {
 			}
 			return merkleTree(parentHashList);
 		}
-	}
+	}*/
 
 }

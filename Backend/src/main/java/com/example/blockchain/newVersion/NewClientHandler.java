@@ -1,6 +1,6 @@
-package newVersion;
+package com.example.blockchain.newVersion;
 
-import users.Vote;
+import com.example.blockchain.users.Vote;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -49,8 +49,10 @@ public class NewClientHandler implements Runnable {
 	}
 
 	private void handleObjects(Object object) {
-		if (object instanceof Vote vote)
+		if (object instanceof Vote vote) {
 			votes.add(vote);
+			System.out.println("Vote received");
+		}
 		close();
 	}
 

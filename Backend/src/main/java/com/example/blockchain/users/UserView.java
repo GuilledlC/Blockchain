@@ -1,7 +1,7 @@
-package users;
+package com.example.blockchain.users;
 
-import utils.HashUtils;
-import utils.View;
+import com.example.blockchain.utils.HashUtils;
+import com.example.blockchain.utils.View;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -52,10 +52,11 @@ public class UserView extends View {
                     if (t != null) {
                         try {
                             System.out.println(t.displayVote());
-                        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
+                        } catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException |
+								 InvalidKeySpecException | IOException e) {
                             throw new RuntimeException(e);
                         }
-                    }
+					}
                     else
                         System.out.println("You haven't voted yet!");
                 } else if(args.equals("address")) {

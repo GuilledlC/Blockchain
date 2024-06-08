@@ -1,8 +1,9 @@
-package users;
+package com.example.blockchain.users;
 
-import sockets.NetworkUser;
-import utils.HashUtils;
-import utils.KeyUtils;
+import com.example.blockchain.sockets.NetworkUser;
+import com.example.blockchain.sockets.NetworkUser;
+import com.example.blockchain.utils.HashUtils;
+import com.example.blockchain.utils.KeyUtils;
 
 import java.io.IOException;
 import java.nio.file.Files;

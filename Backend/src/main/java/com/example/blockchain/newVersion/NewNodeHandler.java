@@ -1,8 +1,8 @@
-package newVersion;
+package com.example.blockchain.newVersion;
 
-import ledger.Block;
-import ledger.Ledger;
-import users.Vote;
+import com.example.blockchain.ledger.Block;
+import com.example.blockchain.ledger.Ledger;
+import com.example.blockchain.users.Vote;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

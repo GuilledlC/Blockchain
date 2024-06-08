@@ -1,4 +1,4 @@
-package newVersion;
+package com.example.blockchain.newVersion;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -15,6 +15,7 @@ public class NewClientListener implements Runnable {
 
 	@Override
 	public void run() {
+		System.out.println("Client listener initiated");
 		try {
 			while(!listener.isClosed()) {
 				isListening = true;

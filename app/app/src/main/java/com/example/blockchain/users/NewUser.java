@@ -4,7 +4,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.InetAddress;
+import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -16,14 +19,18 @@ public class NewUser implements Serializable {
 	private PrivateKey priv;
 	private PublicKey pub;
 	private Vote vote;
-	private ObjectOutputStream oos;
-	private ObjectInputStream ois;
-	private static final ArrayList<Socket> bootstrapNodes = new ArrayList<>();
+	private final ArrayList<String> bootstrapNodes = new ArrayList<>();
 
 	public NewUser(PrivateKey privateKey, PublicKey publicKey) {
 		this.priv = privateKey;
 		this.pub = publicKey;
+
 		//todo initialize bootstrap nodes
+		initializeBootstrapNodes();
+	}
+
+	private void initializeBootstrapNodes() {
+		bootstrapNodes.add("10.0.2.2");
 	}
 
 	public void vote(String receiver) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
@@ -33,33 +40,25 @@ public class NewUser implements Serializable {
 	}
 
 	private void distributeVote() {
-		for(Socket node : bootstrapNodes) {
-			sendToNode(node);
+		for(String ip : bootstrapNodes) {
+			try {
+				sendToNode(new Socket(ip, 8888));
+			} catch (IOException e) {}
 		}
 	}
 
 	private void sendToNode(Socket node) {
 		if(node.isConnected()) {
 			try {
-				oos = new ObjectOutputStream(node.getOutputStream());
-				ois = new ObjectInputStream(node.getInputStream());
+				ObjectOutputStream oos = new ObjectOutputStream(node.getOutputStream());
+				ObjectInputStream ois = new ObjectInputStream(node.getInputStream());
 				oos.writeObject(vote);
 				node.close();
+				oos.close();
+				ois.close();
 			} catch (IOException e) {
 				System.out.println("Error sending vote");
-				close();
 			}
-		}
-	}
-
-	private void close() {
-		try {
-			if (ois != null)
-				ois.close();
-			if (oos != null)
-				oos.close();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
 		}
 	}
 

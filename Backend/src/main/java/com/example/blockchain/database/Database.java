@@ -1,4 +1,4 @@
-package database;
+package com.example.blockchain.database;
 
 import org.iq80.leveldb.*;
 import static org.iq80.leveldb.impl.Iq80DBFactory.*;

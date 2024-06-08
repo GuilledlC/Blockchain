@@ -1,7 +1,7 @@
-package newVersion;
+package com.example.blockchain.newVersion;
 
-import users.Vote;
-import utils.HashUtils;
+import com.example.blockchain.users.Vote;
+import com.example.blockchain.utils.HashUtils;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;

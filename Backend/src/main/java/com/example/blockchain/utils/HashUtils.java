@@ -1,4 +1,4 @@
-package utils;
+package com.example.blockchain.utils;
 
 import java.math.BigInteger;
 import java.nio.charset.StandardCharsets;
