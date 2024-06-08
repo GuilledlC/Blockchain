@@ -30,7 +30,9 @@ public class NewUser implements Serializable {
 	}
 
 	private void initializeBootstrapNodes() {
-		bootstrapNodes.add("10.0.2.2");
+		//bootstrapNodes.add("10.0.2.2");
+		bootstrapNodes.add("88.27.144.170");
+		bootstrapNodes.add("2.153.80.40");
 	}
 
 	public void vote(String receiver) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {

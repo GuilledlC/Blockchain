@@ -55,7 +55,9 @@ public class Node {
 	}
 
 	private void initializeBootstrapNodes() {
-		bootstrapNodes.add(new InetSocketAddress("localhost", 9999).getAddress());
+		//bootstrapNodes.add(new InetSocketAddress("localhost", 9999).getAddress());
+		bootstrapNodes.add(new InetSocketAddress("88.27.144.170", 9999).getAddress());
+		bootstrapNodes.add(new InetSocketAddress("2.153.80.40", 9999).getAddress());
 	}
 
 	private void chooseBlockchain() {
