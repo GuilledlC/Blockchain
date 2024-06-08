@@ -1,5 +1,7 @@
 package com.example.blockchain.network;
 
+import com.example.blockchain.nodes.Node;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;

@@ -49,7 +49,6 @@ public class NodeHandler implements Runnable {
 		while(socket.isConnected()) {
 			try {
 				Object object = ois.readObject();
-				System.out.println("He recibido un objeto");
 				handleObjects(object);
 			} catch (IOException | ClassNotFoundException e) {
 				System.out.println("close the nodehandler");
@@ -60,6 +59,7 @@ public class NodeHandler implements Runnable {
 	}
 
 	private void handleObjects(Object object) {
+		System.out.println(object.getClass());
 		if (object instanceof Vote vote)
 			votes.add(vote);
 		else if(object instanceof Block blocka) {
@@ -129,7 +129,9 @@ public class NodeHandler implements Runnable {
 	}
 	public static void sendBlockToAll(Block block) {
 		for(NodeHandler handler : nodes) {
+			System.out.println("sending block " + block.getHash().toString() + " to " + handler.getIp());
 			handler.sendObject(block);
+			System.out.println("enviado");
 		}
 	}
 

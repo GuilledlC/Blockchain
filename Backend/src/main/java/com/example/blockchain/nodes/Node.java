@@ -35,7 +35,10 @@ public class Node {
 		connectToBootstrapNodes();
 		setNonMinedBlocks(bootstrapNodes);
 
-		chooseBlockchain();
+		//chooseBlockchain();
+		Ledger.dropBlocks();
+		this.blocks.add(Block.getGenesis());
+		Ledger.storeBlock(Block.getGenesis());
 
 		nodeExecution();
 	}
@@ -66,11 +69,18 @@ public class Node {
 
 		ArrayList<Block> chosenBlockchain = new ArrayList<>();
 		NodeHandler.requestBlockchainS();
+		try {
+			Thread.sleep(2000);
+		} catch (InterruptedException e) {
+			throw new RuntimeException(e);
+		}
 		ArrayList<ArrayList<Block>> blockchainS = NodeHandler.getBlockchainS();
 		HashMap<byte[], Integer> election = new HashMap<>();
 
 		//Por cada una de las listas de bloques que tengo (que asumo que estan ordenadas)
 		for (ArrayList<Block> blockchain : blockchainS) {
+			if(blockchain.size() == 0)
+				continue;
 			//Cojo el ultimo bloque
 			Block aux = blockchain.get(blockchain.size() - 1);
 			//Si no existe lo apunto
@@ -82,6 +92,8 @@ public class Node {
 
 		int max = 0;
 		for(ArrayList<Block> blockchain : blockchainS) {
+			if(blockchain.size() == 0)
+				continue;
 			Block aux = blockchain.get(blockchain.size() - 1);
 			int num = election.get(aux.getHash());
 			if(num > max) {
@@ -113,7 +125,6 @@ public class Node {
 
 	private void syncChosenOnes() {
 		ArrayList<InetAddress> tempChosenOnes = NodeHandler.getChosenOnes();
-		tempChosenOnes.add(chosenMiner);
 		int count = 0;
 		for(NonMinedBlock item : nonMinedBlocks) {
 			while(count < tempChosenOnes.size() && tempChosenOnes.get(count).equals(item.getIp())) {
@@ -249,15 +260,14 @@ public class Node {
 	}
 
 	private void nodeExecution() throws InterruptedException {
-		Thread mineThread = new Thread(new Runnable() {
+		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
-				System.out.println("Start mining thread");
 				while (true) {
 					try {
 						Block minedblock;
 						if (actualMiner != null) {
-							System.out.println("We have a miner");
+							System.out.println("We have a miner: " + actualMiner);
 							if (myTurnToMine()) {
 								System.out.println("ME toca minar");
 								syncVotes();
@@ -287,25 +297,7 @@ public class Node {
 							actualMiner = null;
 
 						} else {
-							System.out.println("Sleeping for 5s");
-							Thread.sleep(5000);
-						}
-					} catch (InterruptedException ignored) {} catch (IOException | InvalidKeySpecException e) {
-						throw new RuntimeException(e);
-					}
-				}
-			}
-		});
-		mineThread.start();
-
-		Thread minerElection = new Thread(new Runnable() {
-			@Override
-			public void run() {
-				System.out.println("Start election thread");
-				while (true) {
-					try {
-						//Para que no se elija minero mientras se está minando
-						if(actualMiner == null) {
+							System.out.println("choosing miner");
 							Random random = new Random();
 							int randomNumber = random.nextInt(0, getNonMinedBlocksModule());
 							chosenMiner = proofOfConsensus(randomNumber);
@@ -316,13 +308,14 @@ public class Node {
 							actualMiner = chooseActualMiner();
 							resetNodes();
 							addEveryoneExcept(actualMiner);
-						} else
-							Thread.sleep(1000);
-					} catch (InterruptedException ignored) {}
+						}
+					} catch (InterruptedException ignored) {} catch (IOException | InvalidKeySpecException e) {
+						throw new RuntimeException(e);
+					}
 				}
 			}
 		});
-		minerElection.start();
+		thread.start();
 	}
 
 	private class NonMinedBlock {
@@ -359,7 +352,7 @@ public class Node {
 	private static InetAddress ip = new InetSocketAddress("88.27.144.170", 9999).getAddress();
 	private static InetAddress chosenMiner = null;
 	private static InetAddress actualMiner = null;
-	private final ArrayList<NonMinedBlock> nonMinedBlocks = new ArrayList<>();
+	private static final ArrayList<NonMinedBlock> nonMinedBlocks = new ArrayList<>();
 	private final ArrayList<Vote> votes;
 	private final ArrayList<Block> blocks;
 	Database database;
