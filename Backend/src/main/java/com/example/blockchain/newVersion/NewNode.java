@@ -21,9 +21,11 @@ public class NewNode {
 		chooseBlockchain();
 
 		this.userListener = new NewClientListener(8888);
-		this.userListener.run();
+		Thread userThread = new Thread(this.userListener);
+		userThread.start();
 		this.nodeListener = new NewNodeListener(9999);
-		this.nodeListener.run();
+		Thread nodeThread = new Thread(this.nodeListener);
+		nodeThread.start();
 
 		//todo connect to every node
 

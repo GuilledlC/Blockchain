@@ -12,7 +12,6 @@ public class Main {
     public static void main(String[] args) throws IOException, InterruptedException {
 
 		NewNode node = new NewNode();
-
     }
 
     private static void generateData(File dnis) throws IOException {
