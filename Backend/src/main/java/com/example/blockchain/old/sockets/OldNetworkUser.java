@@ -1,20 +1,20 @@
-package com.example.blockchain.sockets;
+package com.example.blockchain.old.sockets;
 
 import java.io.IOException;
 import java.io.Serializable;
 
-public class NetworkUser {
+public class OldNetworkUser {
 
     protected final String id;
-    protected Listener listener = null;
+    protected OldListener oldListener = null;
 
-    public NetworkUser(String id) {
+    public OldNetworkUser(String id) {
         this.id = id;
     }
 
     public void startListener(int port) throws IOException {
-        listener = new Listener(port);
-        listener.startListening();
+        oldListener = new OldListener(port);
+        oldListener.startListening();
     }
 
     public void connectTo(String address) throws IOException {
@@ -24,15 +24,15 @@ public class NetworkUser {
     }
 
     private void connectTo(String ip, int port) throws IOException {
-        listener.connectTo(ip, port);
+        oldListener.connectTo(ip, port);
     }
 
     public void sendObject(Serializable object) {
         if(isListening())
-            listener.sendObject(object);
+            oldListener.sendObject(object);
     }
 
     public boolean isListening() {
-        return listener != null;
+        return oldListener != null;
     }
 }

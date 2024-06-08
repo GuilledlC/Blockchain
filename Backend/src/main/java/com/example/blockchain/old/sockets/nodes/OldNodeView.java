@@ -1,18 +1,18 @@
-package com.example.blockchain.nodes;
+package com.example.blockchain.old.sockets.nodes;
 
 import com.example.blockchain.ledger.Block;
 import com.example.blockchain.users.Vote;
-import com.example.blockchain.utils.View;
+import com.example.blockchain.old.View;
 import java.util.Scanner;
 
-public class NodeView extends View {
+public class OldNodeView extends View {
 
     @Override
     public void run() {
         Scanner scanner = new Scanner(System.in);
         System.out.println("\nWhat do you wish to be called?");
         String text = scanner.nextLine();
-        networkUser = new Node(text);
+        oldNetworkUser = new OldNode(text);
         super.run();
 
     }
@@ -26,15 +26,15 @@ public class NodeView extends View {
         String command = text.substring(0, endCMDIndex).toLowerCase();
         String args = text.substring(text.indexOf(' ') + 1);
 
-        Node node = (Node)networkUser;
+        OldNode oldNode = (OldNode) oldNetworkUser;
         switch (command) {
             case "/help" -> displayHelp();
             case "/view" -> {
                 if(args.equals("votes")) {
-                    for (Vote t: node.getVotes())
+                    for (Vote t: oldNode.getVotes())
                         System.out.println(t.displayVoteShort());
                 } else if(args.equals("blocks")) {
-                    for(Block b: node.getBlocks())
+                    for(Block b: oldNode.getBlocks())
                         System.out.println(b.displayBlock());
                 }
             }
@@ -51,7 +51,7 @@ public class NodeView extends View {
     }
 
     public static void main(String[] args) {
-        NodeView nv = new NodeView();
+        OldNodeView nv = new OldNodeView();
         nv.run();
     }
 }

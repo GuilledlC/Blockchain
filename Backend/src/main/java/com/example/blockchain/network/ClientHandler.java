@@ -1,4 +1,4 @@
-package com.example.blockchain.newVersion;
+package com.example.blockchain.network;
 
 import com.example.blockchain.users.Vote;
 
@@ -9,7 +9,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class NewClientHandler implements Runnable {
+public class ClientHandler implements Runnable {
 
 	private Socket socket;
 	private ObjectOutputStream oos;
@@ -24,7 +24,7 @@ public class NewClientHandler implements Runnable {
 	}
 
 
-	public NewClientHandler(Socket socket) {
+	public ClientHandler(Socket socket) {
 		try {
 			this.socket = socket;
 			this.oos = new ObjectOutputStream(socket.getOutputStream());

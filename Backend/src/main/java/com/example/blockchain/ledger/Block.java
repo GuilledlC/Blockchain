@@ -6,7 +6,6 @@ import com.example.blockchain.utils.HashUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 
 public class Block implements Serializable {

@@ -1,7 +1,7 @@
-package com.example.blockchain.users;
+package com.example.blockchain.old.users;
 
-import com.example.blockchain.sockets.NetworkUser;
-import com.example.blockchain.sockets.NetworkUser;
+import com.example.blockchain.users.Vote;
+import com.example.blockchain.old.sockets.OldNetworkUser;
 import com.example.blockchain.utils.HashUtils;
 import com.example.blockchain.utils.KeyUtils;
 
@@ -11,7 +11,7 @@ import java.nio.file.Paths;
 import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 
-public class OldUser extends NetworkUser {
+public class OldUserOld extends OldNetworkUser {
 
     private PrivateKey priv;
     private PublicKey pub;
@@ -20,7 +20,7 @@ public class OldUser extends NetworkUser {
     private String privatePath;
     private String publicPath;
 
-    public OldUser(String id) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
+    public OldUserOld(String id) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
         super(id);
         init();
     }

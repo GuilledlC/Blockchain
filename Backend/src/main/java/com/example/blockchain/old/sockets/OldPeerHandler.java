@@ -1,4 +1,4 @@
-package com.example.blockchain.sockets;
+package com.example.blockchain.old.sockets;
 
 import com.example.blockchain.users.Vote;
 
@@ -6,19 +6,19 @@ import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class PeerHandler implements Runnable {
-    private static final ArrayList<PeerHandler> peerHandlers = new ArrayList<>();
+public class OldPeerHandler implements Runnable {
+    private static final ArrayList<OldPeerHandler> OLD_PEER_HANDLERS = new ArrayList<>();
     private static final ArrayList<Object> objects = new ArrayList<>();
     private Socket socket;
     protected ObjectOutputStream oos;
     protected ObjectInputStream ois;
 
-    public PeerHandler(Socket socket) {
+    public OldPeerHandler(Socket socket) {
         try {
             this.socket = socket;
             this.oos = new ObjectOutputStream(socket.getOutputStream());
             this.ois = new ObjectInputStream(socket.getInputStream());
-            peerHandlers.add(this);
+            OLD_PEER_HANDLERS.add(this);
         } catch (IOException e) {
             close();
         }
@@ -51,8 +51,8 @@ public class PeerHandler implements Runnable {
     }
 
     protected static void sendObjects(Serializable object) {
-        for(PeerHandler peerHandler : peerHandlers)
-            peerHandler.sendObject(object);
+        for(OldPeerHandler oldPeerHandler : OLD_PEER_HANDLERS)
+            oldPeerHandler.sendObject(object);
     }
 
     private void sendObject(Serializable object) {
@@ -64,7 +64,7 @@ public class PeerHandler implements Runnable {
     }
 
     private void close() {
-        peerHandlers.remove(this);
+        OLD_PEER_HANDLERS.remove(this);
         try {
             if(ois != null)
                 ois.close();

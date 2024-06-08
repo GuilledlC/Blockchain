@@ -11,7 +11,7 @@ public class Database {
         this.openDatabase(path);
     }
 
-    public void openDatabase(String path) throws IOException {
+    private void openDatabase(String path) throws IOException {
         Options options = new Options();
         options.createIfMissing(true);
         this.db = factory.open(new File(path), options);

@@ -1,4 +1,4 @@
-package com.example.blockchain.newVersion;
+package com.example.blockchain.network;
 
 import com.example.blockchain.ledger.Block;
 import com.example.blockchain.ledger.Ledger;
@@ -11,71 +11,20 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.Comparator;
 
-public class NewNodeHandler implements Runnable {
+public class NodeHandler implements Runnable {
 
 	private Socket socket;
 	private ObjectOutputStream oos;
 	private ObjectInputStream ois;
-	private static final ArrayList<NewNodeHandler> nodes = new ArrayList<>();
+	private static final ArrayList<NodeHandler> nodes = new ArrayList<>();
 	private static final ArrayList<Vote> votes = new ArrayList<>();
 	private static Block block;
 	private static final ArrayList<InetAddress> chosenOnes = new ArrayList<>();
 	private static final ArrayList<ArrayList<Block>> blockchainS = new ArrayList<>();
 
-
-	public static ArrayList<Vote> getVotes() {
-		ArrayList<Vote> returnVotes = new ArrayList<>(votes);
-		votes.clear();
-		return returnVotes;
-	}
-	public static void sendVoteToAll(Vote vote) {
-		for(NewNodeHandler handler : nodes) {
-			handler.sendObject(vote);
-		}
-	}
-
-	public static Block getBlock() {
-		Block returnBlock = new Block(block);
-		block = null;
-		return returnBlock;
-	}
-	public static void sendBlockToAll(Block block) {
-		for(NewNodeHandler handler : nodes) {
-			handler.sendObject(block);
-		}
-	}
-
-	public static ArrayList<InetAddress> getChosenOnes() {
-		ArrayList<InetAddress> returnChosenOnes = new ArrayList<>(chosenOnes);
-		returnChosenOnes.sort(new Comparator<InetAddress>() {
-			@Override
-			public int compare(InetAddress o1, InetAddress o2) {
-				return o1.toString().compareTo(o2.toString());
-			}
-		});
-		chosenOnes.clear();
-		return returnChosenOnes;
-	}
-	public static void sendChosenOneToAll(InetAddress chosenOne) {
-		for(NewNodeHandler handler : nodes)
-			handler.sendObject(chosenOne);
-	}
-
-	public static ArrayList<ArrayList<Block>> getBlockchainS() {
-		ArrayList<ArrayList<Block>> returnBlockchainS = new ArrayList<>(blockchainS);
-		blockchainS.clear();
-		return returnBlockchainS;
-	}
-	public static void requestBlockchainS() {
-		for(NewNodeHandler handler : nodes)
-			handler.sendObject("request");
-	}
-
-	public NewNodeHandler(Socket socket) {
+	public NodeHandler(Socket socket) {
 		try {
 			this.socket = socket;
 			this.oos = new ObjectOutputStream(socket.getOutputStream());
@@ -85,6 +34,14 @@ public class NewNodeHandler implements Runnable {
 		} catch (IOException e) {
 			close();
 		}
+	}
+
+	public static boolean isConnectedTo(InetAddress address) {
+		for(NodeHandler nodeHandler : nodes) {
+			if(nodeHandler.getIp().equals(address))
+				return true;
+		}
+		return false;
 	}
 
 	@Override
@@ -141,10 +98,59 @@ public class NewNodeHandler implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		nodes.remove(this);
 	}
 
 	public InetAddress getIp() {
 		return socket.getInetAddress();
+	}
+
+	public static ArrayList<Vote> getVotes() {
+		ArrayList<Vote> returnVotes = new ArrayList<>(votes);
+		votes.clear();
+		return returnVotes;
+	}
+	public static void sendVoteToAll(Vote vote) {
+		for(NodeHandler handler : nodes) {
+			handler.sendObject(vote);
+		}
+	}
+
+	public static Block getBlock() {
+		Block returnBlock = new Block(block);
+		block = null;
+		return returnBlock;
+	}
+	public static void sendBlockToAll(Block block) {
+		for(NodeHandler handler : nodes) {
+			handler.sendObject(block);
+		}
+	}
+
+	public static ArrayList<InetAddress> getChosenOnes() {
+		ArrayList<InetAddress> returnChosenOnes = new ArrayList<>(chosenOnes);
+		returnChosenOnes.sort(new Comparator<InetAddress>() {
+			@Override
+			public int compare(InetAddress o1, InetAddress o2) {
+				return o1.toString().compareTo(o2.toString());
+			}
+		});
+		chosenOnes.clear();
+		return returnChosenOnes;
+	}
+	public static void sendChosenOneToAll(InetAddress chosenOne) {
+		for(NodeHandler handler : nodes)
+			handler.sendObject(chosenOne);
+	}
+
+	public static ArrayList<ArrayList<Block>> getBlockchainS() {
+		ArrayList<ArrayList<Block>> returnBlockchainS = new ArrayList<>(blockchainS);
+		blockchainS.clear();
+		return returnBlockchainS;
+	}
+	public static void requestBlockchainS() {
+		for(NodeHandler handler : nodes)
+			handler.sendObject("request");
 	}
 
 }

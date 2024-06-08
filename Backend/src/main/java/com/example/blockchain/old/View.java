@@ -1,13 +1,13 @@
-package com.example.blockchain.utils;
+package com.example.blockchain.old;
 
-import com.example.blockchain.sockets.NetworkUser;
+import com.example.blockchain.old.sockets.OldNetworkUser;
 
 import java.io.IOException;
 import java.util.Scanner;
 
 public class View implements Runnable {
 
-    protected NetworkUser networkUser;
+    protected OldNetworkUser oldNetworkUser;
 
     @Override
     public void run() {
@@ -35,16 +35,16 @@ public class View implements Runnable {
             case "/start" -> {
                 int port = Integer.parseInt(args);
                 try {
-                    networkUser.startListener(port);
+                    oldNetworkUser.startListener(port);
                     System.out.println("Listening at port " + port);
                 } catch (IOException e) {
                     System.out.println("Unable to start listening on port " + port);
                 }
             }
             case "/connect" -> {
-                if (networkUser.isListening()) {
+                if (oldNetworkUser.isListening()) {
                     try {
-                        networkUser.connectTo(args);
+                        oldNetworkUser.connectTo(args);
                     } catch (IOException e) {
                         System.out.println("Unable to connect to " + args);
                     }

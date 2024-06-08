@@ -1,7 +1,8 @@
-package com.example.blockchain.users;
+package com.example.blockchain.old.users;
 
+import com.example.blockchain.users.Vote;
 import com.example.blockchain.utils.HashUtils;
-import com.example.blockchain.utils.View;
+import com.example.blockchain.old.View;
 
 import java.io.IOException;
 import java.security.InvalidKeyException;
@@ -19,7 +20,7 @@ public class UserView extends View {
         System.out.println("\nWhat do you wish to be called?");
         String text = scanner.nextLine();
         try {
-            networkUser = new OldUser(text);
+            oldNetworkUser = new OldUserOld(text);
         } catch (IOException | NoSuchAlgorithmException | InvalidKeySpecException e) {
             throw new RuntimeException(e);}
         super.run();
@@ -34,7 +35,7 @@ public class UserView extends View {
         String command = text.substring(0, endCMDIndex).toLowerCase();
         String args = text.substring(text.indexOf(' ') + 1);
 
-        OldUser user = ((OldUser)networkUser);
+        OldUserOld user = ((OldUserOld) oldNetworkUser);
         Vote t = user.getVote();
         switch (command) {
             case "/help" -> displayHelp();
@@ -82,8 +83,8 @@ public class UserView extends View {
     }
 
     private void testVote() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, SignatureException, InvalidKeyException {
-        OldUser a = new OldUser("Guille");
-        OldUser b = new OldUser("Carlos");
+        OldUserOld a = new OldUserOld("Guille");
+        OldUserOld b = new OldUserOld("Carlos");
 
         //a.vote(b.getAddress());
         Vote t1 = a.getVote();

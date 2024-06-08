@@ -1,7 +1,4 @@
-package com.example.blockchain.newVersion;
-
-import com.example.blockchain.users.Vote;
-import com.example.blockchain.utils.HashUtils;
+package com.example.blockchain.users;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -11,7 +8,7 @@ import java.net.Socket;
 import java.security.*;
 import java.util.ArrayList;
 
-public class NewUser implements Serializable {
+public class User implements Serializable {
 	private PrivateKey priv;
 	private PublicKey pub;
 	private Vote vote;
@@ -19,7 +16,7 @@ public class NewUser implements Serializable {
 	private ObjectInputStream ois;
 	private static final ArrayList<Socket> bootstrapNodes = new ArrayList<>();
 
-	public NewUser(PrivateKey privateKey, PublicKey publicKey) {
+	public User(PrivateKey privateKey, PublicKey publicKey) {
 		this.priv = privateKey;
 		this.pub = publicKey;
 	}

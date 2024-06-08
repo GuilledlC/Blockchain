@@ -1,24 +1,23 @@
-package com.example.blockchain.sockets;
+package com.example.blockchain.old.sockets;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashMap;
 
-public class Listener {
+public class OldListener {
 
 	//Nodos que deberiamos tener hardcodeados
     private static ArrayList<Socket> bootstrapNodes;
 
 	//Nodos que se conectan a nosotros
-    private ArrayList<PeerHandler> connectedNodes;
+    private ArrayList<OldPeerHandler> connectedNodes;
 
 	//El socket a traves del cual escuchamos
     private final ServerSocket serverSocket;
 
-    public Listener(int port) throws IOException {
+    public OldListener(int port) throws IOException {
         this.serverSocket = new ServerSocket(port);
         bootstrapNodes = new ArrayList<>();
         connectedNodes = new ArrayList<>();
@@ -49,7 +48,7 @@ public class Listener {
 
 	//Metodo para crear un Thread con la conexion
     private void handlePeer(Socket peerSocket) {
-        PeerHandler peer = new PeerHandler(peerSocket);
+        OldPeerHandler peer = new OldPeerHandler(peerSocket);
         Thread peerThread = new Thread(peer);
         peerThread.start();
         connectedNodes.add(peer);
@@ -57,12 +56,12 @@ public class Listener {
 
 	//Metodo para enviar objetos a todos nuestros Peers
     public void sendObject(Serializable object) {
-        PeerHandler.sendObjects(object);
+        OldPeerHandler.sendObjects(object);
     }
 
 	//Metodo para recoger todos los objetos que nos han mandado nuestros Peers
     public ArrayList<Object> getObjects() {
-        return PeerHandler.getObjects();
+        return OldPeerHandler.getObjects();
     }
 
 	//Metodo para cerrar la conexion
