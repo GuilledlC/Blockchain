@@ -40,9 +40,11 @@ public class NodeListener implements Runnable {
 	}
 
 	private void handleNode(Socket peerSocket) {
-		NodeHandler peer = new NodeHandler(peerSocket);
-		Thread peerThread = new Thread(peer);
-		peerThread.start();
+		if(!NodeHandler.isConnectedTo(peerSocket.getInetAddress())) {
+			NodeHandler peer = new NodeHandler(peerSocket);
+			Thread peerThread = new Thread(peer);
+			peerThread.start();
+		}
 	}
 
 	public boolean isListening() {

@@ -44,18 +44,18 @@ public class Node {
 	}
 
 	private void connectToBootstrapNodes() {
-		for(InetAddress address : bootstrapNodes) {
+		//for(InetAddress address : bootstrapNodes) {
 			try {
-				if(!NodeHandler.isConnectedTo(address)) {
-					System.out.println(address);
-					NodeHandler peer = new NodeHandler(new Socket(address, 9999));
+				//if(!NodeHandler.isConnectedTo(address)) {
+					//System.out.println(address);
+					NodeHandler peer = new NodeHandler(new Socket("80.39.151.138", 9999));
 					Thread peerThread = new Thread(peer);
 					peerThread.start();
-				}
+				//}
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
-		}
+		//}
 	}
 
 	private void initializeBootstrapNodes() {
@@ -151,8 +151,7 @@ public class Node {
 				votes.remove(v);
 				database.putValue(v.getKey(), Database.State.Voted);
 			}
-		}
-		else
+		} else
 			punishNode(actualMiner);
 	}
 
@@ -265,50 +264,51 @@ public class Node {
 			public void run() {
 				while (true) {
 					try {
-						Block minedblock;
-						if (actualMiner != null) {
-							System.out.println("We have a miner: " + actualMiner);
-							if (myTurnToMine()) {
-								System.out.println("ME toca minar");
-								syncVotes();
-								while (votes.isEmpty()) { //todo carlos no lo ve seguro
-									System.out.println("waiting for votes");
-									Thread.sleep(1000);
-									syncVotes();
-								}
-								minedblock = new Block(votes, getLastBlock());
-
-								//Add block to ledger
-								storeBlock(minedblock);
-
-								//Delete votes and update voted users
-								for(Vote v : minedblock.getVotes()) {
-									database.putValue(v.getKey(), Database.State.Voted);
-								}
-								votes.clear();
-
-								//Send block to everyone
-								System.out.println("enviando bloque");
-								NodeHandler.sendBlockToAll(minedblock);
-							}
-							else
-								syncBlock();
-
-							actualMiner = null;
-
-						} else {
-							System.out.println("choosing miner");
-							Random random = new Random();
-							int randomNumber = random.nextInt(0, getNonMinedBlocksModule());
-							chosenMiner = proofOfConsensus(randomNumber);
-							NodeHandler.sendChosenOneToAll(chosenMiner); //Send chosen miner to nodes
-							System.out.println("Sleeping for 10s");
-							Thread.sleep(10000); //todo 30s
-							syncChosenOnes(); //Receive actualMiner from nodes receiveActualMiner();
-							actualMiner = chooseActualMiner();
-							resetNodes();
-							addEveryoneExcept(actualMiner);
+						System.out.println("choosing miner");
+						Random random = new Random();
+						int randomNumber = random.nextInt(0, getNonMinedBlocksModule());
+						chosenMiner = proofOfConsensus(randomNumber);
+						NodeHandler.sendChosenOneToAll(chosenMiner); //Send chosen miner to nodes
+						System.out.println("Sleeping for 10s");
+						Thread.sleep(10000); //todo 30s
+						syncChosenOnes(); //Receive actualMiner from nodes receiveActualMiner();
+						System.out.println("lista");
+						for(NonMinedBlock m : nonMinedBlocks) {
+							System.out.println(m.ip + " " + m.magicNumberCount);
 						}
+						actualMiner = chooseActualMiner();
+						resetNodes();
+						addEveryoneExcept(actualMiner);
+
+						Block minedblock;
+
+						System.out.println("We have a miner: " + actualMiner);
+						if (myTurnToMine()) {
+							System.out.println("ME toca minar");
+							syncVotes();
+							while (votes.isEmpty()) { //todo carlos no lo ve seguro
+								System.out.println("waiting for votes");
+								Thread.sleep(1000);
+								syncVotes();
+							}
+							minedblock = new Block(votes, getLastBlock());
+
+							//Add block to ledger
+							storeBlock(minedblock);
+
+							//Delete votes and update voted users
+							for(Vote v : minedblock.getVotes()) {
+								database.putValue(v.getKey(), Database.State.Voted);
+							}
+							votes.clear();
+
+							//Send block to everyone
+							System.out.println("enviando bloque");
+							NodeHandler.sendBlockToAll(minedblock);
+						}
+						else
+							syncBlock();
+
 					} catch (InterruptedException ignored) {} catch (IOException | InvalidKeySpecException e) {
 						throw new RuntimeException(e);
 					}
