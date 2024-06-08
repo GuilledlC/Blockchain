@@ -23,18 +23,18 @@ public class Node {
 		this.database = new Database("votesCheck");
 		this.blocks = new ArrayList<>();
 
-		initializeBootstrapNodes();
-		connectToBootstrapNodes();
-		setNonMinedBlocks(bootstrapNodes);
-
-		chooseBlockchain();
-
 		this.userListener = new ClientListener(8888);
 		Thread userThread = new Thread(this.userListener);
 		userThread.start();
 		this.nodeListener = new NodeListener(9999);
 		Thread nodeThread = new Thread(this.nodeListener);
 		nodeThread.start();
+
+		initializeBootstrapNodes();
+		connectToBootstrapNodes();
+		setNonMinedBlocks(bootstrapNodes);
+
+		chooseBlockchain();
 
 		nodeExecution();
 	}
@@ -43,6 +43,7 @@ public class Node {
 		for(InetAddress address : bootstrapNodes) {
 			try {
 				if(!NodeHandler.isConnectedTo(address)) {
+					System.out.println(address);
 					NodeHandler peer = new NodeHandler(new Socket(address, 9999));
 					Thread peerThread = new Thread(peer);
 					peerThread.start();
