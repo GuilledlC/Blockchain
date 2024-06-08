@@ -21,8 +21,12 @@ public class Node {
 	public Node() throws IOException, InterruptedException  {
 		this.votes = new ArrayList<>();
 		this.database = new Database("votesCheck");
-
 		this.blocks = new ArrayList<>();
+
+		initializeBootstrapNodes();
+		connectToBootstrapNodes();
+		setNonMinedBlocks(bootstrapNodes);
+
 		chooseBlockchain();
 
 		this.userListener = new ClientListener(8888);
@@ -31,11 +35,6 @@ public class Node {
 		this.nodeListener = new NodeListener(9999);
 		Thread nodeThread = new Thread(this.nodeListener);
 		nodeThread.start();
-
-		initializeBootstrapNodes();
-		//todo connect to every node
-		connectToBootstrapNodes();
-		setNonMinedBlocks(bootstrapNodes);
 
 		nodeExecution();
 	}
