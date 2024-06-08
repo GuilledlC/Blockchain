@@ -20,7 +20,7 @@ public class NodeHandler implements Runnable {
 	private ObjectInputStream ois;
 	private static final ArrayList<NodeHandler> nodes = new ArrayList<>();
 	private static final ArrayList<Vote> votes = new ArrayList<>();
-	private static Block block;
+	private static Block block = null;
 	private static final ArrayList<InetAddress> chosenOnes = new ArrayList<>();
 	private static final ArrayList<ArrayList<Block>> blockchainS = new ArrayList<>();
 
@@ -117,6 +117,8 @@ public class NodeHandler implements Runnable {
 	}
 
 	public static Block getBlock() {
+		if(block == null)
+			return null;
 		Block returnBlock = new Block(block);
 		block = null;
 		return returnBlock;

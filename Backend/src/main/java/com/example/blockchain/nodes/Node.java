@@ -124,6 +124,13 @@ public class Node {
 	private void syncBlock() throws IOException, InvalidKeySpecException {
 		//todo esperar 10s a que lo mande el nodo minero
 		Block block = NodeHandler.getBlock();
+		while (block == null) {
+			try {
+				Thread.sleep(5000); //todo calibrar tiempo
+				block = NodeHandler.getBlock();
+			} catch (InterruptedException e) {throw new RuntimeException(e);}
+		}
+
 		if (correctBlock(block)) {
 			storeBlock(block);
 			for(Vote v : block.getVotes()) {
