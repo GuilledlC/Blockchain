@@ -10,8 +10,6 @@ import com.example.blockchain.network.NodeListener;
 import com.example.blockchain.users.Vote;
 
 import java.io.IOException;
-import java.net.InetAddress;
-import java.net.InetSocketAddress;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
 
@@ -32,16 +30,12 @@ public class Node {
 		Thread nodeThread = new Thread(this.nodeListener);
 		nodeThread.start();
 
-		//todo meter en un thread
 		initializeBootstrapNodes();
 		connectToBootstrapNodes();
 		setNonMinedBlocks(bootstrapNodes);
 
 		chooseBlockchain();
-		/*Ledger.dropBlocks();
-		this.blocks.add(Block.getGenesis());
-		Ledger.storeBlock(Block.getGenesis());*/
-		//nodeExecution();
+		nodeExecution();
 	}
 
 	private void connectToBootstrapNodes() {
@@ -120,6 +114,8 @@ public class Node {
 
 	private void syncChosenOnes() {
 		ArrayList<String> tempChosenOnes = NodeHandler.getChosenOnes();
+		tempChosenOnes.add(chosenMiner);
+		tempChosenOnes.sort(String::compareTo);
 		int count = 0;
 		for(NonMinedBlock item : nonMinedBlocks) {
 			while(count < tempChosenOnes.size() && tempChosenOnes.get(count).equals(item.getIp())) {
@@ -165,8 +161,6 @@ public class Node {
 				return o1.getIp().compareTo(o2.getIp());
 			}
 		});
-
-		System.out.println(nonMinedBlocks);
 	}
 
 	private void addEveryoneExcept(String ip){
@@ -223,7 +217,7 @@ public class Node {
 		return aux;
 	}
 
-	private void resetNodes() {
+	private void resetMagicNumbers() {
 		for (NonMinedBlock item : nonMinedBlocks)
 			item.setMagicNumberCount(0);
 	}
@@ -257,7 +251,7 @@ public class Node {
 		return ip.equals(actualMiner);
 	}
 
-	private void nodeExecution() throws InterruptedException {
+	private void nodeExecution() {
 		Thread thread = new Thread(new Runnable() {
 			@Override
 			public void run() {
@@ -276,7 +270,7 @@ public class Node {
 							System.out.println(m.ip + " " + m.magicNumberCount);
 						}
 						actualMiner = chooseActualMiner();
-						resetNodes();
+						resetMagicNumbers();
 						addEveryoneExcept(actualMiner);
 
 						Block minedblock;

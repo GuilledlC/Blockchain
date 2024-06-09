@@ -2,6 +2,8 @@ package com.example.blockchain.users;
 
 import com.example.blockchain.utils.HashUtils;
 import com.example.blockchain.utils.KeyUtils;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -20,6 +22,18 @@ public class Vote implements Serializable, Comparable<Vote> {
         this.signature = signature;
         this.key = key.getEncoded();
         this.time = System.currentTimeMillis();
+    }
+
+    @JsonCreator
+    public Vote(
+            @JsonProperty("voteString") String voteString,
+            @JsonProperty("signature") byte[] signature,
+            @JsonProperty("key") byte[] key,
+            @JsonProperty("time") long time) {
+        this.voteString = voteString;
+        this.signature = signature;
+        this.key = key;
+        this.time = time;
     }
 
     public String getVoteString() {
@@ -85,18 +99,18 @@ public class Vote implements Serializable, Comparable<Vote> {
         return getVoteString().substring(getVoteString().indexOf(' '));
     }
 
-    public byte[] getTXID() {
+    /*public byte[] getTXID() {
         String dataToHash = voteString + Arrays.toString(signature) + key.toString() + time;
         return HashUtils.hashString(dataToHash);
-    }
+    }*/
 
     @Override
     public String toString() {
         try {
             return displayVote();
         } catch (NoSuchAlgorithmException | SignatureException | InvalidKeyException | IOException |
-				 InvalidKeySpecException e) {
+                 InvalidKeySpecException e) {
             throw new RuntimeException(e);
         }
-	}
+    }
 }

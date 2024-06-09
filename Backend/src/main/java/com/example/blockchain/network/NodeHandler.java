@@ -132,12 +132,6 @@ public class NodeHandler implements Runnable {
 
 	public static ArrayList<String> getChosenOnes() {
 		ArrayList<String> returnChosenOnes = new ArrayList<>(chosenOnes);
-		returnChosenOnes.sort(new Comparator<String>() {
-			@Override
-			public int compare(String o1, String o2) {
-				return o1.compareTo(o2);
-			}
-		});
 		chosenOnes.clear();
 		return returnChosenOnes;
 	}
