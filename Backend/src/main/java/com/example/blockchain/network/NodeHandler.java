@@ -22,7 +22,7 @@ public class NodeHandler implements Runnable {
 	public static final ArrayList<NodeHandler> nodes = new ArrayList<>();
 	private static final ArrayList<Vote> votes = new ArrayList<>();
 	private static Block block = null;
-	private static final ArrayList<InetAddress> chosenOnes = new ArrayList<>();
+	private static final ArrayList<String> chosenOnes = new ArrayList<>();
 	private static final ArrayList<ArrayList<Block>> blockchainS = new ArrayList<>();
 
 	public NodeHandler(Socket socket, NodeListener listener) {
@@ -60,11 +60,11 @@ public class NodeHandler implements Runnable {
 			System.out.println("Tengo un vloqyue");
 			block = new Block(blocka);
 		}
-		else if(object instanceof InetAddress ip)
-			chosenOnes.add(ip);
 		else if (object instanceof String string) {
 			if(string.equals("request"))
 				sendBlockchain();
+			else
+				chosenOnes.add(string);
 		} else if(object instanceof ArrayList<?> blockchain)
 			blockchainS.add((ArrayList<Block>)blockchain);
 	}
@@ -130,18 +130,18 @@ public class NodeHandler implements Runnable {
 		}
 	}
 
-	public static ArrayList<InetAddress> getChosenOnes() {
-		ArrayList<InetAddress> returnChosenOnes = new ArrayList<>(chosenOnes);
-		returnChosenOnes.sort(new Comparator<InetAddress>() {
+	public static ArrayList<String> getChosenOnes() {
+		ArrayList<String> returnChosenOnes = new ArrayList<>(chosenOnes);
+		returnChosenOnes.sort(new Comparator<String>() {
 			@Override
-			public int compare(InetAddress o1, InetAddress o2) {
-				return o1.toString().compareTo(o2.toString());
+			public int compare(String o1, String o2) {
+				return o1.compareTo(o2);
 			}
 		});
 		chosenOnes.clear();
 		return returnChosenOnes;
 	}
-	public static void sendChosenOneToAll(InetAddress chosenOne) {
+	public static void sendChosenOneToAll(String chosenOne) {
 		for(NodeHandler handler : nodes)
 			handler.sendObject(chosenOne);
 	}

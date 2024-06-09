@@ -33,24 +33,14 @@ public class Node {
 		//todo meter en un thread
 		initializeBootstrapNodes();
 		connectToBootstrapNodes();
-		System.out.println(NodeHandler.nodes.size());
-		for (NodeHandler n : NodeHandler.nodes) {
-			System.out.println(n.getIp());
-		}
-
-		System.out.println(nodeListener.connections.size());
-		for (String n : nodeListener.connections.keySet()) {
-			System.out.println(n);
-		}
-		System.out.println("hay " + Thread.activeCount() + " threads");
-		/*setNonMinedBlocks(bootstrapNodes);
+		setNonMinedBlocks(bootstrapNodes);
 
 		//chooseBlockchain();
 		Ledger.dropBlocks();
 		this.blocks.add(Block.getGenesis());
 		Ledger.storeBlock(Block.getGenesis());
 
-		nodeExecution();*/
+		nodeExecution();
 	}
 
 	private void connectToBootstrapNodes() {
@@ -60,9 +50,9 @@ public class Node {
 	}
 
 	private void initializeBootstrapNodes() {
-		bootstrapNodes.add("80.39.151.138");
+		//bootstrapNodes.add("80.39.151.138");
 		bootstrapNodes.add("2.153.80.40");
-		//bootstrapNodes.add("88.27.144.170");
+		bootstrapNodes.add("88.27.144.170");
 	}
 
 	private void chooseBlockchain() {
@@ -125,7 +115,7 @@ public class Node {
 	}
 
 	private void syncChosenOnes() {
-		ArrayList<InetAddress> tempChosenOnes = NodeHandler.getChosenOnes();
+		ArrayList<String> tempChosenOnes = NodeHandler.getChosenOnes();
 		int count = 0;
 		for(NonMinedBlock item : nonMinedBlocks) {
 			while(count < tempChosenOnes.size() && tempChosenOnes.get(count).equals(item.getIp())) {
@@ -160,13 +150,13 @@ public class Node {
 		return blocks;
 	}
 
-	private void setNonMinedBlocks(ArrayList<InetAddress> sockets) {
-		for (InetAddress ip : sockets)
+	private void setNonMinedBlocks(ArrayList<String> sockets) {
+		for (String ip : sockets)
 			this.nonMinedBlocks.add(new NonMinedBlock(ip, 1, 0));
 		this.nonMinedBlocks.sort(new Comparator<NonMinedBlock>() {
 			@Override
 			public int compare(NonMinedBlock o1, NonMinedBlock o2) {
-				return o1.getIp().toString().compareTo(o2.getIp().toString());
+				return o1.getIp().compareTo(o2.getIp());
 			}
 		});
 	}
@@ -230,9 +220,9 @@ public class Node {
 			item.setMagicNumberCount(0);
 	}
 
-	private InetAddress proofOfConsensus(int magicNumber) {
+	private String proofOfConsensus(int magicNumber) {
 		int aux = -1;
-		InetAddress miner = null;
+		String miner = null;
 		for (NonMinedBlock item : nonMinedBlocks){
 			aux += item.getNonMinedBlocks();
 			miner = item.getIp();
@@ -243,8 +233,8 @@ public class Node {
 		return null;
 	}
 
-	private InetAddress chooseActualMiner() {
-		InetAddress ip = null;
+	private String chooseActualMiner() {
+		String ip = null;
 		int aux = 0;
 		for (NonMinedBlock item : nonMinedBlocks){
 			if (aux < item.getMagicNumberCount()){
@@ -320,17 +310,17 @@ public class Node {
 	}
 
 	private class NonMinedBlock {
-		private final InetAddress ip;
+		private final String ip;
 		private int nonMinedBlocks;
 		private int magicNumberCount;
 
-		public NonMinedBlock(InetAddress ip, int nonMinedBlocks, int magicNumberCount) {
+		public NonMinedBlock(String ip, int nonMinedBlocks, int magicNumberCount) {
 			this.ip = ip;
 			this.nonMinedBlocks = nonMinedBlocks;
 			this.magicNumberCount = magicNumberCount;
 		}
 
-		public InetAddress getIp() {
+		public String getIp() {
 			return ip;
 		}
 		public int getNonMinedBlocks() {
@@ -350,9 +340,9 @@ public class Node {
 	private final ArrayList<String> bootstrapNodes = new ArrayList<>();
 	private final ClientListener userListener;
 	private final NodeListener nodeListener;
-	private static InetAddress ip = new InetSocketAddress("88.27.144.170", 9999).getAddress(); //todo cambiar a String
-	private static InetAddress chosenMiner = null; //todo cambiar a String
-	private static InetAddress actualMiner = null; //todo cambiar a String
+	private static InetAddress ip = new InetSocketAddress("80.39.151.138", 9999).getAddress(); //todo cambiar a String
+	private static String chosenMiner = null; //todo cambiar a String
+	private static String actualMiner = null; //todo cambiar a String
 	private static final ArrayList<NonMinedBlock> nonMinedBlocks = new ArrayList<>();
 	private final ArrayList<Vote> votes;
 	private final ArrayList<Block> blocks;
