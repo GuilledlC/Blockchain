@@ -24,17 +24,18 @@ public class Ledger {
 
     private static final String BLOCKS_DIRECTORY = "blocks/";
 
-	private static int counter = -1;
+	private static int counter = 0;
 
 	public static ArrayList<Block> getAllBlocks() {
 		ArrayList<Block> returnBlocks = new ArrayList<>();
 
-		for(int i = 0; i <= counter; i++)
+		for(int i = 0; i < counter; i++)
 			returnBlocks.add(getBlock(i));
 
 		return returnBlocks;
 	}
 
+	//todo use this
 	public static Block getLastBlock() {
 		return getBlock(counter);
 	}
@@ -53,8 +54,8 @@ public class Ledger {
 		ObjectMapper objectMapper = new ObjectMapper();
 
 		try {
-			return objectMapper.readValue(BLOCKS_DIRECTORY + position + ".json", Block.class);
-		} catch (JsonProcessingException e) {
+			return objectMapper.readValue(new File(BLOCKS_DIRECTORY + position + ".json"), Block.class);
+		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
@@ -74,7 +75,7 @@ public class Ledger {
         }
 
         // Generate a file name based on block hash (you can adjust this according to your requirements)
-        String fileName = BLOCKS_DIRECTORY + ++counter + ".json";
+        String fileName = BLOCKS_DIRECTORY + counter++ + ".json";
         File file = new File(fileName);
 
         try {

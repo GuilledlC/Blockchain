@@ -37,10 +37,10 @@ public class Node {
 		connectToBootstrapNodes();
 		setNonMinedBlocks(bootstrapNodes);
 
-		//chooseBlockchain();
-		Ledger.dropBlocks();
+		chooseBlockchain();
+		/*Ledger.dropBlocks();
 		this.blocks.add(Block.getGenesis());
-		Ledger.storeBlock(Block.getGenesis());
+		Ledger.storeBlock(Block.getGenesis());*/
 		//nodeExecution();
 	}
 
@@ -52,7 +52,7 @@ public class Node {
 
 	private void initializeBootstrapNodes() {
 		bootstrapNodes.add("80.39.151.138");
-		bootstrapNodes.add("2.153.80.40");
+		//bootstrapNodes.add("2.153.80.40");
 		bootstrapNodes.add("88.27.144.170");
 
 		bootstrapNodes.remove(ip);
@@ -100,6 +100,7 @@ public class Node {
 			storeBlock(Block.getGenesis());
 		else
 			storeBlocks(chosenBlockchain);
+		NodeHandler.getBlockchainS(); //Esto sirve para vaciar el buffer de NodeHandler
 		System.out.println("Blockchain chosen");
 	}
 
