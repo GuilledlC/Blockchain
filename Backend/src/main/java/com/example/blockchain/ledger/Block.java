@@ -67,6 +67,14 @@ public class Block implements Serializable {
 		return previousHash;
 	}
 
+	public Long getYoungestVote() {
+		return youngestVote;
+	}
+
+	public Long getOldestVote() {
+		return oldestVote;
+	}
+
 	public boolean isTimeBetweenVotes(long time) {
 		return time >= youngestVote && time <= oldestVote;
 	}

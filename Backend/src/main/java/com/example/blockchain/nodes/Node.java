@@ -37,14 +37,11 @@ public class Node {
 		connectToBootstrapNodes();
 		setNonMinedBlocks(bootstrapNodes);
 
-		/*
-
 		//chooseBlockchain();
 		Ledger.dropBlocks();
 		this.blocks.add(Block.getGenesis());
 		Ledger.storeBlock(Block.getGenesis());
-
-		nodeExecution();*/
+		//nodeExecution();
 	}
 
 	private void connectToBootstrapNodes() {
