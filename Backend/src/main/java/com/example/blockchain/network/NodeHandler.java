@@ -29,8 +29,8 @@ public class NodeHandler implements Runnable {
 			this.socket = socket;
 			this.oos = new ObjectOutputStream(socket.getOutputStream());
 			this.ois = new ObjectInputStream(socket.getInputStream());
+			System.out.println(ois == null);
 			nodes.add(this);
-			//this.run();
 		} catch (IOException e) {
 			close();
 		}

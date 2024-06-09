@@ -12,10 +12,8 @@ import com.example.blockchain.users.Vote;
 import java.io.IOException;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
-import java.net.Socket;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class Node {
 
@@ -39,6 +37,12 @@ public class Node {
 		for (NodeHandler n : NodeHandler.nodes) {
 			System.out.println(n.getIp());
 		}
+
+		System.out.println(nodeListener.connections.size());
+		for (String n : nodeListener.connections.keySet()) {
+			System.out.println(n);
+		}
+		System.out.println("hay " + Thread.activeCount() + " threads");
 		/*setNonMinedBlocks(bootstrapNodes);
 
 		//chooseBlockchain();
@@ -57,7 +61,8 @@ public class Node {
 
 	private void initializeBootstrapNodes() {
 		bootstrapNodes.add("80.39.151.138");
-		//bootstrapNodes.add("88.27.144.170");
+		bootstrapNodes.add("2.153.80.40");
+		//bootstrapNodes.add("/88.27.144.170");
 	}
 
 	private void chooseBlockchain() {
@@ -345,9 +350,9 @@ public class Node {
 	private final ArrayList<String> bootstrapNodes = new ArrayList<>();
 	private final ClientListener userListener;
 	private final NodeListener nodeListener;
-	private static InetAddress ip = new InetSocketAddress("88.27.144.170", 9999).getAddress();
-	private static InetAddress chosenMiner = null;
-	private static InetAddress actualMiner = null;
+	private static InetAddress ip = new InetSocketAddress("88.27.144.170", 9999).getAddress(); //todo cambiar a String
+	private static InetAddress chosenMiner = null; //todo cambiar a String
+	private static InetAddress actualMiner = null; //todo cambiar a String
 	private static final ArrayList<NonMinedBlock> nonMinedBlocks = new ArrayList<>();
 	private final ArrayList<Vote> votes;
 	private final ArrayList<Block> blocks;
