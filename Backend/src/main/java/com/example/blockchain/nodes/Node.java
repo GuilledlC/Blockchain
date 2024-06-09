@@ -35,12 +35,14 @@ public class Node {
 		connectToBootstrapNodes();
 		setNonMinedBlocks(bootstrapNodes);
 
+		/*setNonMinedBlocks(bootstrapNodes);
+
 		//chooseBlockchain();
 		Ledger.dropBlocks();
 		this.blocks.add(Block.getGenesis());
 		Ledger.storeBlock(Block.getGenesis());
 
-		nodeExecution();
+		nodeExecution();*/
 	}
 
 	private void connectToBootstrapNodes() {
@@ -161,7 +163,7 @@ public class Node {
 		});
 	}
 
-	private void addEveryoneExcept(InetAddress ip){
+	private void addEveryoneExcept(String ip){
 		for (NonMinedBlock item : nonMinedBlocks) {
 			if (item.getNonMinedBlocks() != 0)
 				item.setNonMinedBlocks(item.getNonMinedBlocks() + 1);
@@ -200,7 +202,7 @@ public class Node {
 		Ledger.storeBlock(block);
 	}
 
-	private void punishNode(InetAddress ip) {
+	private void punishNode(String ip) {
 		for (NonMinedBlock item : nonMinedBlocks){
 			if (item.getIp().equals(ip))
 				item.setNonMinedBlocks(0);
