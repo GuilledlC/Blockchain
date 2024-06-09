@@ -15,6 +15,7 @@ import java.util.Comparator;
 
 public class NodeHandler implements Runnable {
 
+	NodeListener listener;
 	private Socket socket;
 	private ObjectOutputStream oos;
 	private ObjectInputStream ois;
@@ -24,7 +25,8 @@ public class NodeHandler implements Runnable {
 	private static final ArrayList<InetAddress> chosenOnes = new ArrayList<>();
 	private static final ArrayList<ArrayList<Block>> blockchainS = new ArrayList<>();
 
-	public NodeHandler(Socket socket) {
+	public NodeHandler(Socket socket, NodeListener listener) {
+		this.listener = listener;
 		try {
 			this.socket = socket;
 			this.oos = new ObjectOutputStream(socket.getOutputStream());
@@ -84,6 +86,7 @@ public class NodeHandler implements Runnable {
 	}
 
 	private void close() {
+		this.listener.remove(socket.getInetAddress().toString());
 		try {
 			if(ois != null)
 				ois.close();

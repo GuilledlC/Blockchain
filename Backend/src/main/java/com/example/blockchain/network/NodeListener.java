@@ -14,6 +14,11 @@ public class NodeListener implements Runnable {
 		this.listener = new ServerSocket(port);
 	}
 
+	public void remove(String id) {
+		synchronized (connections) {
+			connections.remove(id);
+		}
+	}
 
 	public void connectTo(String ip) {
 		try {
@@ -64,7 +69,7 @@ public class NodeListener implements Runnable {
 	}
 
 	private void handleNode(Socket nodeSocket) {
-		NodeHandler peer = new NodeHandler(nodeSocket);
+		NodeHandler peer = new NodeHandler(nodeSocket, this);
 		Thread peerThread = new Thread(peer);
 		peerThread.start();
 	}
