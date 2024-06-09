@@ -17,6 +17,8 @@ import java.util.*;
 
 public class Node {
 
+	private String ip = "88.27.144.170";
+
 	public Node() throws IOException, InterruptedException  {
 		this.votes = new ArrayList<>();
 		this.database = new Database("votesCheck");
@@ -35,7 +37,7 @@ public class Node {
 		connectToBootstrapNodes();
 		setNonMinedBlocks(bootstrapNodes);
 
-		/*setNonMinedBlocks(bootstrapNodes);
+		/*
 
 		//chooseBlockchain();
 		Ledger.dropBlocks();
@@ -52,9 +54,11 @@ public class Node {
 	}
 
 	private void initializeBootstrapNodes() {
-		//bootstrapNodes.add("80.39.151.138");
+		bootstrapNodes.add("80.39.151.138");
 		bootstrapNodes.add("2.153.80.40");
 		bootstrapNodes.add("88.27.144.170");
+
+		bootstrapNodes.remove(ip);
 	}
 
 	private void chooseBlockchain() {
@@ -155,12 +159,16 @@ public class Node {
 	private void setNonMinedBlocks(ArrayList<String> sockets) {
 		for (String ip : sockets)
 			this.nonMinedBlocks.add(new NonMinedBlock(ip, 1, 0));
+
+		this.nonMinedBlocks.add(new NonMinedBlock(this.ip, 1, 0));
 		this.nonMinedBlocks.sort(new Comparator<NonMinedBlock>() {
 			@Override
 			public int compare(NonMinedBlock o1, NonMinedBlock o2) {
 				return o1.getIp().compareTo(o2.getIp());
 			}
 		});
+
+		System.out.println(nonMinedBlocks);
 	}
 
 	private void addEveryoneExcept(String ip){
@@ -337,15 +345,19 @@ public class Node {
 		public void setMagicNumberCount(int magicNumberCount) {
 			this.magicNumberCount = magicNumberCount;
 		}
+
+		@Override
+		public String toString() {
+			return ip + ", " + nonMinedBlocks + ", " + magicNumberCount + "\n";
+		}
 	}
 
 	private final ArrayList<String> bootstrapNodes = new ArrayList<>();
 	private final ClientListener userListener;
 	private final NodeListener nodeListener;
-	private static InetAddress ip = new InetSocketAddress("80.39.151.138", 9999).getAddress(); //todo cambiar a String
-	private static String chosenMiner = null; //todo cambiar a String
-	private static String actualMiner = null; //todo cambiar a String
-	private static final ArrayList<NonMinedBlock> nonMinedBlocks = new ArrayList<>();
+	private String chosenMiner = null; //todo cambiar a String
+	private String actualMiner = null; //todo cambiar a String
+	private final ArrayList<NonMinedBlock> nonMinedBlocks = new ArrayList<>();
 	private final ArrayList<Vote> votes;
 	private final ArrayList<Block> blocks;
 	Database database;
