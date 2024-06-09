@@ -8,7 +8,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NodeListener implements Runnable {
 
 	private final ServerSocket listener;
-	public final ConcurrentHashMap<String, Socket> connections = new ConcurrentHashMap<>();
+	private static final ConcurrentHashMap<String, Socket> connections = new ConcurrentHashMap<>();
 
 	public NodeListener(int port) throws IOException {
 		this.listener = new ServerSocket(port);

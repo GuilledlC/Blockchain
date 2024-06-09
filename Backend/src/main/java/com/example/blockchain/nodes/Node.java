@@ -33,16 +33,6 @@ public class Node {
 		//todo meter en un thread
 		initializeBootstrapNodes();
 		connectToBootstrapNodes();
-		System.out.println(NodeHandler.nodes.size());
-		for (NodeHandler n : NodeHandler.nodes) {
-			System.out.println(n.getIp());
-		}
-
-		System.out.println(nodeListener.connections.size());
-		for (String n : nodeListener.connections.keySet()) {
-			System.out.println(n);
-		}
-		System.out.println("hay " + Thread.activeCount() + " threads");
 		/*setNonMinedBlocks(bootstrapNodes);
 
 		//chooseBlockchain();
