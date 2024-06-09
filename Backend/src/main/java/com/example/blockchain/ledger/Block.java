@@ -1,5 +1,7 @@
 package com.example.blockchain.ledger;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.primitives.Bytes;
 import com.example.blockchain.users.Vote;
 import com.example.blockchain.utils.HashUtils;
@@ -45,6 +47,20 @@ public class Block implements Serializable {
 		this.youngestVote = copy.youngestVote;
 		this.oldestVote = copy.oldestVote;
 		this.hash = copy.hash;
+	}
+
+	@JsonCreator
+	public Block(
+			@JsonProperty("hash") byte[] hash,
+			@JsonProperty("previousHash") byte[] previousHash,
+			@JsonProperty("youngestVote") Long youngestVote,
+			@JsonProperty("oldestVote") Long oldestVote,
+			@JsonProperty("votes") ArrayList<Vote>  votes) {
+		this.hash = hash;
+		this.previousHash = previousHash;
+		this.youngestVote = youngestVote;
+		this.oldestVote = oldestVote;
+		this.votes.addAll(votes);
 	}
 
     public String displayBlock() {
