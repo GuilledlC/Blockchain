@@ -8,48 +8,50 @@ import java.util.concurrent.ConcurrentHashMap;
 public class NodeListener implements Runnable {
 
 	private final ServerSocket listener;
-	private final ConcurrentHashMap<String, Socket> connections = new ConcurrentHashMap<>();
-
-	public void connectTo(String ip) {
-		synchronized (connections) {
-			if(connections.contains(ip)) {
-				System.out.println("Ya estamos conectados con " + ip + "!");
-				return;
-			}
-		}
-
-		try {
-			Socket nodeSocket = new Socket(ip, 9999);
-			synchronized (connections) {
-				connections.put(ip, nodeSocket);
-			}
-			System.out.println("Conectado con " + ip + "!");
-		} catch (IOException e) {
-			System.out.println("Error al conectar con el nodo " + ip + ": " + e.getMessage());
-		}
-	}
+	public final ConcurrentHashMap<String, Socket> connections = new ConcurrentHashMap<>();
 
 	public NodeListener(int port) throws IOException {
 		this.listener = new ServerSocket(port);
 	}
 
+
+	public void connectTo(String ip) {
+		try {
+			String id = "/" + ip;
+			Socket nodeSocket = new Socket(ip, 9999);
+			connectTo(id, nodeSocket);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
 	@Override
 	public void run() {
 		System.out.println("Node listener initiated");
-		try {
-			while(!listener.isClosed()) {
+		while(!listener.isClosed()) {
+			try {
 				Socket nodeSocket = listener.accept();
 				String id = nodeSocket.getInetAddress().toString();
+				connectTo(id, nodeSocket);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void connectTo(String id, Socket nodeSocket) {
+		try {
+			synchronized (connections) {
 				if(connections.putIfAbsent(id, nodeSocket) == null) {
-					System.out.println("Conectado con " + id);
 					handleNode(nodeSocket);
+					System.out.println("Conectado con " + id);
 				} else {
 					System.out.println("Ya estamos conectados con " + id);
 					nodeSocket.close();
 				}
 			}
 		} catch (IOException e) {
-			closeListener();
+			throw new RuntimeException(e);
 		}
 	}
 
