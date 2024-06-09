@@ -15,6 +15,7 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.security.spec.InvalidKeySpecException;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Node {
 
@@ -26,6 +27,7 @@ public class Node {
 		this.userListener = new ClientListener(8888);
 		Thread userThread = new Thread(this.userListener);
 		userThread.start();
+
 		this.nodeListener = new NodeListener(9999);
 		Thread nodeThread = new Thread(this.nodeListener);
 		nodeThread.start();
@@ -33,35 +35,29 @@ public class Node {
 		//todo meter en un thread
 		initializeBootstrapNodes();
 		connectToBootstrapNodes();
-		setNonMinedBlocks(bootstrapNodes);
+		System.out.println(NodeHandler.nodes.size());
+		for (NodeHandler n : NodeHandler.nodes) {
+			System.out.println(n.getIp());
+		}
+		/*setNonMinedBlocks(bootstrapNodes);
 
 		//chooseBlockchain();
 		Ledger.dropBlocks();
 		this.blocks.add(Block.getGenesis());
 		Ledger.storeBlock(Block.getGenesis());
 
-		nodeExecution();
+		nodeExecution();*/
 	}
 
 	private void connectToBootstrapNodes() {
-		//for(InetAddress address : bootstrapNodes) {
-			try {
-				//if(!NodeHandler.isConnectedTo(address)) {
-					//System.out.println(address);
-					NodeHandler peer = new NodeHandler(new Socket("80.39.151.138", 9999));
-					Thread peerThread = new Thread(peer);
-					peerThread.start();
-				//}
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
-		//}
+		for(String address : bootstrapNodes) {
+			nodeListener.connectTo(address);
+		}
 	}
 
 	private void initializeBootstrapNodes() {
-		//bootstrapNodes.add(new InetSocketAddress("localhost", 9999).getAddress());
-		bootstrapNodes.add(new InetSocketAddress("80.39.151.138", 9999).getAddress());
-		bootstrapNodes.add(new InetSocketAddress("88.27.144.170", 9999).getAddress());
+		bootstrapNodes.add("80.39.151.138");
+		//bootstrapNodes.add("88.27.144.170");
 	}
 
 	private void chooseBlockchain() {
@@ -346,7 +342,7 @@ public class Node {
 		}
 	}
 
-	private final ArrayList<InetAddress> bootstrapNodes = new ArrayList<>();
+	private final ArrayList<String> bootstrapNodes = new ArrayList<>();
 	private final ClientListener userListener;
 	private final NodeListener nodeListener;
 	private static InetAddress ip = new InetSocketAddress("88.27.144.170", 9999).getAddress();

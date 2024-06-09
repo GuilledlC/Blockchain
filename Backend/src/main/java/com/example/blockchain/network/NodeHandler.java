@@ -18,7 +18,7 @@ public class NodeHandler implements Runnable {
 	private Socket socket;
 	private ObjectOutputStream oos;
 	private ObjectInputStream ois;
-	private static final ArrayList<NodeHandler> nodes = new ArrayList<>();
+	public static final ArrayList<NodeHandler> nodes = new ArrayList<>();
 	private static final ArrayList<Vote> votes = new ArrayList<>();
 	private static Block block = null;
 	private static final ArrayList<InetAddress> chosenOnes = new ArrayList<>();
@@ -34,14 +34,6 @@ public class NodeHandler implements Runnable {
 		} catch (IOException e) {
 			close();
 		}
-	}
-
-	public static boolean isConnectedTo(InetAddress address) {
-		for(NodeHandler nodeHandler : nodes) {
-			if(nodeHandler.getIp().equals(address))
-				return true;
-		}
-		return false;
 	}
 
 	@Override
@@ -105,8 +97,8 @@ public class NodeHandler implements Runnable {
 		nodes.remove(this);
 	}
 
-	public InetAddress getIp() {
-		return socket.getInetAddress();
+	public String getIp() {
+		return socket.getInetAddress().toString();
 	}
 
 	public static ArrayList<Vote> getVotes() {
