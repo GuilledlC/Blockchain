@@ -19,7 +19,7 @@ import java.util.*;
 
 public class Node {
 
-	private String ip = "2.153.80.40";
+	private final String ip = "88.27.144.170";
 
 	public Node() throws IOException, InterruptedException  {
 		this.votes = new ArrayList<>();
@@ -157,7 +157,7 @@ public class Node {
 			} catch (InterruptedException e) {throw new RuntimeException(e);}
 		}
 
-		if (block == null){
+		if (block != null){
 			if(!correctBlock(block))
 				punishNode(actualMiner);
 			else {
@@ -304,9 +304,9 @@ public class Node {
 						Block minedblock;
 
 						System.out.println("We have a miner: " + actualMiner);
+						syncVotes();
 						if (myTurnToMine()) {
 							System.out.println("ME toca minar");
-							syncVotes();
 							while (votes.isEmpty()) { //todo carlos no lo ve seguro
 								System.out.println("waiting for votes");
 								Thread.sleep(1000);

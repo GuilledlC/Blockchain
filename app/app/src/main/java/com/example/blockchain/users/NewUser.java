@@ -7,6 +7,7 @@ import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
@@ -32,7 +33,7 @@ public class NewUser implements Serializable {
 	private void initializeBootstrapNodes() {
 		bootstrapNodes.add("88.27.144.170");
 		bootstrapNodes.add("80.39.151.138");
-		//bootstrapNodes.add("2.153.80.40");
+		bootstrapNodes.add("2.153.80.40");
 	}
 
 	public void vote(String receiver) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
@@ -44,7 +45,10 @@ public class NewUser implements Serializable {
 	private void distributeVote() {
 		for(String ip : bootstrapNodes) {
 			try {
-				sendToNode(new Socket(ip, 8888));
+				SocketAddress sa = new InetSocketAddress(ip, 8888);
+				Socket socket = new Socket();
+				socket.connect(sa, 1000);
+				sendToNode(socket);
 			} catch (IOException e) {}
 		}
 	}
