@@ -118,7 +118,9 @@ public class Node {
 		tempVotes.addAll(NodeHandler.getVotes());
 
 		for (Vote v : tempVotes) {
+			System.out.println(database.exists(v.getKey()));
 			if(database.exists(v.getKey()) && Vote.verify(v)) {
+				System.out.println("añado voto");
 				votes.add(v);
 				database.putValue(v.getKey(), Database.State.InPool);
 				NodeHandler.sendVoteToAll(v);
@@ -203,6 +205,7 @@ public class Node {
 			if (item.getIp().equals(ip))
 				item.setNonMinedBlocks(0);
 		}
+		System.out.println("castigueited");
 	}
 
 	private int getNonMinedBlocksModule() {
