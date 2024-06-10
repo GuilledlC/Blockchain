@@ -24,6 +24,7 @@ public class NodeListener implements Runnable {
 		try {
 			String id = "/" + ip;
 			Socket nodeSocket = new Socket(ip, 9999);
+			nodeSocket.setSoTimeout(1000);
 			connectTo(id, nodeSocket);
 		} catch (IOException e) {
 			e.printStackTrace();
