@@ -12,6 +12,7 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 
 public class NodeHandler implements Runnable {
 
@@ -24,6 +25,7 @@ public class NodeHandler implements Runnable {
 	private static Block block = null;
 	private static final ArrayList<String> chosenOnes = new ArrayList<>();
 	private static final ArrayList<ArrayList<Block>> blockchainS = new ArrayList<>();
+	private boolean hasVotedMiner = false;
 
 	public NodeHandler(Socket socket, NodeListener listener) {
 		this.listener = listener;
@@ -53,18 +55,23 @@ public class NodeHandler implements Runnable {
 	}
 
 	private void handleObjects(Object object) {
-		System.out.println(object.getClass());
-		if (object instanceof Vote vote)
+		if (object instanceof Vote vote) {
 			votes.add(vote);
+		}
 		else if(object instanceof Block blocka) {
-			System.out.println("Tengo un vloqyue");
 			block = new Block(blocka);
 		}
 		else if (object instanceof String string) {
-			if(string.equals("request"))
+			if(string.equals("request")) {
 				sendBlockchain();
-			else
-				chosenOnes.add(string);
+			}
+			else {
+				if(!hasVotedMiner) {
+					chosenOnes.add(string);
+					System.out.println(this.getIp() + "has voted: " + string);
+					hasVotedMiner = true;
+				}
+			}
 		} else if(object instanceof ArrayList<?> blockchain)
 			blockchainS.add((ArrayList<Block>)blockchain);
 	}
@@ -136,8 +143,10 @@ public class NodeHandler implements Runnable {
 		return returnChosenOnes;
 	}
 	public static void sendChosenOneToAll(String chosenOne) {
-		for(NodeHandler handler : nodes)
+		for(NodeHandler handler : nodes) {
 			handler.sendObject(chosenOne);
+			handler.hasVotedMiner = false;
+		}
 	}
 
 	public static ArrayList<ArrayList<Block>> getBlockchainS() {

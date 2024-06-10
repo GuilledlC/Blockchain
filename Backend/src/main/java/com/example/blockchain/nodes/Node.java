@@ -15,7 +15,7 @@ import java.util.*;
 
 public class Node {
 
-	private String ip = "88.27.144.170";
+	private String ip = "80.39.151.138";
 
 	public Node() throws IOException, InterruptedException  {
 		this.votes = new ArrayList<>();
@@ -46,8 +46,8 @@ public class Node {
 
 	private void initializeBootstrapNodes() {
 		bootstrapNodes.add("80.39.151.138");
-		//bootstrapNodes.add("2.153.80.40");
-		bootstrapNodes.add("88.27.144.170");
+		bootstrapNodes.add("2.153.80.40");
+		//bootstrapNodes.add("88.27.144.170");
 
 		bootstrapNodes.remove(ip);
 	}
@@ -95,7 +95,6 @@ public class Node {
 		else
 			storeBlocks(chosenBlockchain);
 		NodeHandler.getBlockchainS(); //Esto sirve para vaciar el buffer de NodeHandler
-		System.out.println("Blockchain chosen");
 	}
 
 	private void syncVotes() throws IOException, InvalidKeySpecException {
@@ -257,13 +256,14 @@ public class Node {
 			public void run() {
 				while (true) {
 					try {
-						System.out.println("choosing miner");
+						System.out.println("\n");
 						Random random = new Random();
 						int randomNumber = random.nextInt(0, getNonMinedBlocksModule());
 						chosenMiner = proofOfConsensus(randomNumber);
 						NodeHandler.sendChosenOneToAll(chosenMiner); //Send chosen miner to nodes
+						System.out.println("Yo he votado a: " + chosenMiner);
 						System.out.println("Sleeping for 10s");
-						Thread.sleep(10000); //todo 30s
+						Thread.sleep(20000); //todo 30s
 						syncChosenOnes(); //Receive actualMiner from nodes receiveActualMiner();
 						System.out.println("lista");
 						for(NonMinedBlock m : nonMinedBlocks) {
