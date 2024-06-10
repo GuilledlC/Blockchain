@@ -19,7 +19,7 @@ import java.util.*;
 
 public class Node {
 
-	private String ip = "88.27.144.170";
+	private String ip = "2.153.80.40";
 
 	public Node() throws IOException, InterruptedException  {
 		this.votes = new ArrayList<>();
@@ -157,13 +157,15 @@ public class Node {
 			} catch (InterruptedException e) {throw new RuntimeException(e);}
 		}
 
-		if(!correctBlock(block))
-			punishNode(actualMiner);
-		else {
-			storeBlock(block);
-			for(Vote v : block.getVotes()) {
-				votes.remove(v);
-				database.putValue(v.getKey(), Database.State.Voted);
+		if (block == null){
+			if(!correctBlock(block))
+				punishNode(actualMiner);
+			else {
+				storeBlock(block);
+				for(Vote v : block.getVotes()) {
+					votes.remove(v);
+					database.putValue(v.getKey(), Database.State.Voted);
+				}
 			}
 		}
 	}
