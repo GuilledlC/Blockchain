@@ -132,9 +132,8 @@ public class NodeHandler implements Runnable {
 	}
 	public static void sendBlockToAll(Block block) {
 		for(NodeHandler handler : nodes) {
-			System.out.println("sending block " + block.getHash().toString() + " to " + handler.getIp());
 			handler.sendObject(block);
-			System.out.println("enviado");
+			System.out.println("Bloque enviado");
 		}
 	}
 
