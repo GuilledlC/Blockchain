@@ -23,8 +23,14 @@ public class NodeListener implements Runnable {
 	public void connectTo(String ip) {
 		try {
 			String id = "/" + ip;
-			Socket nodeSocket = new Socket(ip, 9999);
-			connectTo(id, nodeSocket);
+			synchronized (connections) {
+				if (!connections.contains(id)) {
+					Socket nodeSocket = new Socket(ip, 9999);
+					connectTo(id, nodeSocket);
+				} else {
+					System.out.println("Ya estamos conectados con " + id);
+				}
+			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
