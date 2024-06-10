@@ -271,11 +271,18 @@ public class Node {
 	private void mine() throws IOException, InvalidKeySpecException, InterruptedException {
 		Block minedblock;
 		System.out.println("ME toca minar");
-		while (votes.isEmpty()) { //todo carlos no lo ve seguro
+		int count = 0;
+		while (votes.isEmpty() && count++ <= 10) { //todo carlos no lo ve seguro
 			System.out.println("waiting for votes");
 			Thread.sleep(1000);
 			syncVotes();
 		}
+
+		if(votes.isEmpty()) {
+			NodeHandler.sendBlockToAll(null);
+			return;
+		}
+
 		minedblock = new Block(votes, getLastBlock());
 
 		//Delete votes and update voted users
