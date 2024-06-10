@@ -1,8 +1,10 @@
 package com.example.blockchain.network;
 
 import java.io.IOException;
+import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class NodeListener implements Runnable {
@@ -25,7 +27,9 @@ public class NodeListener implements Runnable {
 			String id = "/" + ip;
 			synchronized (connections) {
 				if (!connections.contains(id)) {
-					Socket nodeSocket = new Socket(ip, 9999);
+					SocketAddress sa = new InetSocketAddress(ip, 9999);
+					Socket nodeSocket = new Socket();
+					nodeSocket.connect(sa, 1000);
 					connectTo(id, nodeSocket);
 				} else {
 					System.out.println("Ya estamos conectados con " + id);

@@ -61,12 +61,7 @@ public class Node {
 
 	private void connectToBootstrapNodes() {
 		for(String address : bootstrapNodes) {
-			new Thread(new Runnable() {
-				@Override
-				public void run() {
-					nodeListener.connectTo(address);
-				}
-			}).start();
+			nodeListener.connectTo(address);
 		}
 	}
 
