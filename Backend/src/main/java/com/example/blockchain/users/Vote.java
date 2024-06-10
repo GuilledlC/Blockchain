@@ -91,7 +91,7 @@ public class Vote implements Serializable, Comparable<Vote> {
 		return  "\nVote        : " + getVoteString() +
 				"\nTime        : " + getTime() +
 				"\nSignature   : " + HashUtils.toHexString(getSignature()) +
-				"\nPublic Key  : " + getKey() +
+				"\nPublic Key  : " + Arrays.toString(getKey()) +
 				"\nVerified    : " + Vote.verify(this);
 	}
 

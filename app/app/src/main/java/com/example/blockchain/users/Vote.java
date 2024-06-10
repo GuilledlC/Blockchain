@@ -91,7 +91,7 @@ public class Vote implements Serializable, Comparable<Vote> {
         return  "\nVote        : " + getVoteString() +
                 "\nTime        : " + getTime() +
                 "\nSignature   : " + HashUtils.toHexString(getSignature()) +
-                "\nPublic Key  : " + getKey() +
+                "\nPublic Key  : " + Arrays.toString(getKey()) +
                 "\nVerified    : " + Vote.verify(this);
     }
 
@@ -99,10 +99,10 @@ public class Vote implements Serializable, Comparable<Vote> {
         return getVoteString().substring(getVoteString().indexOf(' '));
     }
 
-    /*public byte[] getTXID() {
-        String dataToHash = voteString + Arrays.toString(signature) + key.toString() + time;
-        return HashUtils.hashString(dataToHash);
-    }*/
+	/*public byte[] getTXID() {
+		String dataToHash = voteString + Arrays.toString(signature) + key.toString() + time;
+		return HashUtils.hashString(dataToHash);
+	}*/
 
     @Override
     public String toString() {
