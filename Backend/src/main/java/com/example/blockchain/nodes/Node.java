@@ -120,7 +120,7 @@ public class Node {
 		for (Vote v : tempVotes) {
 			System.out.println(database.exists(v.getKey()));
 			if(database.exists(v.getKey()) && Vote.verify(v)) {
-				System.out.println("añado voto");
+				System.out.println("añado voto " + v.getVoteString());
 				votes.add(v);
 				database.putValue(v.getKey(), Database.State.InPool);
 				NodeHandler.sendVoteToAll(v);
@@ -292,6 +292,7 @@ public class Node {
 		for(Vote v : minedblock.getVotes()) {
 			database.putValue(v.getKey(), Database.State.Voted);
 		}
+		System.out.println("Borro TODOS los votos");
 		votes.clear();
 
 		//Add block to ledger
@@ -320,7 +321,7 @@ public class Node {
 				storeBlock(block);
 				for(Vote v : block.getVotes()) {
 					votes.remove(v);
-					System.out.println("Borro votos");
+					System.out.println("Borro votos " + v.getVoteString());
 					database.putValue(v.getKey(), Database.State.Voted);
 				}
 			}
