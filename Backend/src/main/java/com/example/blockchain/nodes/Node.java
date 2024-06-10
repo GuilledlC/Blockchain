@@ -292,6 +292,7 @@ public class Node {
 		for(Vote v : minedblock.getVotes()) {
 			database.putValue(v.getKey(), Database.State.Voted);
 		}
+		System.out.println(votes);
 		System.out.println("Borro TODOS los votos");
 		votes.clear();
 
@@ -319,7 +320,10 @@ public class Node {
 				punishNode(actualMiner);
 			else {
 				storeBlock(block);
+				System.out.println(block.getVotes());
+				System.out.println(votes);
 				for(Vote v : block.getVotes()) {
+					System.out.println(votes.contains(v));
 					votes.remove(v);
 					System.out.println("Borro votos " + v.getVoteString());
 					database.putValue(v.getKey(), Database.State.Voted);
