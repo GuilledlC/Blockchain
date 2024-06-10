@@ -55,7 +55,7 @@ public class Node {
 			objetivo = ahora.truncatedTo(ChronoUnit.MINUTES).plusMinutes(1);
 
 		while(LocalTime.now().isBefore(objetivo)) {
-			Thread.sleep(500);
+			Thread.sleep(100);
 		}
 	}
 
