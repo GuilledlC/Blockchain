@@ -8,8 +8,6 @@ import com.example.blockchain.users.Vote;
 
 import java.io.IOException;
 import java.security.spec.InvalidKeySpecException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
@@ -120,7 +118,7 @@ public class Node {
 		tempVotes.addAll(NodeHandler.getVotes());
 
 		for (Vote v : tempVotes) {
-			if(database.notExists(v.getKey()) && Vote.verify(v)) {
+			if(database.exists(v.getKey()) && Vote.verify(v)) {
 				votes.add(v);
 				database.putValue(v.getKey(), Database.State.InPool);
 				NodeHandler.sendVoteToAll(v);
@@ -255,7 +253,6 @@ public class Node {
 		int randomNumber = random.nextInt(0, getNonMinedBlocksModule());
 		chosenMiner = proofOfConsensus(randomNumber);
 		NodeHandler.sendChosenOneToAll(chosenMiner); //Send chosen miner to nodes
-		System.out.println("Yo he votado a: " + chosenMiner);
 		System.out.println("Sleeping for 10s");
 		timeBarrier(); //todo 30s
 		syncChosenOnes(); //Receive actualMiner from nodes receiveActualMiner();
@@ -281,14 +278,14 @@ public class Node {
 		}
 		minedblock = new Block(votes, getLastBlock());
 
-		//Add block to ledger
-		storeBlock(minedblock);
-
 		//Delete votes and update voted users
 		for(Vote v : minedblock.getVotes()) {
 			database.putValue(v.getKey(), Database.State.Voted);
 		}
 		votes.clear();
+
+		//Add block to ledger
+		storeBlock(minedblock);
 
 		//Send block to everyone
 		System.out.println("enviando bloque");
@@ -302,18 +299,18 @@ public class Node {
 		while (block == null && count++ <= 10) {
 			try {
 				Thread.sleep(1000); //todo interrumpir
-				System.out.println("esperando a un bloque");
 				block = NodeHandler.getBlock();
 			} catch (InterruptedException e) {throw new RuntimeException(e);}
 		}
 
-		if (block != null){
+		if (block != null) {
 			if(!correctBlock(block))
 				punishNode(actualMiner);
 			else {
 				storeBlock(block);
 				for(Vote v : block.getVotes()) {
 					votes.remove(v);
+					System.out.println("Borro votos");
 					database.putValue(v.getKey(), Database.State.Voted);
 				}
 			}

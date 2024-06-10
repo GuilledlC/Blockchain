@@ -38,7 +38,7 @@ public class Database {
         }
     }
 
-	public boolean notExists(byte[] key) {
+	public boolean exists(byte[] key) {
 		try {
 			String value = new String(this.db.get(key));
 			return value.equals("0");
