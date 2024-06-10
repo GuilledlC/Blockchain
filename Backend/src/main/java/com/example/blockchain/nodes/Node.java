@@ -35,6 +35,7 @@ public class Node {
 		connectToBootstrapNodes();
 
 		timeBarrier(1, 0);
+		System.out.println("\nTime barrier terminated\n");
 
 		setNonMinedBlocks(bootstrapNodes);
 
@@ -180,10 +181,11 @@ public class Node {
 
 	private void addEveryoneExcept(String ip){
 		for (NonMinedBlock item : nonMinedBlocks) {
-			if (item.getNonMinedBlocks() != 0)
+			if (item.getNonMinedBlocks() != 0) {
 				item.setNonMinedBlocks(item.getNonMinedBlocks() + 1);
-			if (item.getIp().equals(ip))
-				item.setNonMinedBlocks(item.getNonMinedBlocks() - 1);
+				if (item.getIp().equals(ip))
+					item.setNonMinedBlocks(item.getNonMinedBlocks() - 1);
+			}
 		}
 	}
 
