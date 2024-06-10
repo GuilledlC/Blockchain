@@ -124,7 +124,7 @@ public class Node {
 		tempVotes.addAll(NodeHandler.getVotes());
 
 		for (Vote v : tempVotes) {
-			if(database.notExists(v.getKey()) && Vote.verify(v)) { //Cambiar .getKey().toString()
+			if(database.notExists(v.getKey()) && Vote.verify(v)) {
 				votes.add(v);
 				database.putValue(v.getKey(), Database.State.InPool);
 				NodeHandler.sendVoteToAll(v);

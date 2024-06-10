@@ -56,6 +56,7 @@ public class NodeHandler implements Runnable {
 
 	private void handleObjects(Object object) {
 		if (object instanceof Vote vote) {
+			System.out.println("He recibido un voto");
 			votes.add(vote);
 		}
 		else if(object instanceof Block blocka) {

@@ -20,20 +20,13 @@ import java.util.Date;
 
 public class Main {
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, InterruptedException {
-
-		while (true) {
-			Node.timeBarrier();
-			System.out.println("son las " + LocalTime.now());
-		}
-
-		/*Database database = new Database("votesCheck");
+        Database database = new Database("votesCheck");
 		PublicKey pubk = KeyUtils.publicKeyReader(Files.readAllBytes(Paths.get("keys/Carlos.pub")));
 		database.putValue(pubk.getEncoded(), Database.State.Exists);
 		pubk = KeyUtils.publicKeyReader(Files.readAllBytes(Paths.get("keys/Guille.pub")));
 		database.putValue(pubk.getEncoded(), Database.State.Exists);
 		database.closeDatabase();
-		Node node = new Node();*/
-
+		Node node = new Node();
     }
 
     private static void generateData(File dnis) throws IOException {
