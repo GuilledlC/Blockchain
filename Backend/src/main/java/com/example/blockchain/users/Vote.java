@@ -60,7 +60,7 @@ public class Vote implements Serializable, Comparable<Vote> {
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof Vote vote)
-			return this.getKey().equals(vote.getKey());
+			return Arrays.equals(this.getKey(), vote.getKey());
 		else
 			return super.equals(obj);
 	}

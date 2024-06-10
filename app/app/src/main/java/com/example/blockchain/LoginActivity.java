@@ -147,6 +147,8 @@ public class LoginActivity extends AppCompatActivity {
                 PublicKey puk = KeyUtils.publicKeyReader(publicKey);
                 PrivateKey prk = KeyUtils.privateKeyReader(privateKey);
 
+                System.out.println(Arrays.toString(puk.getEncoded()));
+
                 String num = String.valueOf((new Random().nextInt(34)));
                 System.out.println(num);
 
