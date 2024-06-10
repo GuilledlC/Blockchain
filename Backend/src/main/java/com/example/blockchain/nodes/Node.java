@@ -15,7 +15,7 @@ import java.util.*;
 
 public class Node {
 
-	private String ip = "80.39.151.138";
+	private String ip = "88.27.144.170";
 
 	public Node() throws IOException, InterruptedException  {
 		this.votes = new ArrayList<>();
@@ -47,7 +47,7 @@ public class Node {
 	private void initializeBootstrapNodes() {
 		bootstrapNodes.add("80.39.151.138");
 		bootstrapNodes.add("2.153.80.40");
-		//bootstrapNodes.add("88.27.144.170");
+		bootstrapNodes.add("88.27.144.170");
 
 		bootstrapNodes.remove(ip);
 	}
@@ -127,22 +127,24 @@ public class Node {
 	private void syncBlock() throws IOException, InvalidKeySpecException {
 		//todo esperar 10s a que lo mande el nodo minero
 		Block block = NodeHandler.getBlock();
-		while (block == null) {
+		int count = 0;
+		while (block == null && count++ <= 3) {
 			try {
-				Thread.sleep(5000); //todo calibrar tiempo
+				Thread.sleep(5000); //todo interrumpir
 				System.out.println("esperando a un bloque");
 				block = NodeHandler.getBlock();
 			} catch (InterruptedException e) {throw new RuntimeException(e);}
 		}
 
-		if (correctBlock(block)) {
+		if(!correctBlock(block))
+			punishNode(actualMiner);
+		else {
 			storeBlock(block);
 			for(Vote v : block.getVotes()) {
 				votes.remove(v);
 				database.putValue(v.getKey(), Database.State.Voted);
 			}
-		} else
-			punishNode(actualMiner);
+		}
 	}
 
 	public ArrayList<Block> getBlocks() {
@@ -176,6 +178,8 @@ public class Node {
 		 * es igual que el del bloque anterior de la blockchain del nodo,
 		 * si cada voto pertenece a un votante que no ha votado aun
 		 * y comprobar que los votos sean correctos (que la firma funcione con la publica).**/
+		if(block == null)
+			return false;
 		ArrayList<Vote> tempVotes = block.getVotes();
 		boolean aux = Arrays.equals(block.getPreviousHash(), getLastBlock().getHash());
 		int count = 0;
@@ -263,7 +267,7 @@ public class Node {
 						NodeHandler.sendChosenOneToAll(chosenMiner); //Send chosen miner to nodes
 						System.out.println("Yo he votado a: " + chosenMiner);
 						System.out.println("Sleeping for 10s");
-						Thread.sleep(20000); //todo 30s
+						Thread.sleep(5000); //todo 30s
 						syncChosenOnes(); //Receive actualMiner from nodes receiveActualMiner();
 						System.out.println("lista");
 						for(NonMinedBlock m : nonMinedBlocks) {

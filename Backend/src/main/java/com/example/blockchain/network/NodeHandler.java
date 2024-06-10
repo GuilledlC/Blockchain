@@ -140,13 +140,13 @@ public class NodeHandler implements Runnable {
 	public static ArrayList<String> getChosenOnes() {
 		ArrayList<String> returnChosenOnes = new ArrayList<>(chosenOnes);
 		chosenOnes.clear();
+		for(NodeHandler handler : nodes)
+			handler.hasVotedMiner = false;
 		return returnChosenOnes;
 	}
 	public static void sendChosenOneToAll(String chosenOne) {
-		for(NodeHandler handler : nodes) {
+		for(NodeHandler handler : nodes)
 			handler.sendObject(chosenOne);
-			handler.hasVotedMiner = false;
-		}
 	}
 
 	public static ArrayList<ArrayList<Block>> getBlockchainS() {
