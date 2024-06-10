@@ -11,7 +11,10 @@ import com.example.blockchain.users.Vote;
 
 import java.io.IOException;
 import java.security.spec.InvalidKeySpecException;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.time.temporal.ChronoUnit;
 import java.util.*;
 
 public class Node {
@@ -34,7 +37,7 @@ public class Node {
 		initializeBootstrapNodes();
 		connectToBootstrapNodes();
 
-		timeBarrier(1, 0);
+		timeBarrier();
 		System.out.println("\nTime barrier terminated\n");
 
 		setNonMinedBlocks(bootstrapNodes);
@@ -43,13 +46,16 @@ public class Node {
 		nodeExecution();
 	}
 
-	private void timeBarrier(int minutes, int seconds) throws InterruptedException {
-		LocalTime objetivo = LocalTime.of(
-				LocalTime.now().getHour(),
-				LocalTime.now().getMinute() + minutes,
-				seconds);
-		while(LocalTime.now().isBefore(objetivo)){
-			Thread.sleep(1000);
+	public static void timeBarrier() throws InterruptedException {
+
+		LocalTime ahora = LocalTime.now(), objetivo;
+		if(ahora.getSecond() < 30)
+			objetivo = ahora.truncatedTo(ChronoUnit.MINUTES).plusSeconds(30);
+		else
+			objetivo = ahora.truncatedTo(ChronoUnit.MINUTES).plusMinutes(1);
+
+		while(LocalTime.now().isBefore(objetivo)) {
+			Thread.sleep(500);
 		}
 	}
 

@@ -20,16 +20,19 @@ import java.util.Date;
 
 public class Main {
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, InterruptedException {
-		System.out.println("Son las " + LocalTime.now());
-		System.out.println(System.currentTimeMillis());
 
-		Database database = new Database("votesCheck");
+		while (true) {
+			Node.timeBarrier();
+			System.out.println("son las " + LocalTime.now());
+		}
+
+		/*Database database = new Database("votesCheck");
 		PublicKey pubk = KeyUtils.publicKeyReader(Files.readAllBytes(Paths.get("keys/Carlos.pub")));
 		database.putValue(pubk.getEncoded(), Database.State.Exists);
 		pubk = KeyUtils.publicKeyReader(Files.readAllBytes(Paths.get("keys/Guille.pub")));
 		database.putValue(pubk.getEncoded(), Database.State.Exists);
 		database.closeDatabase();
-		Node node = new Node();
+		Node node = new Node();*/
 
     }
 
