@@ -3,10 +3,7 @@ package com.example.blockchain.nodes;
 import com.example.blockchain.database.Database;
 import com.example.blockchain.ledger.Block;
 import com.example.blockchain.ledger.Ledger;
-import com.example.blockchain.network.ClientHandler;
-import com.example.blockchain.network.ClientListener;
-import com.example.blockchain.network.NodeHandler;
-import com.example.blockchain.network.NodeListener;
+import com.example.blockchain.network.*;
 import com.example.blockchain.users.Vote;
 
 import java.io.IOException;
@@ -19,7 +16,6 @@ import java.util.*;
 
 public class Node {
 
-	private final String ip = "88.27.144.170";
 
 	public Node() throws IOException, InterruptedException  {
 		this.votes = new ArrayList<>();
@@ -70,7 +66,7 @@ public class Node {
 		bootstrapNodes.add("2.153.80.40");
 		bootstrapNodes.add("88.27.144.170");
 
-		bootstrapNodes.remove(ip);
+		bootstrapNodes.remove(NetworkVariables.ip);
 	}
 
 	private void chooseBlockchain() {
@@ -145,31 +141,6 @@ public class Node {
 		}
 	}
 
-	private void syncBlock() throws IOException, InvalidKeySpecException {
-		//todo esperar 10s a que lo mande el nodo minero
-		Block block = NodeHandler.getBlock();
-		int count = 0;
-		while (block == null && count++ <= 3) {
-			try {
-				Thread.sleep(5000); //todo interrumpir
-				System.out.println("esperando a un bloque");
-				block = NodeHandler.getBlock();
-			} catch (InterruptedException e) {throw new RuntimeException(e);}
-		}
-
-		if (block != null){
-			if(!correctBlock(block))
-				punishNode(actualMiner);
-			else {
-				storeBlock(block);
-				for(Vote v : block.getVotes()) {
-					votes.remove(v);
-					database.putValue(v.getKey(), Database.State.Voted);
-				}
-			}
-		}
-	}
-
 	public ArrayList<Block> getBlocks() {
 		return blocks;
 	}
@@ -178,7 +149,7 @@ public class Node {
 		for (String ip : sockets)
 			this.nonMinedBlocks.add(new NonMinedBlock(ip, 1, 0));
 
-		this.nonMinedBlocks.add(new NonMinedBlock(this.ip, 1, 0));
+		this.nonMinedBlocks.add(new NonMinedBlock(NetworkVariables.ip, 1, 0));
 		this.nonMinedBlocks.sort(new Comparator<NonMinedBlock>() {
 			@Override
 			public int compare(NonMinedBlock o1, NonMinedBlock o2) {
@@ -275,7 +246,78 @@ public class Node {
 	}
 
 	private boolean myTurnToMine(){
-		return ip.equals(actualMiner);
+		return NetworkVariables.ip.equals(actualMiner);
+	}
+
+	private void minerElection() throws IOException, InvalidKeySpecException, InterruptedException {
+		System.out.println("\n");
+		Random random = new Random();
+		int randomNumber = random.nextInt(0, getNonMinedBlocksModule());
+		chosenMiner = proofOfConsensus(randomNumber);
+		NodeHandler.sendChosenOneToAll(chosenMiner); //Send chosen miner to nodes
+		System.out.println("Yo he votado a: " + chosenMiner);
+		System.out.println("Sleeping for 10s");
+		timeBarrier(); //todo 30s
+		syncChosenOnes(); //Receive actualMiner from nodes receiveActualMiner();
+		System.out.println("lista");
+		for(NonMinedBlock m : nonMinedBlocks) {
+			System.out.println(m.ip + " " + m.magicNumberCount);
+		}
+		actualMiner = chooseActualMiner();
+		resetMagicNumbers();
+		addEveryoneExcept(actualMiner);
+
+		System.out.println("We have a miner: " + actualMiner);
+		syncVotes();
+	}
+
+	private void mine() throws IOException, InvalidKeySpecException, InterruptedException {
+		Block minedblock;
+		System.out.println("ME toca minar");
+		while (votes.isEmpty()) { //todo carlos no lo ve seguro
+			System.out.println("waiting for votes");
+			Thread.sleep(1000);
+			syncVotes();
+		}
+		minedblock = new Block(votes, getLastBlock());
+
+		//Add block to ledger
+		storeBlock(minedblock);
+
+		//Delete votes and update voted users
+		for(Vote v : minedblock.getVotes()) {
+			database.putValue(v.getKey(), Database.State.Voted);
+		}
+		votes.clear();
+
+		//Send block to everyone
+		System.out.println("enviando bloque");
+		NodeHandler.sendBlockToAll(minedblock);
+	}
+
+	private void syncBlock() throws IOException, InvalidKeySpecException {
+		//todo esperar 10s a que lo mande el nodo minero
+		Block block = NodeHandler.getBlock();
+		int count = 0;
+		while (block == null && count++ <= 10) {
+			try {
+				Thread.sleep(1000); //todo interrumpir
+				System.out.println("esperando a un bloque");
+				block = NodeHandler.getBlock();
+			} catch (InterruptedException e) {throw new RuntimeException(e);}
+		}
+
+		if (block != null){
+			if(!correctBlock(block))
+				punishNode(actualMiner);
+			else {
+				storeBlock(block);
+				for(Vote v : block.getVotes()) {
+					votes.remove(v);
+					database.putValue(v.getKey(), Database.State.Voted);
+				}
+			}
+		}
 	}
 
 	private void nodeExecution() {
@@ -284,52 +326,11 @@ public class Node {
 			public void run() {
 				while (true) {
 					try {
-						System.out.println("\n");
-						Random random = new Random();
-						int randomNumber = random.nextInt(0, getNonMinedBlocksModule());
-						chosenMiner = proofOfConsensus(randomNumber);
-						NodeHandler.sendChosenOneToAll(chosenMiner); //Send chosen miner to nodes
-						System.out.println("Yo he votado a: " + chosenMiner);
-						System.out.println("Sleeping for 10s");
-						Thread.sleep(5000); //todo 30s
-						syncChosenOnes(); //Receive actualMiner from nodes receiveActualMiner();
-						System.out.println("lista");
-						for(NonMinedBlock m : nonMinedBlocks) {
-							System.out.println(m.ip + " " + m.magicNumberCount);
-						}
-						actualMiner = chooseActualMiner();
-						resetMagicNumbers();
-						addEveryoneExcept(actualMiner);
-
-						Block minedblock;
-
-						System.out.println("We have a miner: " + actualMiner);
-						syncVotes();
-						if (myTurnToMine()) {
-							System.out.println("ME toca minar");
-							while (votes.isEmpty()) { //todo carlos no lo ve seguro
-								System.out.println("waiting for votes");
-								Thread.sleep(1000);
-								syncVotes();
-							}
-							minedblock = new Block(votes, getLastBlock());
-
-							//Add block to ledger
-							storeBlock(minedblock);
-
-							//Delete votes and update voted users
-							for(Vote v : minedblock.getVotes()) {
-								database.putValue(v.getKey(), Database.State.Voted);
-							}
-							votes.clear();
-
-							//Send block to everyone
-							System.out.println("enviando bloque");
-							NodeHandler.sendBlockToAll(minedblock);
-						}
+						minerElection();
+						if (myTurnToMine())
+							mine();
 						else
 							syncBlock();
-
 					} catch (InterruptedException ignored) {} catch (IOException | InvalidKeySpecException e) {
 						throw new RuntimeException(e);
 					}
