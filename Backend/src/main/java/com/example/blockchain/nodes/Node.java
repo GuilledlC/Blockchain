@@ -31,7 +31,7 @@ public class Node {
 		initializeBootstrapNodes();
 		connectToBootstrapNodes();
 
-		minerBarrier();
+		blockBarrier();
 		System.out.println("\nTime barrier terminated\n");
 
 		setNonMinedBlocks(bootstrapNodes); //todo cambiar para que la gente se pueda meter (o no)
@@ -264,7 +264,7 @@ public class Node {
 		chosenMiner = proofOfConsensus(randomNumber);
 		NodeHandler.sendChosenOneToAll(chosenMiner); //Send chosen miner to nodes
 		System.out.println("Sleeping for 10s");
-		minerBarrier(); //todo 30s
+		Thread.sleep(10000);
 		syncChosenOnes(); //Receive actualMiner from nodes receiveActualMiner();
 		System.out.println("lista");
 		for(NonMinedBlock m : nonMinedBlocks) {
@@ -299,7 +299,6 @@ public class Node {
 		for(Vote v : minedblock.getVotes()) {
 			database.putValue(v.getKey(), Database.State.Voted);
 		}
-		System.out.println(votes);
 		System.out.println("Borro TODOS los votos");
 		votes.clear();
 
@@ -327,7 +326,6 @@ public class Node {
 				punishNode(actualMiner);
 			else {
 				storeBlock(block);
-				System.out.println(block.getVotes());
 				System.out.println(votes);
 				for(Vote v : block.getVotes()) {
 					System.out.println(votes.contains(v));
@@ -345,12 +343,13 @@ public class Node {
 			public void run() {
 				while (true) {
 					try {
+						minerBarrier(); //todo 30s
 						minerElection();
+						blockBarrier();
 						if (myTurnToMine())
 							mine();
 						else
 							syncBlock();
-						blockBarrier();
 					} catch (InterruptedException ignored) {} catch (IOException | InvalidKeySpecException e) {
 						throw new RuntimeException(e);
 					}
