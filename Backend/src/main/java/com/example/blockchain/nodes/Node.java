@@ -125,9 +125,7 @@ public class Node {
 		tempVotes.addAll(NodeHandler.getVotes());
 
 		for (Vote v : tempVotes) {
-			System.out.println(database.exists(v.getKey()));
 			if(database.exists(v.getKey()) && Vote.verify(v)) {
-				System.out.println("añado voto " + v.getVoteString());
 				votes.add(v);
 				database.putValue(v.getKey(), Database.State.InPool);
 				NodeHandler.sendVoteToAll(v);
@@ -263,9 +261,10 @@ public class Node {
 		int randomNumber = random.nextInt(0, getNonMinedBlocksModule());
 		chosenMiner = proofOfConsensus(randomNumber);
 		NodeHandler.sendChosenOneToAll(chosenMiner); //Send chosen miner to nodes
-		System.out.println("Sleeping for 10s");
+		System.out.println("Waiting for barrier");
 		minerBarrier(); //todo 30s
 		syncChosenOnes(); //Receive actualMiner from nodes receiveActualMiner();
+		System.out.println("\n\nRecolectingVotes\n");
 		System.out.println("lista");
 		for(NonMinedBlock m : nonMinedBlocks) {
 			System.out.println(m.ip + " " + m.magicNumberCount);
@@ -299,14 +298,12 @@ public class Node {
 		for(Vote v : minedblock.getVotes()) {
 			database.putValue(v.getKey(), Database.State.Voted);
 		}
-		System.out.println("Borro TODOS los votos");
 		votes.clear();
 
 		//Add block to ledger
 		storeBlock(minedblock);
 
 		//Send block to everyone
-		System.out.println("enviando bloque");
 		NodeHandler.sendBlockToAll(minedblock);
 	}
 
@@ -326,11 +323,8 @@ public class Node {
 				punishNode(actualMiner);
 			else {
 				storeBlock(block);
-				System.out.println(votes);
 				for(Vote v : block.getVotes()) {
-					System.out.println(votes.contains(v));
 					votes.remove(v);
-					System.out.println("Borro votos " + v.getVoteString());
 					database.putValue(v.getKey(), Database.State.Voted);
 				}
 			}
@@ -394,8 +388,8 @@ public class Node {
 	private final ArrayList<String> bootstrapNodes = new ArrayList<>();
 	private final ClientListener userListener;
 	private final NodeListener nodeListener;
-	private String chosenMiner = null; //todo cambiar a String
-	private String actualMiner = null; //todo cambiar a String
+	private String chosenMiner = null;
+	private String actualMiner = null;
 	private final ArrayList<NonMinedBlock> nonMinedBlocks = new ArrayList<>();
 	private final ArrayList<Vote> votes;
 	private final ArrayList<Block> blocks;

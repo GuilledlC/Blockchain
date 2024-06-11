@@ -38,39 +38,4 @@ public class Main {
         }
         bw.close();
     }
-
-	/*try {
-			Database votesCheck = new Database("votesCheck");
-
-            File file = new File("publicKeys.txt");
-            //generateData(file);
-            //votesCheck.loadData(file);
-
-            long millis = System.currentTimeMillis();
-
-            votesCheck.changeValue("27384915E", "0");
-            System.out.println(votesCheck.hasVoted("27384915E"));
-            votesCheck.changeValue("27384915E", "1");
-            System.out.println(votesCheck.hasVoted("27384915E"));
-            votesCheck.changeValue("27384915E", "2");
-            System.out.println(votesCheck.hasVoted("0"));
-
-            long millis2 = System.currentTimeMillis();
-            System.out.println(millis2 - millis);
-
-            votesCheck.closeDatabase();
-        } catch (IOException error){
-            error.printStackTrace();
-        }*/
-
-
-    /** FOR ANGUS
-    private boolean getValues(ArrayList<Vote> votos) {
-        boolean aux = false;
-        int counter = 0;
-        while (!aux)
-            aux = db.hasVoted(votos.get(counter++).getKey());
-        return !aux;
-    }
-     */
 }
