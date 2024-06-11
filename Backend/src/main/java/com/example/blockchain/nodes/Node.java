@@ -264,7 +264,7 @@ public class Node {
 		chosenMiner = proofOfConsensus(randomNumber);
 		NodeHandler.sendChosenOneToAll(chosenMiner); //Send chosen miner to nodes
 		System.out.println("Sleeping for 10s");
-		Thread.sleep(10000);
+		minerBarrier(); //todo 30s
 		syncChosenOnes(); //Receive actualMiner from nodes receiveActualMiner();
 		System.out.println("lista");
 		for(NonMinedBlock m : nonMinedBlocks) {
@@ -343,13 +343,12 @@ public class Node {
 			public void run() {
 				while (true) {
 					try {
-						minerBarrier(); //todo 30s
 						minerElection();
-						blockBarrier();
 						if (myTurnToMine())
 							mine();
 						else
 							syncBlock();
+						blockBarrier();
 					} catch (InterruptedException ignored) {} catch (IOException | InvalidKeySpecException e) {
 						throw new RuntimeException(e);
 					}
