@@ -31,22 +31,29 @@ public class Node {
 		initializeBootstrapNodes();
 		connectToBootstrapNodes();
 
-		timeBarrier();
+		minerBarrier();
 		System.out.println("\nTime barrier terminated\n");
 
-		setNonMinedBlocks(bootstrapNodes);
-
+		setNonMinedBlocks(bootstrapNodes); //todo cambiar para que la gente se pueda meter (o no)
 		chooseBlockchain();
+
 		nodeExecution();
 	}
 
-	public static void timeBarrier() throws InterruptedException {
+	public static void minerBarrier() throws InterruptedException {
 
 		LocalTime ahora = LocalTime.now(), objetivo;
-		if(ahora.getSecond() < 30)
-			objetivo = ahora.truncatedTo(ChronoUnit.MINUTES).plusSeconds(30);
-		else
-			objetivo = ahora.truncatedTo(ChronoUnit.MINUTES).plusMinutes(1);
+		objetivo = ahora.truncatedTo(ChronoUnit.MINUTES).plusMinutes(1);
+
+		while(LocalTime.now().isBefore(objetivo)) {
+			Thread.sleep(100);
+		}
+	}
+
+	public static void blockBarrier() throws InterruptedException {
+
+		LocalTime ahora = LocalTime.now(), objetivo;
+		objetivo = ahora.truncatedTo(ChronoUnit.MINUTES).plusSeconds(30);
 
 		while(LocalTime.now().isBefore(objetivo)) {
 			Thread.sleep(100);
@@ -257,7 +264,7 @@ public class Node {
 		chosenMiner = proofOfConsensus(randomNumber);
 		NodeHandler.sendChosenOneToAll(chosenMiner); //Send chosen miner to nodes
 		System.out.println("Sleeping for 10s");
-		timeBarrier(); //todo 30s
+		minerBarrier(); //todo 30s
 		syncChosenOnes(); //Receive actualMiner from nodes receiveActualMiner();
 		System.out.println("lista");
 		for(NonMinedBlock m : nonMinedBlocks) {
@@ -304,7 +311,7 @@ public class Node {
 		NodeHandler.sendBlockToAll(minedblock);
 	}
 
-	private void syncBlock() throws IOException, InvalidKeySpecException {
+	private void syncBlock() throws IOException, InvalidKeySpecException, InterruptedException {
 		//todo esperar 10s a que lo mande el nodo minero
 		Block block = NodeHandler.getBlock();
 		int count = 0;
@@ -343,6 +350,7 @@ public class Node {
 							mine();
 						else
 							syncBlock();
+						blockBarrier();
 					} catch (InterruptedException ignored) {} catch (IOException | InvalidKeySpecException e) {
 						throw new RuntimeException(e);
 					}
