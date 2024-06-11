@@ -13,9 +13,7 @@ import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.compose.ui.state.ToggleableState;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -30,8 +28,7 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 import java.util.Random;
 
-import com.example.blockchain.users.NewUser;
-import com.example.blockchain.users.Vote;
+import com.example.blockchain.users.User;
 import com.example.blockchain.utils.KeyUtils;
 
 public class LoginActivity extends AppCompatActivity {
@@ -155,7 +152,7 @@ public class LoginActivity extends AppCompatActivity {
                 byte[] signature = sign(num, prk);
 
                 if(verify(num, puk, signature)) {
-                    NewUser user = new NewUser(prk, puk);
+                    User user = new User(prk, puk);
                     Intent intent = new Intent(LoginActivity.this,
                             MainMenuActivity.class);
                     intent.putExtra("user", user);

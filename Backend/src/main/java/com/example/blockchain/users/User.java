@@ -4,57 +4,65 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.net.InetSocketAddress;
 import java.net.Socket;
-import java.security.*;
+import java.net.SocketAddress;
+import java.security.InvalidKeyException;
+import java.security.NoSuchAlgorithmException;
+import java.security.PrivateKey;
+import java.security.PublicKey;
+import java.security.SignatureException;
 import java.util.ArrayList;
 
 public class User implements Serializable {
 	private PrivateKey priv;
 	private PublicKey pub;
 	private Vote vote;
-	private ObjectOutputStream oos;
-	private ObjectInputStream ois;
-	private static final ArrayList<Socket> bootstrapNodes = new ArrayList<>();
+	private final ArrayList<String> bootstrapNodes = new ArrayList<>();
 
 	public User(PrivateKey privateKey, PublicKey publicKey) {
 		this.priv = privateKey;
 		this.pub = publicKey;
+
+		//todo initialize bootstrap nodes
+		initializeBootstrapNodes();
 	}
 
-	protected void vote(String receiver) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+	private void initializeBootstrapNodes() {
+		bootstrapNodes.add("88.27.144.170");
+		bootstrapNodes.add("80.39.151.138");
+		//bootstrapNodes.add("2.153.80.40");
+	}
+
+	public void vote(String receiver) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
 		byte[] signature = Vote.sign(receiver, priv);
 		vote = new Vote(receiver, signature, pub);
 		distributeVote();
 	}
 
 	private void distributeVote() {
-		for(Socket node : bootstrapNodes) {
-			sendToNode(node);
+		for(String ip : bootstrapNodes) {
+			try {
+				SocketAddress sa = new InetSocketAddress(ip, 8888);
+				Socket socket = new Socket();
+				socket.connect(sa, 1000);
+				sendToNode(socket);
+			} catch (IOException e) {}
 		}
 	}
 
 	private void sendToNode(Socket node) {
 		if(node.isConnected()) {
 			try {
-				oos = new ObjectOutputStream(node.getOutputStream());
-				ois = new ObjectInputStream(node.getInputStream());
+				ObjectOutputStream oos = new ObjectOutputStream(node.getOutputStream());
+				ObjectInputStream ois = new ObjectInputStream(node.getInputStream());
 				oos.writeObject(vote);
 				node.close();
+				oos.close();
+				ois.close();
 			} catch (IOException e) {
 				System.out.println("Error sending vote");
-				close();
 			}
-		}
-	}
-
-	private void close() {
-		try {
-			if (ois != null)
-				ois.close();
-			if (oos != null)
-				oos.close();
-		} catch (IOException e) {
-			throw new RuntimeException(e);
 		}
 	}
 

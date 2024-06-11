@@ -8,18 +8,17 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.blockchain.users.NewUser;
-import com.example.blockchain.users.Vote;
+import com.example.blockchain.users.User;
 
 public class MainMenuActivity extends AppCompatActivity {
-    private NewUser user;
+    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main_menu);
 
-        this.user = (NewUser) getIntent().getSerializableExtra("user");
+        this.user = (User) getIntent().getSerializableExtra("user");
 
         Button btnVote = findViewById(R.id.btnVote);
         Button btnCheckVote = findViewById(R.id.btnCheckVote);

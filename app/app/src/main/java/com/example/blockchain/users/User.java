@@ -4,11 +4,9 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.SocketAddress;
-import java.net.UnknownHostException;
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.PrivateKey;
@@ -16,13 +14,13 @@ import java.security.PublicKey;
 import java.security.SignatureException;
 import java.util.ArrayList;
 
-public class NewUser implements Serializable {
+public class User implements Serializable {
 	private PrivateKey priv;
 	private PublicKey pub;
 	private Vote vote;
 	private final ArrayList<String> bootstrapNodes = new ArrayList<>();
 
-	public NewUser(PrivateKey privateKey, PublicKey publicKey) {
+	public User(PrivateKey privateKey, PublicKey publicKey) {
 		this.priv = privateKey;
 		this.pub = publicKey;
 

@@ -10,20 +10,16 @@ import android.widget.Toast;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.blockchain.users.NewUser;
+import com.example.blockchain.users.User;
 import com.google.android.material.textfield.MaterialAutoCompleteTextView;
 import com.google.android.material.textfield.TextInputLayout;
 
 import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
-import java.time.DateTimeException;
-import java.time.LocalDate;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class VoteActivity extends AppCompatActivity {
-    private NewUser user;
+    private User user;
     private MaterialAutoCompleteTextView autoCompleteTextView;
     private TextInputLayout partyLayout;
 
@@ -32,7 +28,7 @@ public class VoteActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_vote);
 
-        this.user = (NewUser) getIntent().getSerializableExtra("user");
+        this.user = (User) getIntent().getSerializableExtra("user");
 
         Button btnCancel = findViewById(R.id.buttonCancel);
         Button btnConfirm = findViewById(R.id.buttonConfirm);
