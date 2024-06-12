@@ -74,7 +74,7 @@ public class Vote implements Serializable, Comparable<Vote> {
 		return signature.sign();
 	}
 
-	public static boolean verify(Vote vote) throws IOException, InvalidKeySpecException {
+	public static boolean verifyVote(Vote vote) throws IOException, InvalidKeySpecException {
 		try {
 			Signature signature = Signature.getInstance("SHA256withRSA");
 			signature.initVerify(KeyUtils.publicKeyReader(vote.getKey()));
@@ -92,7 +92,7 @@ public class Vote implements Serializable, Comparable<Vote> {
 				"\nTime        : " + getTime() +
 				"\nSignature   : " + HashUtils.toHexString(getSignature()) +
 				"\nPublic Key  : " + Arrays.toString(getKey()) +
-				"\nVerified    : " + Vote.verify(this);
+				"\nVerified    : " + Vote.verifyVote(this);
 	}
 
 	public String displayVoteShort() {

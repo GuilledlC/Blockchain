@@ -125,7 +125,7 @@ public class Node {
 		tempVotes.addAll(NodeHandler.getVotes());
 
 		for (Vote v : tempVotes) {
-			if(database.exists(v.getKey()) && Vote.verify(v)) {
+			if(database.exists(v.getKey()) && Vote.verifyVote(v)) {
 				votes.add(v);
 				database.putValue(v.getKey(), Database.State.InPool);
 				NodeHandler.sendVoteToAll(v);
@@ -181,11 +181,11 @@ public class Node {
 		if(block == null)
 			return false;
 		ArrayList<Vote> tempVotes = block.getVotes();
-		boolean aux = Arrays.equals(block.getPreviousHash(), getLastBlock().getHash());
+		boolean aux = Arrays.equals(block.getPreviousHash(), getLastBlock().getHash()) && Block.verifyBlock(block);
 		int count = 0;
 		while (aux && count < tempVotes.size()) {
 			Vote tempVote = tempVotes.get(count);
-			aux = !database.hasVoted(tempVote.getKey()) && Vote.verify(tempVote);
+			aux = !database.hasVoted(tempVote.getKey()) && Vote.verifyVote(tempVote);
 			count++;
 		}
 		return aux;

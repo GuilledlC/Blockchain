@@ -8,6 +8,7 @@ import com.example.blockchain.utils.HashUtils;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 
 public class Block implements Serializable {
@@ -39,6 +40,11 @@ public class Block implements Serializable {
 		this.oldestVote = votes.get(votes.size() - 1).getTime();
 		this.hash = HashUtils.hash(Bytes.concat(previousHash, ("" + youngestVote + oldestVote + this.votes).getBytes()));
     }
+
+	public static boolean verifyBlock(Block block) {
+		byte[] hash = HashUtils.hash(Bytes.concat(block.previousHash, ("" + block.youngestVote + block.oldestVote + block.votes).getBytes()));
+		return Arrays.equals(block.hash, hash);
+	}
 
 	//Copy
 	public Block(Block copy) {
