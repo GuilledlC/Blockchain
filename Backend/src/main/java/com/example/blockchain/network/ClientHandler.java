@@ -8,24 +8,9 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
-import java.security.PublicKey;
 import java.util.ArrayList;
 
 public class ClientHandler implements Runnable {
-
-	private Node node;
-	private Socket socket;
-	private ObjectOutputStream oos;
-	private ObjectInputStream ois;
-	private static final ArrayList<Vote> votes = new ArrayList<>();
-
-
-	public static ArrayList<Vote> getVotes() {
-		ArrayList<Vote> returnVotes = new ArrayList<>(votes);
-		votes.clear();
-		return returnVotes;
-	}
-
 
 	public ClientHandler(Socket socket, Node node) {
 		try {
@@ -50,6 +35,12 @@ public class ClientHandler implements Runnable {
 				break;
 			}
 		}
+	}
+
+	public static ArrayList<Vote> getVotes() {
+		ArrayList<Vote> returnVotes = new ArrayList<>(votes);
+		votes.clear();
+		return returnVotes;
 	}
 
 	private void handleObjects(Object object) {
@@ -83,4 +74,11 @@ public class ClientHandler implements Runnable {
 	public InetAddress getIp() {
 		return socket.getInetAddress();
 	}
+
+
+	private Node node;
+	private Socket socket;
+	private ObjectOutputStream oos;
+	private ObjectInputStream ois;
+	private static final ArrayList<Vote> votes = new ArrayList<>();
 }

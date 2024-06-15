@@ -19,9 +19,6 @@ import java.security.NoSuchAlgorithmException;
 import java.security.SignatureException;
 
 public class VoteActivity extends AppCompatActivity {
-    private User user;
-    private MaterialAutoCompleteTextView autoCompleteTextView;
-    private TextInputLayout partyLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,14 +26,20 @@ public class VoteActivity extends AppCompatActivity {
         setContentView(R.layout.activity_vote);
 
         this.user = (User) getIntent().getSerializableExtra("user");
+        initializeViews();
+        setListeners();
 
-        Button btnCancel = findViewById(R.id.buttonCancel);
-        Button btnConfirm = findViewById(R.id.buttonConfirm);
+    }
 
+    private void initializeViews() {
+        buttonCancel = findViewById(R.id.buttonCancel);
+        buttonConfirm = findViewById(R.id.buttonConfirm);
         autoCompleteTextView = findViewById(R.id.autocompleteParties);
         partyLayout = findViewById(R.id.layoutParties);
+    }
 
-        btnCancel.setOnClickListener(new View.OnClickListener() {
+    private void setListeners() {
+        buttonCancel.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(VoteActivity.this,
@@ -46,14 +49,8 @@ public class VoteActivity extends AppCompatActivity {
                 finish();
             }
         });
-        btnConfirm.setOnClickListener(new VoteOnClickListener());
+        buttonConfirm.setOnClickListener(new VoteOnClickListener());
     }
-
-    private void roastyToasty(Object o) {
-        Toast.makeText(this, o.toString(),
-                Toast.LENGTH_SHORT).show();
-    }
-
 
     private class VoteOnClickListener implements View.OnClickListener {
         @RequiresApi(api = Build.VERSION_CODES.Q)
@@ -81,5 +78,18 @@ public class VoteActivity extends AppCompatActivity {
 
         }
     }
+
+    private void roastyToasty(Object o) {
+        Toast.makeText(this, o.toString(),
+                Toast.LENGTH_SHORT).show();
+    }
+
+
+    private User user;
+    private Button buttonCancel;
+    private Button buttonConfirm;
+    private MaterialAutoCompleteTextView autoCompleteTextView;
+    private TextInputLayout partyLayout;
+
 }
 

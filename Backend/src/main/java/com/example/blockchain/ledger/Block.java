@@ -13,15 +13,16 @@ import java.util.Collections;
 
 public class Block implements Serializable {
 
-	private final byte[] hash;
-	private final byte[] previousHash;
-	private final Long youngestVote;
-	private final Long oldestVote;
-    private final ArrayList<Vote> votes = new ArrayList<>();
 
 	public static Block getGenesis() {
 		return new Block();
 	}
+
+	public static boolean verifyBlock(Block block) {
+		byte[] hash = HashUtils.hash(Bytes.concat(block.previousHash, ("" + block.youngestVote + block.oldestVote + block.votes).getBytes()));
+		return Arrays.equals(block.hash, hash);
+	}
+
 
 	//Genesis
 	private Block() { //todo
@@ -40,11 +41,6 @@ public class Block implements Serializable {
 		this.oldestVote = votes.get(votes.size() - 1).getTime();
 		this.hash = HashUtils.hash(Bytes.concat(previousHash, ("" + youngestVote + oldestVote + this.votes).getBytes()));
     }
-
-	public static boolean verifyBlock(Block block) {
-		byte[] hash = HashUtils.hash(Bytes.concat(block.previousHash, ("" + block.youngestVote + block.oldestVote + block.votes).getBytes()));
-		return Arrays.equals(block.hash, hash);
-	}
 
 	//Copy
 	public Block(Block copy) {
@@ -68,6 +64,7 @@ public class Block implements Serializable {
 		this.oldestVote = oldestVote;
 		this.votes.addAll(votes);
 	}
+
 
     public String displayBlock() {
         StringBuilder block = new StringBuilder("\nNumber of votes in block: " + votes.size());
@@ -101,43 +98,11 @@ public class Block implements Serializable {
 		return time >= youngestVote && time <= oldestVote;
 	}
 
-	//todo merkle root
-	/*public byte[] getMerkleRoot() {
-		ArrayList<byte[]> txids = new ArrayList<>();
-		for(Vote vote : votes)
-			txids.add(vote.getTXID());
-		return MerkleTree.getMerkleRoot(txids);
-	}
 
-	static class MerkleTree {
-
-		public static byte[] getMerkleRoot(ArrayList<byte[]> txids) {
-			ArrayList<byte[]> merkleRoot = merkleTree(txids);
-			return merkleRoot.get(0);
-		}
-
-		private static ArrayList<byte[]> merkleTree(ArrayList<byte[]> hashList){
-
-			//If we only have one leaf, return
-			if(hashList.size() == 1)
-				return hashList;
-
-			ArrayList<byte[]> parentHashList = new ArrayList<>();
-
-			//Hash the leaf transaction pair to get the parent transaction
-			for(int i = 0; i < hashList.size(); i += 2){
-				byte[] hashedPair = HashUtils.hash(HashUtils.concat(hashList.get(i), hashList.get(i+1)));
-				parentHashList.add(hashedPair);
-			}
-
-			//If there is an odd number of transactions, add the last transaction again
-			if(hashList.size() % 2 == 1){
-				byte[] lastHash = hashList.get(hashList.size() - 1);
-				byte[] hashedPair = HashUtils.hash(HashUtils.concat(lastHash, lastHash));
-				parentHashList.add(hashedPair);
-			}
-			return merkleTree(parentHashList);
-		}
-	}*/
+	private final byte[] hash;
+	private final byte[] previousHash;
+	private final Long youngestVote;
+	private final Long oldestVote;
+	private final ArrayList<Vote> votes = new ArrayList<>();
 
 }

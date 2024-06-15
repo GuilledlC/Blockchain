@@ -8,24 +8,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.net.InetAddress;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
 
 public class NodeHandler implements Runnable {
-
-	NodeListener listener;
-	private Socket socket;
-	private ObjectOutputStream oos;
-	private ObjectInputStream ois;
-	public static final ArrayList<NodeHandler> nodes = new ArrayList<>();
-	private static final ArrayList<Vote> votes = new ArrayList<>();
-	private static Block block = null;
-	private static final ArrayList<String> chosenOnes = new ArrayList<>();
-	private static final ArrayList<ArrayList<Block>> blockchainS = new ArrayList<>();
-	private boolean hasVotedMiner = false;
 
 	public NodeHandler(Socket socket, NodeListener listener) {
 		this.listener = listener;
@@ -67,7 +53,7 @@ public class NodeHandler implements Runnable {
 			}
 			else {
 				if(!hasVotedMiner) {
-					chosenOnes.add(string);
+					magicNumbers.add(string);
 					System.out.println(this.getIp() + " has voted: " + string);
 					hasVotedMiner = true;
 				}
@@ -84,6 +70,54 @@ public class NodeHandler implements Runnable {
 		}
 	}
 
+
+
+	public static ArrayList<Vote> getVotes() {
+		ArrayList<Vote> returnVotes = new ArrayList<>(votes);
+		votes.clear();
+		return returnVotes;
+	}
+	public static void sendVoteToAll(Vote vote) {
+		for(NodeHandler handler : nodes) {
+			handler.sendObject(vote);
+		}
+	}
+
+	public static Block getBlock() {
+		if(block == null)
+			return null;
+		Block returnBlock = new Block(block);
+		block = null;
+		return returnBlock;
+	}
+	public static void sendBlockToAll(Block block) {
+		for(NodeHandler handler : nodes) {
+			handler.sendObject(block);
+			System.out.println("Bloque enviado");
+		}
+	}
+
+	public static ArrayList<String> getMagicNumbers() {
+		ArrayList<String> returnMagicNumbers = new ArrayList<>(magicNumbers);
+		magicNumbers.clear();
+		for(NodeHandler handler : nodes)
+			handler.hasVotedMiner = false;
+		return returnMagicNumbers;
+	}
+	public static void sendMagicNumberToAll(String magicNumber) {
+		for(NodeHandler handler : nodes)
+			handler.sendObject(magicNumber);
+	}
+
+	public static ArrayList<ArrayList<Block>> getBlockchainS() {
+		ArrayList<ArrayList<Block>> returnBlockchainS = new ArrayList<>(blockchainS);
+		blockchainS.clear();
+		return returnBlockchainS;
+	}
+	public static void requestBlockchainS() {
+		for(NodeHandler handler : nodes)
+			handler.sendObject("request");
+	}
 	private void sendBlockchain() {
 		try {
 			oos.writeObject(Ledger.getAllBlocks());
@@ -111,51 +145,16 @@ public class NodeHandler implements Runnable {
 		return socket.getInetAddress().toString();
 	}
 
-	public static ArrayList<Vote> getVotes() {
-		ArrayList<Vote> returnVotes = new ArrayList<>(votes);
-		votes.clear();
-		return returnVotes;
-	}
-	public static void sendVoteToAll(Vote vote) {
-		for(NodeHandler handler : nodes) {
-			handler.sendObject(vote);
-		}
-	}
 
-	public static Block getBlock() {
-		if(block == null)
-			return null;
-		Block returnBlock = new Block(block);
-		block = null;
-		return returnBlock;
-	}
-	public static void sendBlockToAll(Block block) {
-		for(NodeHandler handler : nodes) {
-			handler.sendObject(block);
-			System.out.println("Bloque enviado");
-		}
-	}
-
-	public static ArrayList<String> getChosenOnes() {
-		ArrayList<String> returnChosenOnes = new ArrayList<>(chosenOnes);
-		chosenOnes.clear();
-		for(NodeHandler handler : nodes)
-			handler.hasVotedMiner = false;
-		return returnChosenOnes;
-	}
-	public static void sendChosenOneToAll(String chosenOne) {
-		for(NodeHandler handler : nodes)
-			handler.sendObject(chosenOne);
-	}
-
-	public static ArrayList<ArrayList<Block>> getBlockchainS() {
-		ArrayList<ArrayList<Block>> returnBlockchainS = new ArrayList<>(blockchainS);
-		blockchainS.clear();
-		return returnBlockchainS;
-	}
-	public static void requestBlockchainS() {
-		for(NodeHandler handler : nodes)
-			handler.sendObject("request");
-	}
+	NodeListener listener;
+	private Socket socket;
+	private ObjectOutputStream oos;
+	private ObjectInputStream ois;
+	public static final ArrayList<NodeHandler> nodes = new ArrayList<>();
+	private static final ArrayList<Vote> votes = new ArrayList<>();
+	private static Block block = null;
+	private static final ArrayList<String> magicNumbers = new ArrayList<>();
+	private static final ArrayList<ArrayList<Block>> blockchainS = new ArrayList<>();
+	private boolean hasVotedMiner = false;
 
 }

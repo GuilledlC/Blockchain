@@ -8,10 +8,6 @@ import java.net.Socket;
 
 public class ClientListener implements Runnable {
 
-	private Node node;
-	private final ServerSocket listener;
-	private boolean isListening = false;
-
 	public ClientListener(int port, Node node) throws IOException {
 		this.node = node;
 		this.listener = new ServerSocket(port);
@@ -22,7 +18,6 @@ public class ClientListener implements Runnable {
 		System.out.println("Client listener initiated");
 		try {
 			while(!listener.isClosed()) {
-				isListening = true;
 				Socket clientSocket = listener.accept();
 				System.out.println("Client connected from " + clientSocket.getInetAddress() + ":" + clientSocket.getPort());
 				handleClient(clientSocket);
@@ -41,14 +36,13 @@ public class ClientListener implements Runnable {
 	private void closeListener() {
 		try {
 			listener.close();
-			isListening = true;
 		} catch (IOException e) {
 			throw new RuntimeException(e);
 		}
 	}
 
-	public boolean isListening() {
-		return isListening;
-	}
+
+	private Node node;
+	private final ServerSocket listener;
 
 }

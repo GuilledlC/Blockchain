@@ -11,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import com.example.blockchain.users.User;
 
 public class MainMenuActivity extends AppCompatActivity {
-    private User user;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -19,11 +18,18 @@ public class MainMenuActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main_menu);
 
         this.user = (User) getIntent().getSerializableExtra("user");
+        initializeViews();
+        setListeners();
 
-        Button btnVote = findViewById(R.id.btnVote);
-        Button btnCheckVote = findViewById(R.id.btnCheckVote);
+    }
 
-        btnVote.setOnClickListener(new View.OnClickListener() {
+    private void initializeViews() {
+        buttonVote = findViewById(R.id.btnVote);
+        buttonCheckVote = findViewById(R.id.btnCheckVote);
+    }
+
+    private void setListeners() {
+        buttonVote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainMenuActivity.this,
@@ -33,8 +39,7 @@ public class MainMenuActivity extends AppCompatActivity {
                 finish();
             }
         });
-
-        btnCheckVote.setOnClickListener(new View.OnClickListener() {
+        buttonCheckVote.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Intent intent = new Intent(MainMenuActivity.this, CheckActivity.class);
@@ -49,5 +54,11 @@ public class MainMenuActivity extends AppCompatActivity {
         Toast.makeText(this, o.toString(),
                 Toast.LENGTH_SHORT).show();
     }
+
+
+    private User user;
+    Button buttonVote;
+    Button buttonCheckVote;
+
 }
 

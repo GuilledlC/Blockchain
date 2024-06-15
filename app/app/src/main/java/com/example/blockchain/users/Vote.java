@@ -12,10 +12,6 @@ import java.security.spec.InvalidKeySpecException;
 import java.util.Arrays;
 
 public class Vote implements Serializable, Comparable<Vote> {
-    private final String voteString;
-    private final byte[] signature;
-    private final byte[] key;
-    private final long time;
 
     public Vote(String vote, byte[] signature, PublicKey key) {
         this.voteString = vote;
@@ -36,6 +32,7 @@ public class Vote implements Serializable, Comparable<Vote> {
         this.time = time;
     }
 
+
     public String getVoteString() {
         return voteString;
     }
@@ -52,20 +49,7 @@ public class Vote implements Serializable, Comparable<Vote> {
         return time;
     }
 
-    @Override
-    public int compareTo(Vote vote) {
-        return Long.compare(this.getTime(), vote.getTime());
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if(obj instanceof Vote vote)
-            return Arrays.equals(this.getKey(), vote.getKey());
-        else
-            return super.equals(obj);
-    }
-
-    public static byte[] sign(String vote, PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
+    public static byte[] signVote(String vote, PrivateKey key) throws NoSuchAlgorithmException, InvalidKeyException, SignatureException {
         Signature signature = Signature.getInstance("SHA256withRSA");
         signature.initSign(key);
 
@@ -74,7 +58,7 @@ public class Vote implements Serializable, Comparable<Vote> {
         return signature.sign();
     }
 
-    public static boolean verify(Vote vote) throws IOException, InvalidKeySpecException {
+    public static boolean verifyVote(Vote vote) throws IOException, InvalidKeySpecException {
         try {
             Signature signature = Signature.getInstance("SHA256withRSA");
             signature.initVerify(KeyUtils.publicKeyReader(vote.getKey()));
@@ -92,18 +76,24 @@ public class Vote implements Serializable, Comparable<Vote> {
                 "\nTime        : " + getTime() +
                 "\nSignature   : " + HashUtils.toHexString(getSignature()) +
                 "\nPublic Key  : " + Arrays.toString(getKey()) +
-                "\nVerified    : " + Vote.verify(this);
+                "\nVerified    : " + Vote.verifyVote(this);
     }
 
     public String displayVoteShort() {
         return getVoteString().substring(getVoteString().indexOf(' '));
     }
 
-	/*public byte[] getTXID() {
-		String dataToHash = voteString + Arrays.toString(signature) + key.toString() + time;
-		return HashUtils.hashString(dataToHash);
-	}*/
-
+    @Override
+    public int compareTo(Vote vote) {
+        return Long.compare(this.getTime(), vote.getTime());
+    }
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Vote vote)
+            return Arrays.equals(this.getKey(), vote.getKey());
+        else
+            return super.equals(obj);
+    }
     @Override
     public String toString() {
         try {
@@ -113,4 +103,12 @@ public class Vote implements Serializable, Comparable<Vote> {
             throw new RuntimeException(e);
         }
     }
+
+
+    private final String voteString;
+    private final byte[] signature;
+    private final byte[] key;
+    private final long time;
+
+
 }

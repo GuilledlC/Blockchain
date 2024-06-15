@@ -22,18 +22,8 @@ public class CheckActivity extends AppCompatActivity {
 
 		this.user = (User) getIntent().getSerializableExtra("user");
 
-		TextView textView = findViewById(R.id.voteStatus);
-		Button buttonBack = findViewById(R.id.buttonBack);
-
-		buttonBack.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				Intent intent = new Intent(CheckActivity.this, MainMenuActivity.class);
-				intent.putExtra("user", user);
-				startActivity(intent);
-				finish();
-			}
-		});
+		initializeViews();
+		setListeners();
 
 		try {
 			boolean check = user.checkVote();
@@ -45,5 +35,28 @@ public class CheckActivity extends AppCompatActivity {
 		} catch (NullPointerException e) {
 			textView.setText("No se ha podido conectar al nodo");
 		}
+
 	}
+
+	private void initializeViews() {
+		textView = findViewById(R.id.voteStatus);
+		buttonBack = findViewById(R.id.buttonBack);
+	}
+
+	private void setListeners() {
+		buttonBack.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				Intent intent = new Intent(CheckActivity.this, MainMenuActivity.class);
+				intent.putExtra("user", user);
+				startActivity(intent);
+				finish();
+			}
+		});
+	}
+
+
+	TextView textView;
+	Button buttonBack;
+
 }

@@ -33,13 +33,6 @@ import com.example.blockchain.utils.KeyUtils;
 
 public class LoginActivity extends AppCompatActivity {
 
-    private ActivityResultLauncher<Intent> fileChooserLauncherPublic;
-    private ActivityResultLauncher<Intent> fileChooserLauncherPrivate;
-    private boolean[] files;
-    private Uri uriPublic;
-    private Uri uriPrivate;
-
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
@@ -52,49 +45,15 @@ public class LoginActivity extends AppCompatActivity {
 
         this.files = new boolean[2];
 
-        Button btnSelectPublicKey = findViewById(R.id.btnSelectPublicKey);
-        Button btnSelectPrivateKey = findViewById(R.id.btnSelectPrivateKey);
-        Button btnCheck = findViewById(R.id.btnCheck);
+        buttonSelectPublicKey = findViewById(R.id.btnSelectPublicKey);
+        buttonSelectPrivateKey = findViewById(R.id.btnSelectPrivateKey);
+        buttonCheck = findViewById(R.id.btnCheck);
 
 
-        this.initializerPublic();
-        this.initializerPrivate();
+        initializerPublic();
+        initializerPrivate();
 
-        btnSelectPublicKey.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showFileChooserPublic();
-            }
-        });
-        btnSelectPrivateKey.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                showFileChooserPrivate();
-            }
-        });
-
-        btnCheck.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                manager();
-            }
-        });
-    }
-
-    private void showFileChooserPublic() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("application/vnd.exstream-package");
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        fileChooserLauncherPublic.launch(Intent.createChooser(intent,
-                "Select a file to upload"));
-    }
-
-    private void showFileChooserPrivate() {
-        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
-        intent.setType("application/pgp-keys");
-        intent.addCategory(Intent.CATEGORY_OPENABLE);
-        fileChooserLauncherPrivate.launch(Intent.createChooser(intent,
-                "Select a file to upload"));
+        setListeners();
 
     }
 
@@ -130,6 +89,44 @@ public class LoginActivity extends AppCompatActivity {
                     }
                 }
         );
+    }
+
+    private void setListeners() {
+        buttonSelectPublicKey.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showFileChooserPublic();
+            }
+        });
+        buttonSelectPrivateKey.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                showFileChooserPrivate();
+            }
+        });
+        buttonCheck.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                manager();
+            }
+        });
+    }
+
+    private void showFileChooserPublic() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("application/vnd.exstream-package");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        fileChooserLauncherPublic.launch(Intent.createChooser(intent,
+                "Select a file to upload"));
+    }
+
+    private void showFileChooserPrivate() {
+        Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+        intent.setType("application/pgp-keys");
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        fileChooserLauncherPrivate.launch(Intent.createChooser(intent,
+                "Select a file to upload"));
+
     }
 
     private void manager() {
@@ -202,5 +199,16 @@ public class LoginActivity extends AppCompatActivity {
         signature.update(bytes);
         return signature.verify(givenSignature);
     }
+
+
+    private ActivityResultLauncher<Intent> fileChooserLauncherPublic;
+    private ActivityResultLauncher<Intent> fileChooserLauncherPrivate;
+    Button buttonSelectPublicKey;
+    Button buttonSelectPrivateKey;
+    Button buttonCheck;
+    private boolean[] files;
+    private Uri uriPublic;
+    private Uri uriPrivate;
+
 }
 

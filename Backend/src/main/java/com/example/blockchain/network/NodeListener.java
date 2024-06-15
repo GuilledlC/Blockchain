@@ -1,24 +1,26 @@
 package com.example.blockchain.network;
 
 import java.io.IOException;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketAddress;
+import java.net.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class NodeListener implements Runnable {
-
-	private final ServerSocket listener;
-	private static final ConcurrentHashMap<String, Socket> connections = new ConcurrentHashMap<>();
 
 	public NodeListener(int port) throws IOException {
 		this.listener = new ServerSocket(port);
 	}
 
-	public void remove(String id) {
-		synchronized (connections) {
-			connections.remove(id);
+	@Override
+	public void run() {
+		System.out.println("Node listener initiated");
+		while(!listener.isClosed()) {
+			try {
+				Socket nodeSocket = listener.accept();
+				String id = nodeSocket.getInetAddress().toString();
+				connectTo(id, nodeSocket);
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 	}
 
@@ -35,22 +37,10 @@ public class NodeListener implements Runnable {
 					System.out.println("Ya estamos conectados con " + id);
 				}
 			}
+		} catch (SocketTimeoutException ste) {
+			System.err.println("Socket timed out with " + ip);
 		} catch (IOException e) {
 			e.printStackTrace();
-		}
-	}
-
-	@Override
-	public void run() {
-		System.out.println("Node listener initiated");
-		while(!listener.isClosed()) {
-			try {
-				Socket nodeSocket = listener.accept();
-				String id = nodeSocket.getInetAddress().toString();
-				connectTo(id, nodeSocket);
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
@@ -70,6 +60,18 @@ public class NodeListener implements Runnable {
 		}
 	}
 
+	private void handleNode(Socket nodeSocket) {
+		NodeHandler peer = new NodeHandler(nodeSocket, this);
+		Thread peerThread = new Thread(peer);
+		peerThread.start();
+	}
+
+	public void remove(String id) {
+		synchronized (connections) {
+			connections.remove(id);
+		}
+	}
+
 	private void closeListener() {
 		try {
 			listener.close();
@@ -78,10 +80,8 @@ public class NodeListener implements Runnable {
 		}
 	}
 
-	private void handleNode(Socket nodeSocket) {
-		NodeHandler peer = new NodeHandler(nodeSocket, this);
-		Thread peerThread = new Thread(peer);
-		peerThread.start();
-	}
+
+	private final ServerSocket listener;
+	private static final ConcurrentHashMap<String, Socket> connections = new ConcurrentHashMap<>();
 
 }
