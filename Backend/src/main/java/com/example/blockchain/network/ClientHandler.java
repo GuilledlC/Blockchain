@@ -1,5 +1,6 @@
 package com.example.blockchain.network;
 
+import com.example.blockchain.nodes.Node;
 import com.example.blockchain.users.Vote;
 
 import java.io.IOException;
@@ -7,10 +8,12 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.InetAddress;
 import java.net.Socket;
+import java.security.PublicKey;
 import java.util.ArrayList;
 
 public class ClientHandler implements Runnable {
 
+	private Node node;
 	private Socket socket;
 	private ObjectOutputStream oos;
 	private ObjectInputStream ois;
@@ -24,8 +27,9 @@ public class ClientHandler implements Runnable {
 	}
 
 
-	public ClientHandler(Socket socket) {
+	public ClientHandler(Socket socket, Node node) {
 		try {
+			this.node = node;
 			this.socket = socket;
 			this.oos = new ObjectOutputStream(socket.getOutputStream());
 			this.ois = new ObjectInputStream(socket.getInputStream());
@@ -52,6 +56,13 @@ public class ClientHandler implements Runnable {
 		if (object instanceof Vote vote) {
 			votes.add(vote);
 			System.out.println("Vote received");
+		} else if (object instanceof PublicKey publicKey) {
+			boolean answer = node.checkDatabase(publicKey);
+			try {
+				oos.writeObject(answer);
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
 		}
 		close();
 	}

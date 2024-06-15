@@ -7,6 +7,7 @@ import com.example.blockchain.network.*;
 import com.example.blockchain.users.Vote;
 
 import java.io.IOException;
+import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
@@ -20,7 +21,7 @@ public class Node {
 		this.database = new Database("votesCheck");
 		this.blocks = new ArrayList<>();
 
-		this.userListener = new ClientListener(8888);
+		this.userListener = new ClientListener(8888, this);
 		Thread userThread = new Thread(this.userListener);
 		userThread.start();
 
@@ -38,6 +39,14 @@ public class Node {
 		chooseBlockchain();
 
 		nodeExecution();
+	}
+
+	public boolean checkDatabase(PublicKey publicKey) {
+		try {
+			return this.database.hasVoted(publicKey.getEncoded());
+		} catch (NullPointerException e) {
+			return false;
+		}
 	}
 
 	public static void minerBarrier() throws InterruptedException {

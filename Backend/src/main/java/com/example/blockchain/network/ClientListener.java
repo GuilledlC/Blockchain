@@ -1,15 +1,19 @@
 package com.example.blockchain.network;
 
+import com.example.blockchain.nodes.Node;
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 
 public class ClientListener implements Runnable {
 
+	private Node node;
 	private final ServerSocket listener;
 	private boolean isListening = false;
 
-	public ClientListener(int port) throws IOException {
+	public ClientListener(int port, Node node) throws IOException {
+		this.node = node;
 		this.listener = new ServerSocket(port);
 	}
 
@@ -29,7 +33,7 @@ public class ClientListener implements Runnable {
 	}
 
 	private void handleClient(Socket peerSocket) {
-		ClientHandler peer = new ClientHandler(peerSocket);
+		ClientHandler peer = new ClientHandler(peerSocket, node);
 		Thread peerThread = new Thread(peer);
 		peerThread.start();
 	}
