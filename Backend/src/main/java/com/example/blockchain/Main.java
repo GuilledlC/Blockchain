@@ -20,7 +20,6 @@ import java.util.Date;
 
 public class Main {
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, InterruptedException {
-
 		saveKeys();
 		Node node = new Node();
     }

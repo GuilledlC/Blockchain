@@ -114,8 +114,14 @@ public class Node {
 
 		if(max == 0)
 			storeBlock(Block.getGenesis());
-		else
+		else {
 			storeBlocks(chosenBlockchain);
+			//Actualizar base de datos
+			for(Block b : chosenBlockchain) {
+				for(Vote v : b.getVotes())
+					database.putValue(v.getKey(), Database.State.Voted);
+			}
+		}
 		NodeHandler.getBlockchainS(); //Esto sirve para vaciar el buffer de NodeHandler
 	}
 
@@ -384,7 +390,6 @@ public class Node {
 			return ip + ", " + nonMinedBlocks + ", " + magicNumberCount + "\n";
 		}
 	}
-
 	private final ArrayList<String> bootstrapNodes = new ArrayList<>();
 	private final ClientListener userListener;
 	private final NodeListener nodeListener;
