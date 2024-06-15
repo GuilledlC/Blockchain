@@ -36,7 +36,16 @@ public class VoteActivity extends AppCompatActivity {
         autoCompleteTextView = findViewById(R.id.autocompleteParties);
         partyLayout = findViewById(R.id.layoutParties);
 
-        btnCancel.setOnClickListener(v -> finish());
+        btnCancel.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(VoteActivity.this,
+                        MainMenuActivity.class);
+                intent.putExtra("user", user);
+                startActivity(intent);
+                finish();
+            }
+        });
         btnConfirm.setOnClickListener(new VoteOnClickListener());
     }
 
