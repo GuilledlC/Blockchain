@@ -29,13 +29,9 @@ public class Database {
         this.db.put(key, bytes(value.getValue()));
     }
 
-    public boolean hasVoted(byte[] key) {
-        try {
-            String value = new String(this.db.get(key));
-            return value.equals("2");
-        } catch (NullPointerException e) {
-            return true;
-        }
+    public boolean hasVoted(byte[] key) throws NullPointerException {
+		String value = new String(this.db.get(key));
+		return value.equals("2");
     }
 
 	public boolean exists(byte[] key) {

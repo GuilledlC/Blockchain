@@ -191,7 +191,13 @@ public class Node {
 		int count = 0;
 		while (aux && count < tempVotes.size()) {
 			Vote tempVote = tempVotes.get(count);
-			aux = !database.hasVoted(tempVote.getKey()) && Vote.verifyVote(tempVote);
+
+			try {
+				aux = !database.hasVoted(tempVote.getKey());
+			} catch (NullPointerException e) {
+				aux = false;
+			}
+			aux = aux && Vote.verifyVote(tempVote);
 			count++;
 		}
 		return aux;
