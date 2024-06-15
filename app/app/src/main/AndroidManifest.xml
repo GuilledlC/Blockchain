@@ -18,6 +18,11 @@
         android:theme="@style/Theme.Blockchain"
         tools:targetApi="31">
         <activity
+            android:name=".CheckActivity"
+            android:exported="false"
+            android:label="@string/title_activity_check"
+            android:theme="@style/Theme.Blockchain" />
+        <activity
             android:name=".VoteActivity"
             android:exported="false"
             android:label="@string/title_activity_vote"

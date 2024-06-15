@@ -41,9 +41,9 @@ public class Node {
 		nodeExecution();
 	}
 
-	public boolean checkDatabase(PublicKey publicKey) {
+	public boolean checkDatabase(byte[] publicKey) {
 		try {
-			return this.database.hasVoted(publicKey.getEncoded());
+			return this.database.hasVoted(publicKey);
 		} catch (NullPointerException e) {
 			return false;
 		}
@@ -76,9 +76,9 @@ public class Node {
 	}
 
 	private void initializeBootstrapNodes() {
-		bootstrapNodes.add("80.39.151.138");
+		/*bootstrapNodes.add("80.39.151.138");
 		bootstrapNodes.add("2.153.80.40");
-		bootstrapNodes.add("88.27.144.170");
+		bootstrapNodes.add("88.27.144.170");*/
 
 		bootstrapNodes.remove(NetworkVariables.ip);
 	}
@@ -140,7 +140,7 @@ public class Node {
 		tempVotes.addAll(NodeHandler.getVotes());
 
 		for (Vote v : tempVotes) {
-			if(database.exists(v.getKey()) && Vote.verifyVote(v)) {
+			if(database.exists(v.getKey()) && Vote.verify(v)) {
 				votes.add(v);
 				database.putValue(v.getKey(), Database.State.InPool);
 				NodeHandler.sendVoteToAll(v);
@@ -206,7 +206,7 @@ public class Node {
 			} catch (NullPointerException e) {
 				aux = false;
 			}
-			aux = aux && Vote.verifyVote(tempVote);
+			aux = aux && Vote.verify(tempVote);
 			count++;
 		}
 		return aux;

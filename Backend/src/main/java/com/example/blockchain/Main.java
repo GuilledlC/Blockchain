@@ -30,6 +30,12 @@ public class Main {
 			PublicKey pubk = KeyUtils.publicKeyReader(Files.readAllBytes(Paths.get("keys/" + i + ".pub")));
 			database.putValue(pubk.getEncoded(), Database.State.Exists);
 		}
+
+		PublicKey g = KeyUtils.publicKeyReader(Files.readAllBytes(Paths.get("keys/Guille.pub")));
+		database.putValue(g.getEncoded(), Database.State.Exists);
+		PublicKey c = KeyUtils.publicKeyReader(Files.readAllBytes(Paths.get("keys/Carlos.pub")));
+		database.putValue(c.getEncoded(), Database.State.Exists);
+
 		database.closeDatabase();
 	}
 

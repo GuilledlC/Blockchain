@@ -33,6 +33,16 @@ public class MainMenuActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        btnCheckVote.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(MainMenuActivity.this, CheckActivity.class);
+                intent.putExtra("user", user);
+                startActivity(intent);
+                finish();
+            }
+        });
     }
 
     private void roastyToasty(Object o) {

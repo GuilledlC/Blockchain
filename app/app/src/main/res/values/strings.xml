@@ -3,4 +3,5 @@
     <string name="title_activity_login">LoginActivity</string>
     <string name="title_activity_main_menu">MainMenuActivity</string>
     <string name="title_activity_vote">VoteActivity</string>
+    <string name="title_activity_check">CheckActivity</string>
 </resources>

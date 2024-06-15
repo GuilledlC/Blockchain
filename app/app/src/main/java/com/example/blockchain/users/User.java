@@ -1,5 +1,7 @@
 package com.example.blockchain.users;
 
+import com.example.blockchain.R;
+
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -13,6 +15,7 @@ import java.security.PrivateKey;
 import java.security.PublicKey;
 import java.security.SignatureException;
 import java.util.ArrayList;
+import java.util.Random;
 
 public class User implements Serializable {
 	private PrivateKey priv;
@@ -30,8 +33,8 @@ public class User implements Serializable {
 
 	private void initializeBootstrapNodes() {
 		bootstrapNodes.add("88.27.144.170");
-		bootstrapNodes.add("80.39.151.138");
-		bootstrapNodes.add("2.153.80.40");
+		/*bootstrapNodes.add("80.39.151.138");
+		bootstrapNodes.add("2.153.80.40");*/
 	}
 
 	public void vote(String receiver) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
@@ -64,6 +67,33 @@ public class User implements Serializable {
 				System.out.println("Error sending vote");
 			}
 		}
+	}
+
+	public boolean checkVote() throws NullPointerException {
+		Random random = new Random();
+		int i = random.nextInt();
+		i = Math.abs(i);
+		i %= bootstrapNodes.size();
+		String ip = bootstrapNodes.get(i);
+		try {
+			SocketAddress sa = new InetSocketAddress(ip, 8888);
+			Socket socket = new Socket();
+			socket.connect(sa, 1000);
+			ObjectOutputStream oos = new ObjectOutputStream(socket.getOutputStream());
+			ObjectInputStream ois = new ObjectInputStream(socket.getInputStream());
+			oos.writeObject(pub.getEncoded());
+			Object object;
+			while(socket.isConnected()) {
+				try {
+					object = ois.readObject();
+					if(object instanceof Boolean bool)
+						return bool;
+				} catch (IOException | ClassNotFoundException ignored) {}
+			}
+			System.out.println("Socket is no longer connected");
+		} catch (IOException e) {}
+
+		throw new NullPointerException();
 	}
 
 }
