@@ -58,8 +58,9 @@ public class NodeHandler implements Runnable {
 					hasVotedMiner = true;
 				}
 			}
-		} else if(object instanceof ArrayList<?> blockchain)
+		} else if(object instanceof ArrayList<?> blockchain) {
 			blockchainS.add((ArrayList<Block>)blockchain);
+		}
 	}
 
 	public void sendObject(Serializable object) {
@@ -76,11 +77,6 @@ public class NodeHandler implements Runnable {
 		ArrayList<Vote> returnVotes = new ArrayList<>(votes);
 		votes.clear();
 		return returnVotes;
-	}
-	public static void sendVoteToAll(Vote vote) {
-		for(NodeHandler handler : nodes) {
-			handler.sendObject(vote);
-		}
 	}
 
 	public static Block getBlock() {

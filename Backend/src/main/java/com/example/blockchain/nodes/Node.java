@@ -248,7 +248,6 @@ public class Node {
 			if(database.exists(v.getKey()) && Vote.verifyVote(v)) {
 				votes.add(v);
 				database.putValue(v.getKey(), Database.State.InPool);
-				NodeHandler.sendVoteToAll(v);
 			}
 		}
 	}
