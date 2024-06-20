@@ -54,6 +54,7 @@ public class Vote implements Serializable, Comparable<Vote> {
 		signature.initSign(key);
 
 		byte[] bytes = vote.getBytes();
+		bytes = HashUtils.hash(bytes);
 		signature.update(bytes);
 		return signature.sign();
 	}
