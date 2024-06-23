@@ -30,7 +30,7 @@ public class CheckActivity extends AppCompatActivity {
 			if(check)
 				textView.setText("Voto contado en la Blockchain");
 			else
-				textView.setText("Voto no contado en la Blockchain.\nPor favor vote de nuevo.");
+				textView.setText("Voto no contado en la Blockchain\nPor favor vote de nuevo");
 
 		} catch (NullPointerException e) {
 			textView.setText("No se ha podido conectar al nodo");
