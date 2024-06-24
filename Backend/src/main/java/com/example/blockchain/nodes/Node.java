@@ -45,8 +45,8 @@ public class Node {
 
 	private void initializeBootstrapNodes() {
 		bootstrapNodes.add("80.39.151.138");
-		bootstrapNodes.add("2.153.80.40");
-		bootstrapNodes.add("88.27.144.170");
+		bootstrapNodes.add("86.127.225.89");
+		bootstrapNodes.add("80.102.1.93");
 
 		bootstrapNodes.remove(NetworkVariables.ip);
 	}
@@ -105,7 +105,7 @@ public class Node {
 			throw new RuntimeException(e);
 		}
 
-		DB db = DBMaker.fileDB("blockchain.db").make();
+		DB db = NodeHandler.db;
 		ConcurrentMap<Integer, List<Block>> blockchainS = db.hashMap("blockchainS", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
 
 		HashMap<byte[], Integer> election = new HashMap<>();

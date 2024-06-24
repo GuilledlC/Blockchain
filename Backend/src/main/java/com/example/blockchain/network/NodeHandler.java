@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class NodeHandler implements Runnable {
 
-	private static final DB db = DBMaker.fileDB("blockchain.db").make();
+	public static final DB db = DBMaker.fileDB("blockchain.db").make();
 	private static final ConcurrentMap<Integer, List<Block>> blockchainS =
 			db.hashMap("blockchainS", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
 
