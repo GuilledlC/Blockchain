@@ -16,6 +16,8 @@ import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.concurrent.ConcurrentMap;
 
+import static com.example.blockchain.network.NodeHandler.db;
+
 public class Node {
 
 	public Node() throws IOException, InterruptedException {
@@ -25,6 +27,10 @@ public class Node {
 		this.userListener = new ClientListener(8888, this);
 		Thread userThread = new Thread(this.userListener);
 		userThread.start();
+
+		db = DBMaker.fileDB("blockchain.db").checksumHeaderBypass().make();
+		NodeHandler.blockchainS.clear();
+		db.commit();
 
 		this.nodeListener = new NodeListener(9999);
 		Thread nodeThread = new Thread(this.nodeListener);
