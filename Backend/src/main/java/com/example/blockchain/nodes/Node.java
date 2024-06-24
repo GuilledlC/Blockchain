@@ -145,7 +145,7 @@ public class Node {
 					database.putValue(v.getKey(), Database.State.Voted);
 			}
 		}
-		NodeHandler.getBlockchainS(); //Esto sirve para vaciar el buffer de NodeHandler
+		NodeHandler.emptyBlockchainS(); //Esto sirve para vaciar el buffer de NodeHandler
 
 		db.close();
 	}

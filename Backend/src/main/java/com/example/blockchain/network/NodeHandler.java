@@ -18,7 +18,7 @@ import java.util.concurrent.ConcurrentMap;
 
 public class NodeHandler implements Runnable {
 
-	public static final DB db = DBMaker.fileDB("blockchain.db").make();
+	public static final DB db = DBMaker.fileDB("blockchain.db").checksumHeaderBypass().make();
 	private static final ConcurrentMap<Integer, List<Block>> blockchainS =
 			db.hashMap("blockchainS", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
 
@@ -117,11 +117,10 @@ public class NodeHandler implements Runnable {
 			handler.sendObject(magicNumber);
 	}
 
-	public static ArrayList<ArrayList<Block>> getBlockchainS() {
-		ArrayList<ArrayList<Block>> returnBlockchainS = new ArrayList<>((ArrayList)blockchainS.values());
+	public static void emptyBlockchainS() {
 		blockchainS.clear();
 		db.commit();
-		return returnBlockchainS;
+		db.close();
 	}
 	public static void requestBlockchainS() {
 		for(NodeHandler handler : nodes)
