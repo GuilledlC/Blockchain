@@ -29,6 +29,8 @@ public class Node {
 		userThread.start();
 
 		db = DBMaker.fileDB("blockchain.db").checksumHeaderBypass().make();
+		NodeHandler.blockchainS =
+				db.hashMap("blockchainS", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
 		NodeHandler.blockchainS.clear();
 		db.commit();
 

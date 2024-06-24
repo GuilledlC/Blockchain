@@ -19,8 +19,7 @@ import java.util.concurrent.ConcurrentMap;
 public class NodeHandler implements Runnable {
 
 	public static DB db;
-	public static ConcurrentMap<Integer, List<Block>> blockchainS =
-			db.hashMap("blockchainS", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
+	public static ConcurrentMap<Integer, List<Block>> blockchainS;
 
 
 	public NodeHandler(Socket socket, NodeListener listener) {
