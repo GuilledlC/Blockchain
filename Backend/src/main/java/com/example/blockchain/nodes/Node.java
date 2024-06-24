@@ -135,7 +135,9 @@ public class Node {
 		for(List<Block> blockchain : blockchainS.values()) {
 			if(blockchain.size() == 0)
 				continue;
+
 			Block aux = blockchain.get(blockchain.size() - 1);
+			System.out.println(Arrays.equals(aux.getHash(), (byte[])election.keySet().toArray()[0]));
 			int num = election.get(aux.getHash());
 			if(num > max) {
 				max = num;
