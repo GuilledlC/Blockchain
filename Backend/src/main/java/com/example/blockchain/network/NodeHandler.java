@@ -19,7 +19,7 @@ import java.util.concurrent.ConcurrentMap;
 public class NodeHandler implements Runnable {
 
 	public static DB db;
-	public static ConcurrentMap<Integer, List<Block>> blockchainS;
+	public static ConcurrentMap<Integer, ArrayList<Block>> blockchainS;
 
 
 	public NodeHandler(Socket socket, NodeListener listener) {

@@ -116,19 +116,19 @@ public class Node {
 		DB db = NodeHandler.db;
 		ConcurrentMap<Integer, List<Block>> blockchainS = db.hashMap("blockchainS", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
 
-		HashMap<byte[], Integer> election = new HashMap<>();
+		HashMap<ByteArrayWrapper, Integer> election = new HashMap<>();
 
-		//Por cada una de las listas de bloques que tengo (que asumo que estan ordenadas)
+		// Por cada una de las listas de bloques que tengo (que asumo que están ordenadas)
 		for (List<Block> blockchain : blockchainS.values()) {
 			if(blockchain.size() == 0)
 				continue;
-			//Cojo el ultimo bloque
+			// Cojo el último bloque
 			Block aux = blockchain.get(blockchain.size() - 1);
-			//Si no existe lo apunto
-			if(!election.containsKey(aux.getHash()))
-				election.put(aux.getHash(), 0);
-			//Le voto
-			election.put(aux.getHash(), election.get(aux.getHash()) + 1);
+			ByteArrayWrapper hashWrapper = new ByteArrayWrapper(aux.getHash());
+			// Si no existe lo apunto
+			election.putIfAbsent(hashWrapper, 0);
+			// Le voto
+			election.put(hashWrapper, election.get(hashWrapper) + 1);
 		}
 
 		int max = 0;
@@ -137,8 +137,8 @@ public class Node {
 				continue;
 
 			Block aux = blockchain.get(blockchain.size() - 1);
-			System.out.println(Arrays.equals(aux.getHash(), (byte[])election.keySet().toArray()[0]));
-			int num = election.get(aux.getHash());
+			ByteArrayWrapper hashWrapper = new ByteArrayWrapper(aux.getHash());
+			int num = election.get(hashWrapper);
 			if(num > max) {
 				max = num;
 				chosenBlockchain = new ArrayList<>(blockchain);
@@ -149,13 +149,13 @@ public class Node {
 			storeBlock(Block.getGenesis());
 		else {
 			storeBlocks(chosenBlockchain);
-			//Actualizar base de datos
+			// Actualizar base de datos
 			for(Block b : chosenBlockchain) {
 				for(Vote v : b.getVotes())
 					database.putValue(v.getKey(), Database.State.Voted);
 			}
 		}
-		NodeHandler.emptyBlockchainS(); //Esto sirve para vaciar el buffer de NodeHandler
+		NodeHandler.emptyBlockchainS(); // Esto sirve para vaciar el buffer de NodeHandler
 
 		db.close();
 	}
@@ -440,5 +440,34 @@ public class Node {
 	private final ArrayList<NonMinedBlock> nonMinedBlocks = new ArrayList<>();
 	Database database;
 
+
+	public class ByteArrayWrapper {
+		private byte[] data;
+
+		public ByteArrayWrapper(byte[] data) {
+			this.data = data;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null || getClass() != obj.getClass()) {
+				return false;
+			}
+			ByteArrayWrapper that = (ByteArrayWrapper) obj;
+			return Arrays.equals(data, that.data);
+		}
+
+		@Override
+		public int hashCode() {
+			return Arrays.hashCode(data);
+		}
+
+		public byte[] getData() {
+			return data;
+		}
+	}
 
 }
