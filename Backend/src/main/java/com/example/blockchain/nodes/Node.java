@@ -5,18 +5,21 @@ import com.example.blockchain.ledger.Block;
 import com.example.blockchain.ledger.Ledger;
 import com.example.blockchain.network.*;
 import com.example.blockchain.users.Vote;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.Serializer;
 
 import java.io.IOException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.ConcurrentMap;
 
 public class Node {
 
 	public Node() throws IOException, InterruptedException {
 		this.votes = new ArrayList<>();
-		this.blocks = new ArrayList<>();
 		this.database = new Database("votesCheck");
 
 		this.userListener = new ClientListener(8888, this);
@@ -101,11 +104,14 @@ public class Node {
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
-		ArrayList<ArrayList<Block>> blockchainS = NodeHandler.getBlockchainS();
+
+		DB db = DBMaker.fileDB("blockchain.db").make();
+		ConcurrentMap<Integer, List<Block>> blockchainS = db.hashMap("blockchainS", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
+
 		HashMap<byte[], Integer> election = new HashMap<>();
 
 		//Por cada una de las listas de bloques que tengo (que asumo que estan ordenadas)
-		for (ArrayList<Block> blockchain : blockchainS) {
+		for (List<Block> blockchain : blockchainS.values()) {
 			if(blockchain.size() == 0)
 				continue;
 			//Cojo el ultimo bloque
@@ -118,14 +124,14 @@ public class Node {
 		}
 
 		int max = 0;
-		for(ArrayList<Block> blockchain : blockchainS) {
+		for(List<Block> blockchain : blockchainS.values()) {
 			if(blockchain.size() == 0)
 				continue;
 			Block aux = blockchain.get(blockchain.size() - 1);
 			int num = election.get(aux.getHash());
 			if(num > max) {
 				max = num;
-				chosenBlockchain = blockchain;
+				chosenBlockchain = new ArrayList<>(blockchain);
 			}
 		}
 
@@ -140,6 +146,8 @@ public class Node {
 			}
 		}
 		NodeHandler.getBlockchainS(); //Esto sirve para vaciar el buffer de NodeHandler
+
+		db.close();
 	}
 
 
@@ -345,17 +353,15 @@ public class Node {
 	}
 
 	private void storeBlocks(ArrayList<Block> blocks) {
-		this.blocks.addAll(blocks);
 		Ledger.storeBlocks(blocks);
 	}
 
 	private void storeBlock(Block block) {
-		this.blocks.add(block);
 		Ledger.storeBlock(block);
 	}
 
 	private Block getLastBlock() {
-		return blocks.get(blocks.size() - 1);
+		return Ledger.getLastBlock();
 	}
 
 
@@ -416,7 +422,6 @@ public class Node {
 
 
 	private final ArrayList<Vote> votes;
-	private final ArrayList<Block> blocks;
 	private final ArrayList<String> bootstrapNodes = new ArrayList<>();
 	private final ClientListener userListener;
 	private final NodeListener nodeListener;
