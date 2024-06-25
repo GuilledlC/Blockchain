@@ -121,7 +121,8 @@ public class NodeHandler implements Runnable {
 	}
 	private void sendHash() {
 		try {
-			oos.writeObject(Ledger.getLastBlock().getHash());
+			if(Ledger.getSize() != 0)
+				oos.writeObject(Ledger.getLastBlock().getHash());
 		} catch (IOException e) {
 			close();
 		}

@@ -26,7 +26,7 @@ public class Main {
 
 	private static void saveKeys() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
 		Database database = new Database("votesCheck");
-		for(int i = 0; i < 100; i++) {
+		for(int i = 0; i < 100000; i++) {
 			PublicKey pubk = KeyUtils.publicKeyReader(Files.readAllBytes(Paths.get("keys/" + i + ".pub")));
 			database.putValue(pubk.getEncoded(), Database.State.Exists);
 		}
