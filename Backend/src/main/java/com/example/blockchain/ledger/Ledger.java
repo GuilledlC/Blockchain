@@ -11,13 +11,13 @@ import com.example.blockchain.users.Vote;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.security.NoSuchAlgorithmException;
 import java.security.PublicKey;
 import java.security.spec.InvalidKeySpecException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ForkJoinPool;
 
 public class Ledger {
@@ -63,10 +63,6 @@ public class Ledger {
 		}
 	}
 
-	public static File getFile(int position) {
-		return new File(BLOCKS_DIRECTORY + position + ".json");
-	}
-
 	public static void storeBlocks(ArrayList<Block> blocks) {
 		for(Block block : blocks)
 			storeBlock(block);
@@ -93,31 +89,6 @@ public class Ledger {
             System.err.println("Error occurred while serializing block: " + e.getMessage());
         }
     }
-
-	public static void storeFile(File blockFile) {
-		ObjectMapper objectMapper = new ObjectMapper();
-		File directory = new File(BLOCKS_DIRECTORY);
-
-		// Create blocks directory if it doesn't exist
-		if (!directory.exists()) {
-			directory.mkdir();
-		}
-
-		try {
-			// Deserialize block from JSON file
-			Block block = objectMapper.readValue(blockFile, Block.class);
-
-			// Generate a file name based on block hash (you can adjust this according to your requirements)
-			String fileName = BLOCKS_DIRECTORY + counter++ + ".json";
-			File file = new File(fileName);
-
-			// Serialize block to JSON and write to file
-			objectMapper.writeValue(file, block);
-			System.out.println("Block serialized and stored: " + fileName);
-		} catch (IOException e) {
-			System.err.println("Error occurred while processing block file: " + e.getMessage());
-		}
-	}
 
     // Helper method to convert byte array to hexadecimal string
     private static String byteArrayToHexString(byte[] bytes) {

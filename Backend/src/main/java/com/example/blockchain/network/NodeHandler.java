@@ -6,6 +6,7 @@ import com.example.blockchain.users.Vote;
 
 import java.io.*;
 import java.net.Socket;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -45,8 +46,8 @@ public class NodeHandler implements Runnable {
 		else if(object instanceof Block blocka) {
 			block = new Block(blocka);
 		}
-		else if(object instanceof File blockFile) {
-			Ledger.storeFile(blockFile);
+		else if(object instanceof ArrayList<?> singleBlockArray) {
+			Ledger.storeBlock((Block) singleBlockArray.get(0));
 		}
 		else if (object instanceof String string) {
 			if(string.equals("request")) {
@@ -134,7 +135,7 @@ public class NodeHandler implements Runnable {
 	public void sendBlockchain() {
 		try {
 			for (int i = 0; i < Ledger.getSize(); i++) {
-				oos.writeObject(Ledger.getFile(i));
+				oos.writeObject(new ArrayList<>().add(Ledger.getBlock(i)));
 			}
 		} catch (IOException e) {
 			close();
