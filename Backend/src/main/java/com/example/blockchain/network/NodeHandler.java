@@ -135,7 +135,9 @@ public class NodeHandler implements Runnable {
 	public void sendBlockchain() {
 		try {
 			for (int i = 0; i < Ledger.getSize(); i++) {
-				oos.writeObject(new ArrayList<>().add(Ledger.getBlock(i)));
+				ArrayList<Block> arrayList = new ArrayList<>();
+				arrayList.add(Ledger.getBlock(i));
+				oos.writeObject(arrayList);
 			}
 		} catch (IOException e) {
 			close();
