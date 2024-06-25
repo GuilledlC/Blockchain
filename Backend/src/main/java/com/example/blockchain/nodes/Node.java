@@ -5,23 +5,34 @@ import com.example.blockchain.ledger.Block;
 import com.example.blockchain.ledger.Ledger;
 import com.example.blockchain.network.*;
 import com.example.blockchain.users.Vote;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.Serializer;
 
 import java.io.IOException;
 import java.security.spec.InvalidKeySpecException;
 import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.util.*;
+import java.util.concurrent.ConcurrentMap;
+
+import static com.example.blockchain.network.NodeHandler.db;
 
 public class Node {
 
 	public Node() throws IOException, InterruptedException {
 		this.votes = new ArrayList<>();
-		this.blocks = new ArrayList<>();
 		this.database = new Database("votesCheck");
 
 		this.userListener = new ClientListener(8888, this);
 		Thread userThread = new Thread(this.userListener);
 		userThread.start();
+
+		db = DBMaker.fileDB("blockchain.db").checksumHeaderBypass().make();
+		NodeHandler.blockchainS =
+				db.hashMap("blockchainS", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
+		NodeHandler.blockchainS.clear();
+		db.commit();
 
 		this.nodeListener = new NodeListener(9999);
 		Thread nodeThread = new Thread(this.nodeListener);
@@ -101,31 +112,36 @@ public class Node {
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
-		ArrayList<ArrayList<Block>> blockchainS = NodeHandler.getBlockchainS();
-		HashMap<byte[], Integer> election = new HashMap<>();
 
-		//Por cada una de las listas de bloques que tengo (que asumo que estan ordenadas)
-		for (ArrayList<Block> blockchain : blockchainS) {
+		DB db = NodeHandler.db;
+		ConcurrentMap<Integer, List<Block>> blockchainS = db.hashMap("blockchainS", Serializer.INTEGER, Serializer.JAVA).createOrOpen();
+
+		HashMap<ByteArrayWrapper, Integer> election = new HashMap<>();
+
+		// Por cada una de las listas de bloques que tengo (que asumo que están ordenadas)
+		for (List<Block> blockchain : blockchainS.values()) {
 			if(blockchain.size() == 0)
 				continue;
-			//Cojo el ultimo bloque
+			// Cojo el último bloque
 			Block aux = blockchain.get(blockchain.size() - 1);
-			//Si no existe lo apunto
-			if(!election.containsKey(aux.getHash()))
-				election.put(aux.getHash(), 0);
-			//Le voto
-			election.put(aux.getHash(), election.get(aux.getHash()) + 1);
+			ByteArrayWrapper hashWrapper = new ByteArrayWrapper(aux.getHash());
+			// Si no existe lo apunto
+			election.putIfAbsent(hashWrapper, 0);
+			// Le voto
+			election.put(hashWrapper, election.get(hashWrapper) + 1);
 		}
 
 		int max = 0;
-		for(ArrayList<Block> blockchain : blockchainS) {
+		for(List<Block> blockchain : blockchainS.values()) {
 			if(blockchain.size() == 0)
 				continue;
+
 			Block aux = blockchain.get(blockchain.size() - 1);
-			int num = election.get(aux.getHash());
+			ByteArrayWrapper hashWrapper = new ByteArrayWrapper(aux.getHash());
+			int num = election.get(hashWrapper);
 			if(num > max) {
 				max = num;
-				chosenBlockchain = blockchain;
+				chosenBlockchain = new ArrayList<>(blockchain);
 			}
 		}
 
@@ -133,13 +149,15 @@ public class Node {
 			storeBlock(Block.getGenesis());
 		else {
 			storeBlocks(chosenBlockchain);
-			//Actualizar base de datos
+			// Actualizar base de datos
 			for(Block b : chosenBlockchain) {
 				for(Vote v : b.getVotes())
 					database.putValue(v.getKey(), Database.State.Voted);
 			}
 		}
-		NodeHandler.getBlockchainS(); //Esto sirve para vaciar el buffer de NodeHandler
+		NodeHandler.emptyBlockchainS(); // Esto sirve para vaciar el buffer de NodeHandler
+
+		db.close();
 	}
 
 
@@ -345,17 +363,15 @@ public class Node {
 	}
 
 	private void storeBlocks(ArrayList<Block> blocks) {
-		this.blocks.addAll(blocks);
 		Ledger.storeBlocks(blocks);
 	}
 
 	private void storeBlock(Block block) {
-		this.blocks.add(block);
 		Ledger.storeBlock(block);
 	}
 
 	private Block getLastBlock() {
-		return blocks.get(blocks.size() - 1);
+		return Ledger.getLastBlock();
 	}
 
 
@@ -416,7 +432,6 @@ public class Node {
 
 
 	private final ArrayList<Vote> votes;
-	private final ArrayList<Block> blocks;
 	private final ArrayList<String> bootstrapNodes = new ArrayList<>();
 	private final ClientListener userListener;
 	private final NodeListener nodeListener;
@@ -425,5 +440,34 @@ public class Node {
 	private final ArrayList<NonMinedBlock> nonMinedBlocks = new ArrayList<>();
 	Database database;
 
+
+	public class ByteArrayWrapper {
+		private byte[] data;
+
+		public ByteArrayWrapper(byte[] data) {
+			this.data = data;
+		}
+
+		@Override
+		public boolean equals(Object obj) {
+			if (this == obj) {
+				return true;
+			}
+			if (obj == null || getClass() != obj.getClass()) {
+				return false;
+			}
+			ByteArrayWrapper that = (ByteArrayWrapper) obj;
+			return Arrays.equals(data, that.data);
+		}
+
+		@Override
+		public int hashCode() {
+			return Arrays.hashCode(data);
+		}
+
+		public byte[] getData() {
+			return data;
+		}
+	}
 
 }

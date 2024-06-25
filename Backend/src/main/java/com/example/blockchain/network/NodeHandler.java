@@ -3,6 +3,9 @@ package com.example.blockchain.network;
 import com.example.blockchain.ledger.Block;
 import com.example.blockchain.ledger.Ledger;
 import com.example.blockchain.users.Vote;
+import org.mapdb.DB;
+import org.mapdb.DBMaker;
+import org.mapdb.Serializer;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -10,8 +13,14 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ConcurrentMap;
 
 public class NodeHandler implements Runnable {
+
+	public static DB db;
+	public static ConcurrentMap<Integer, ArrayList<Block>> blockchainS;
+
 
 	public NodeHandler(Socket socket, NodeListener listener) {
 		this.listener = listener;
@@ -59,7 +68,9 @@ public class NodeHandler implements Runnable {
 				}
 			}
 		} else if(object instanceof ArrayList<?> blockchain) {
-			blockchainS.add((ArrayList<Block>)blockchain);
+			int key = blockchainS.size();
+			blockchainS.put(key, (ArrayList<Block>) blockchain);
+			db.commit();
 		}
 	}
 
@@ -105,10 +116,10 @@ public class NodeHandler implements Runnable {
 			handler.sendObject(magicNumber);
 	}
 
-	public static ArrayList<ArrayList<Block>> getBlockchainS() {
-		ArrayList<ArrayList<Block>> returnBlockchainS = new ArrayList<>(blockchainS);
+	public static void emptyBlockchainS() {
 		blockchainS.clear();
-		return returnBlockchainS;
+		db.commit();
+		db.close();
 	}
 	public static void requestBlockchainS() {
 		for(NodeHandler handler : nodes)
@@ -150,7 +161,6 @@ public class NodeHandler implements Runnable {
 	private static final ArrayList<Vote> votes = new ArrayList<>();
 	private static Block block = null;
 	private static final ArrayList<String> magicNumbers = new ArrayList<>();
-	private static final ArrayList<ArrayList<Block>> blockchainS = new ArrayList<>();
 	private boolean hasVotedMiner = false;
 
 }
