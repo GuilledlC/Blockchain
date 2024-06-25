@@ -37,7 +37,7 @@ public class Ledger {
 
 	//todo use this
 	public static Block getLastBlock() {
-		return getBlock(counter);
+		return getBlock(counter - 1);
 	}
 
 	public static void dropBlocks() {

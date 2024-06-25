@@ -42,8 +42,8 @@ public class Node {
 
 	private void initializeBootstrapNodes() {
 		bootstrapNodes.add("80.39.151.138");
-		bootstrapNodes.add("2.153.80.40");
-		bootstrapNodes.add("88.27.144.170");
+		bootstrapNodes.add("86.127.225.89");
+		bootstrapNodes.add("80.102.1.93");
 
 		bootstrapNodes.remove(NetworkVariables.ip);
 	}

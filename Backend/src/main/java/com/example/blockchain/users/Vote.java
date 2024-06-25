@@ -65,6 +65,7 @@ public class Vote implements Serializable, Comparable<Vote> {
 			signature.initVerify(KeyUtils.publicKeyReader(vote.getKey()));
 
 			byte[] bytes = vote.getVoteString().getBytes();
+			bytes = HashUtils.hash(bytes);
 			signature.update(bytes);
 			return signature.verify(vote.getSignature());
 		} catch (NoSuchAlgorithmException | InvalidKeyException | SignatureException e) {
