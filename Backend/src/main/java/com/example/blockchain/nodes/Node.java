@@ -93,52 +93,39 @@ public class Node {
 	private void chooseBlockchain() {
 		Ledger.dropBlocks();
 
-		ArrayList<Block> chosenBlockchain = new ArrayList<>();
-		NodeHandler.requestBlockchainS();
+		String chosenIP = "";
+		NodeHandler.requestHashS();
 		try {
 			Thread.sleep(2000);
 		} catch (InterruptedException e) {
 			throw new RuntimeException(e);
 		}
-		ArrayList<ArrayList<Block>> blockchainS = NodeHandler.getBlockchainS();
+		HashMap<byte[], String> hashes = NodeHandler.getHashes();
 		HashMap<byte[], Integer> election = new HashMap<>();
 
-		//Por cada una de las listas de bloques que tengo (que asumo que estan ordenadas)
-		for (ArrayList<Block> blockchain : blockchainS) {
-			if(blockchain.size() == 0)
-				continue;
-			//Cojo el ultimo bloque
-			Block aux = blockchain.get(blockchain.size() - 1);
+		//Por cada una de los hashes que tengo (que asumo que estan ordenadas)
+		for (byte[] hash : hashes.keySet()) {
 			//Si no existe lo apunto
-			if(!election.containsKey(aux.getHash()))
-				election.put(aux.getHash(), 0);
+			if(!election.containsKey(hash))
+				election.put(hash, 0);
 			//Le voto
-			election.put(aux.getHash(), election.get(aux.getHash()) + 1);
+			election.put(hash, election.get(hash) + 1);
 		}
 
 		int max = 0;
-		for(ArrayList<Block> blockchain : blockchainS) {
-			if(blockchain.size() == 0)
-				continue;
-			Block aux = blockchain.get(blockchain.size() - 1);
-			int num = election.get(aux.getHash());
+		for(byte[] hash : hashes.keySet()) {
+			int num = election.get(hash);
 			if(num > max) {
 				max = num;
-				chosenBlockchain = blockchain;
+				chosenIP = hashes.get(hash);
 			}
 		}
 
 		if(max == 0)
 			storeBlock(Block.getGenesis());
-		else {
-			storeBlocks(chosenBlockchain);
-			//Actualizar base de datos
-			for(Block b : chosenBlockchain) {
-				for(Vote v : b.getVotes())
-					database.putValue(v.getKey(), Database.State.Voted);
-			}
-		}
-		NodeHandler.getBlockchainS(); //Esto sirve para vaciar el buffer de NodeHandler
+		else
+			NodeHandler.requestBlockchain(chosenIP);
+		NodeHandler.getHashes(); //Esto sirve para vaciar el buffer de NodeHandler
 	}
 
 

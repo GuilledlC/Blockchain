@@ -4,12 +4,10 @@ import com.example.blockchain.ledger.Block;
 import com.example.blockchain.ledger.Ledger;
 import com.example.blockchain.users.Vote;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
+import java.io.*;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class NodeHandler implements Runnable {
 
@@ -47,19 +45,25 @@ public class NodeHandler implements Runnable {
 		else if(object instanceof Block blocka) {
 			block = new Block(blocka);
 		}
+		else if(object instanceof File blockFile) {
+			Ledger.storeFile(blockFile);
+		}
 		else if (object instanceof String string) {
 			if(string.equals("request")) {
-				sendBlockchain();
+				sendHash();
 			}
-			else {
+			else if(string.equals("full")) {
+				sendBlockchain();
+			} else {
 				if(!hasVotedMiner) {
 					magicNumbers.add(string);
 					System.out.println(this.getIp() + " has voted: " + string);
 					hasVotedMiner = true;
 				}
 			}
-		} else if(object instanceof ArrayList<?> blockchain) {
-			blockchainS.add((ArrayList<Block>)blockchain);
+		}
+		else if(object instanceof byte[] hash) {
+			hashes.putIfAbsent(hash, getIp());
 		}
 	}
 
@@ -105,18 +109,33 @@ public class NodeHandler implements Runnable {
 			handler.sendObject(magicNumber);
 	}
 
-	public static ArrayList<ArrayList<Block>> getBlockchainS() {
-		ArrayList<ArrayList<Block>> returnBlockchainS = new ArrayList<>(blockchainS);
-		blockchainS.clear();
-		return returnBlockchainS;
+	public static HashMap<byte[], String> getHashes() {
+		HashMap<byte[], String> returnHashes = new HashMap<>(hashes);
+		hashes.clear();
+		return returnHashes;
 	}
-	public static void requestBlockchainS() {
+	public static void requestHashS() {
 		for(NodeHandler handler : nodes)
 			handler.sendObject("request");
 	}
-	private void sendBlockchain() {
+	private void sendHash() {
 		try {
-			oos.writeObject(Ledger.getAllBlocks());
+			oos.writeObject(Ledger.getLastBlock().getHash());
+		} catch (IOException e) {
+			close();
+		}
+	}
+	public static void requestBlockchain(String ip) {
+		for(NodeHandler handler : nodes) {
+			if(handler.getIp().equals(ip))
+				handler.sendObject("full");
+		}
+	}
+	public void sendBlockchain() {
+		try {
+			for (int i = 0; i < Ledger.getSize(); i++) {
+				oos.writeObject(Ledger.getFile(i));
+			}
 		} catch (IOException e) {
 			close();
 		}
@@ -150,7 +169,7 @@ public class NodeHandler implements Runnable {
 	private static final ArrayList<Vote> votes = new ArrayList<>();
 	private static Block block = null;
 	private static final ArrayList<String> magicNumbers = new ArrayList<>();
-	private static final ArrayList<ArrayList<Block>> blockchainS = new ArrayList<>();
+	private static final HashMap<byte[], String> hashes = new HashMap<>();
 	private boolean hasVotedMiner = false;
 
 }
