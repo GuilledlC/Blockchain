@@ -19,11 +19,11 @@ public class ClientListener implements Runnable {
 		try {
 			while(!listener.isClosed()) {
 				Socket clientSocket = listener.accept();
-				System.out.println("Client connected from " + clientSocket.getInetAddress() + ":" + clientSocket.getPort());
+				//System.out.println("Client connected from " + clientSocket.getInetAddress() + ":" + clientSocket.getPort());
 				handleClient(clientSocket);
 			}
 		} catch (IOException e) {
-			closeListener();
+
 		}
 	}
 

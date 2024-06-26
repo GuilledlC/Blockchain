@@ -46,7 +46,7 @@ public class ClientHandler implements Runnable {
 	private void handleObjects(Object object) {
 		if (object instanceof Vote vote) {
 			votes.add(vote);
-			System.out.println("Vote received");
+			//System.out.println("Vote received");
 		} else if (object instanceof byte[] publicKey) {
 			boolean answer = node.checkDatabase(publicKey);
 			try {

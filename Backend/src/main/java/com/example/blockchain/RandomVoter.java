@@ -11,11 +11,9 @@ import java.security.*;
 import java.security.spec.InvalidKeySpecException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 import java.util.Scanner;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.stream.IntStream;
 
 public class RandomVoter {
 	public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, SignatureException, InvalidKeyException, InterruptedException, ExecutionException {
@@ -25,7 +23,7 @@ public class RandomVoter {
 				KeyUtils.publicKeyReader(Files.readAllBytes(Paths.get("keys/Guille.pub")))
 		);
 
-		int numVotes = 1000;
+		int numVotes = 10000;
 		int availableProcessors = Runtime.getRuntime().availableProcessors();
 		ExecutorService executorService = Executors.newFixedThreadPool(availableProcessors);
 		List<Callable<Vote>> tasks = new ArrayList<>();

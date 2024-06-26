@@ -290,6 +290,8 @@ public class Node {
 			return;
 		}
 
+		long t = System.currentTimeMillis();
+
 		minedblock = new Block(votes, getLastBlock());
 
 		//Delete votes and update voted users
@@ -297,6 +299,8 @@ public class Node {
 			database.putValue(v.getKey(), Database.State.Voted);
 		}
 		votes.clear();
+
+		System.out.println("ha tardado: " + (System.currentTimeMillis() - t) + " " + minedblock.getVotes().size());
 
 		//Add block to ledger
 		storeBlock(minedblock);
