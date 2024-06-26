@@ -260,6 +260,7 @@ public class Node {
 				}
 			}
 		}
+		addEveryoneExcept(actualMiner);
 	}
 
 
