@@ -25,8 +25,19 @@ public class User implements Serializable {
 
 	private void initializeBootstrapNodes() {
 		bootstrapNodes.add("80.39.151.138");
-		bootstrapNodes.add("86.127.225.89");
+		//bootstrapNodes.add("86.127.225.89");
 		bootstrapNodes.add("80.102.1.93");
+	}
+
+	public void vote(Vote vote) {
+		this.vote = vote;
+		distributeVote();
+	}
+
+	public Vote createVote(String receiver, PrivateKey priv, PublicKey pub) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
+		byte[] signature = Vote.signVote(receiver, priv);
+		Vote vote = new Vote(receiver, signature, pub);
+		return vote;
 	}
 
 	public void vote(String receiver) throws NoSuchAlgorithmException, SignatureException, InvalidKeyException {
@@ -40,7 +51,7 @@ public class User implements Serializable {
 			try {
 				SocketAddress sa = new InetSocketAddress(ip, 8888);
 				Socket socket = new Socket();
-				socket.connect(sa, 1000);
+				socket.connect(sa, 20);
 				sendToNode(socket);
 			} catch (IOException e) {}
 		}
