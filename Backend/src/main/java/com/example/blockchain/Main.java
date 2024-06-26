@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.stream.IntStream;
 
 public class Main {
     public static void main(String[] args) throws IOException, NoSuchAlgorithmException, InvalidKeySpecException, InterruptedException {
@@ -26,10 +27,15 @@ public class Main {
 
 	private static void saveKeys() throws IOException, NoSuchAlgorithmException, InvalidKeySpecException {
 		Database database = new Database("votesCheck");
-		for(int i = 0; i < 100000; i++) {
-			PublicKey pubk = KeyUtils.publicKeyReader(Files.readAllBytes(Paths.get("keys/" + i + ".pub")));
-			database.putValue(pubk.getEncoded(), Database.State.Exists);
-		}
+
+		IntStream.range(0, 100000).parallel().forEach(i -> {
+			try {
+				PublicKey pubk = KeyUtils.publicKeyReader(Files.readAllBytes(Paths.get("keys/" + i + ".pub")));
+				database.putValue(pubk.getEncoded(), Database.State.Exists);
+			} catch (Exception e) {
+				e.printStackTrace();
+			}
+		});
 
 		PublicKey g = KeyUtils.publicKeyReader(Files.readAllBytes(Paths.get("keys/Guille.pub")));
 		database.putValue(g.getEncoded(), Database.State.Exists);
