@@ -23,7 +23,7 @@ public class RandomVoter {
 				KeyUtils.publicKeyReader(Files.readAllBytes(Paths.get("keys/Guille.pub")))
 		);
 
-		int numVotes = 10000;
+		int numVotes = 100;
 		int availableProcessors = Runtime.getRuntime().availableProcessors();
 		ExecutorService executorService = Executors.newFixedThreadPool(availableProcessors);
 		List<Callable<Vote>> tasks = new ArrayList<>();
@@ -55,24 +55,14 @@ public class RandomVoter {
 
 		executorService.shutdown();
 
-		for(int a = 0; a < 4; a++) {
-			executorService = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
-			System.out.println(Runtime.getRuntime().availableProcessors() + " processors");
-			AtomicLong t1 = new AtomicLong(System.currentTimeMillis());
+		for(int a = 0; a < 1; a++) {
 			for (int i = 0; i < votes.size(); i++) {
-				final int index = i;
-				executorService.submit(() -> {
-					user.vote(votes.get(index));
-					if (index % 100 == 0) {
-						long t2 = System.currentTimeMillis();
-						System.out.println("A" + index + " en " + (t2 - t1.get()) + "ms");
-						t1.set(System.currentTimeMillis());
-					}
-				});
+				user.vote(votes.get(i));
+				if (i % 100 == 0) {
+					long t2 = System.currentTimeMillis();
+					System.out.println("A" + i + " en " + (t2 - System.currentTimeMillis()) + "ms");
+				}
 			}
-
-			executorService.shutdown();
-			executorService.awaitTermination(Long.MAX_VALUE, TimeUnit.NANOSECONDS);
 		}
 
 
