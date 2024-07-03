@@ -41,8 +41,8 @@ public class Node {
 
 	private void initializeBootstrapNodes() {
 		bootstrapNodes.add("80.39.151.138");
-		bootstrapNodes.add("86.127.225.89");
-		bootstrapNodes.add("80.102.1.93");
+		bootstrapNodes.add("86.127.225.125");
+		bootstrapNodes.add("79.148.158.26");
 
 		bootstrapNodes.remove(NetworkVariables.ip);
 	}
@@ -268,7 +268,6 @@ public class Node {
 			if (item.getIp().equals(ip))
 				item.setNonMinedBlocks(0);
 		}
-		System.out.println("castigueited");
 	}
 
 	private boolean myTurnToMine(){

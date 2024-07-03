@@ -25,8 +25,8 @@ public class User implements Serializable {
 
 	private void initializeBootstrapNodes() {
 		bootstrapNodes.add("80.39.151.138");
-		bootstrapNodes.add("86.127.225.89");
-		bootstrapNodes.add("80.102.1.93");
+		bootstrapNodes.add("86.127.225.125");
+		bootstrapNodes.add("79.148.158.26");
 	}
 
 	public void vote(Vote vote) {
